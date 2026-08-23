@@ -138,30 +138,28 @@ def create_tables():
         ("adminSaviourAli", hashed_admin_pw)
     )
 
-   # 4. Auto Seed Receptionist (REC_2000)
-    rec_pw = hash_password("Rec12345!")
+  # 4. Auto Seed Receptionist (Abdullah - REC_2000)
     try:
         cursor.execute(
             """
-            INSERT INTO receptionist (username, name, hashed_password) 
-            VALUES (%s, %s, %s)
-            ON DUPLICATE KEY UPDATE name=VALUES(name), hashed_password=VALUES(hashed_password)
+            INSERT INTO receptionists (hospital_id, full_name) 
+            VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE full_name=VALUES(full_name)
             """,
-            ("REC_2000", "Abdullah", rec_pw)
+            ("REC_2000", "Abdullah")
         )
     except Exception as e:
         print("Receptionist seed log:", e)
 
-    # 5. Auto Seed Lab Technician (LAB_2222)
-    lab_pw = hash_password("Lab12345!")
+    # 5. Auto Seed Lab Technician (Ahmad - LAB_2222)
     try:
-        # Check column names safely
         cursor.execute(
             """
-            INSERT INTO lab_technician (name, hashed_password) 
+            INSERT INTO lab_technician (hospital_id, full_name) 
             VALUES (%s, %s)
+            ON DUPLICATE KEY UPDATE full_name=VALUES(full_name)
             """,
-            ("Ahmad", lab_pw)
+            ("LAB_2222", "Ahmad")
         )
     except Exception as e:
         print("Lab Technician seed log:", e)
