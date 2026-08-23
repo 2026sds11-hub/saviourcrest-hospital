@@ -106,24 +106,14 @@ def create_tables():
     cursor.execute(ADMINS_TABLE_SQL)
     cursor.execute(DISEASE_STATS_TABLE_SQL)
 
-    # 2. FORCE RESET ADMIN (Aapka Pasandida Password)
+    # 2. FORCE RESET ADMIN (Password: admin12!!)
     cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
     hashed_admin_pw = hash_password("admin12!!")
     cursor.execute(
         "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)",
         ("adminSaviourAli", hashed_admin_pw)
     )
-    print("Admin successfully set with password 'admin12!!'")
-
-    # 3. SEED DEFAULT DOCTOR (Khaali Portal Error Khatam Karne Ke Liye)
-    cursor.execute("SELECT COUNT(*) FROM doctors")
-    if cursor.fetchone()[0] == 0:
-        doc_pw = hash_password("Doctor123!")
-        cursor.execute(
-            "INSERT INTO doctors (name, specialization, email, password) VALUES (%s, %s, %s, %s)",
-            ("Dr. Ali Khan", "Cardiology", "drali@saviourcrest.com", doc_pw)
-        )
-        print("Default Doctor Created!")
+    print("Admin successfully created with password 'admin12!!'")
 
     conn.commit()
     cursor.close()
