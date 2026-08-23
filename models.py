@@ -15,16 +15,17 @@ def create_tables():
     cursor= conn.cursor()
 
 
-
 PATIENTS_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS patients (
-  id            INT AUTO_INCREMENT PRIMARY KEY,
-  patient_id    VARCHAR(20) UNIQUE,
-  full_name     VARCHAR(120) NOT NULL,
-  email         VARCHAR(150) UNIQUE NOT NULL,
-  phone         VARCHAR(20),
-  password_hash VARCHAR(255) NOT NULL,
-  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id VARCHAR(20) UNIQUE,
+    full_name VARCHAR(120) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    gender VARCHAR(20),
+    age INT,
+    phone VARCHAR(20),
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
 #-------------- Doctor Signup -------------------------
@@ -196,6 +197,27 @@ def create_tables():
             )
         except Exception as e:
             print("Salary seed log:", e)
+
+
+    try:
+        cursor.execute("ALTER TABLE patients ADD COLUMN gender VARCHAR(20);")
+    except Exception:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE patients ADD COLUMN age INT;")
+    except Exception:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE patients ADD COLUMN phone VARCHAR(20);")
+    except Exception:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE patients ADD COLUMN password_hash VARCHAR(255);")
+    except Exception:
+        pass
 
     conn.commit()
     cursor.close()
