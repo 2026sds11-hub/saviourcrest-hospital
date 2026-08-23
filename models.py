@@ -30,15 +30,18 @@ CREATE TABLE IF NOT EXISTS patients (
 #-------------- Doctor Signup -------------------------
 DOCTOR_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS doctors (
-id INT AUTO_INCREMENT PRIMARY KEY,
-PMDC_ID VARCHAR(20) NOT NULL UNIQUE,
-full_name VARCHAR(120) NOT NULL,
-cnic VARCHAR (15) NOT NULL,
-email VARCHAR(100) NOT NULL,
-password_hash VARCHAR(255) NOT NULL,
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(36),
+    full_name VARCHAR(100) NOT NULL,
+    pmdc_id VARCHAR(50) UNIQUE NOT NULL,
+    cnic VARCHAR(20) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    specialization VARCHAR(100) NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
+
 #======================================================================
 #Admin
 #======================================================================
@@ -51,6 +54,26 @@ CREATE TABLE IF NOT EXISTS admins (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """    
+
+RECEPTIONIST_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS receptionist (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+LAB_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS lab_technician (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
 # ---------live graph----------    
 DISEASE_STATS_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS disease_stats (
@@ -124,19 +147,31 @@ def create_tables():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Tables Create
+    # 1. Execute Table Creations
     cursor.execute(PATIENTS_TABLE_SQL)
     cursor.execute(DOCTOR_TABLE_SQL)
     cursor.execute(ADMINS_TABLE_SQL)
     cursor.execute(DISEASE_STATS_TABLE_SQL)
+    cursor.execute(RECEPTIONIST_TABLE_SQL)
+    cursor.execute(LAB_TABLE_SQL)
 
-    # Missing column fix for Live DB
+    # 2. Missing Columns Fixes for Live Database Schema Alteration
     try:
         cursor.execute("ALTER TABLE admins ADD COLUMN uuid VARCHAR(36);")
     except Exception:
-        pass  # Agar pehle se hoga toh bypass kar dega
+        pass
 
-    # Reset Admin
+    try:
+        cursor.execute("ALTER TABLE doctors ADD COLUMN specialization VARCHAR(100);")
+    except Exception:
+        pass
+
+    try:
+        cursor.execute("ALTER TABLE doctors ADD COLUMN uuid VARCHAR(36);")
+    except Exception:
+        pass
+
+    # 3. Force Reset Super Admin
     cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
     hashed_admin_pw = hash_password("admin12!!")
     cursor.execute(
@@ -144,6 +179,29 @@ def create_tables():
         ("adminSaviourAli", hashed_admin_pw)
     )
 
+    # 4. Auto Seed Receptionist (REC_2000)
+    rec_pw = hash_password("Rec12345!")
+    try:
+        cursor.execute("DELETE FROM receptionist WHERE username = 'REC_2000'")
+        cursor.execute(
+            "INSERT INTO receptionist (username, name, hashed_password) VALUES (%s, %s, %s)",
+            ("REC_2000", "Abdullah", rec_pw)
+        )
+    except Exception as e:
+        print("Receptionist seed error:", e)
+
+    # 5. Auto Seed Lab Technician (LAB_2222)
+    lab_pw = hash_password("Lab12345!")
+    try:
+        cursor.execute("DELETE FROM lab_technician WHERE username = 'LAB_2222'")
+        cursor.execute(
+            "INSERT INTO lab_technician (username, name, hashed_password) VALUES (%s, %s, %s)",
+            ("LAB_2222", "Ahmad", lab_pw)
+        )
+    except Exception as e:
+        print("Lab Technician seed error:", e)
+
     conn.commit()
     cursor.close()
     conn.close()
+    print("Database tables and seed accounts updated successfully!")
