@@ -66,13 +66,17 @@ def create_tables():
     cursor = conn.cursor()
 
 
+ # 1. PEHLE SAB PURANI TABLES DROP KAREIN
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+    cursor.execute("DROP TABLE IF EXISTS medical_history;")
     cursor.execute("DROP TABLE IF EXISTS lab_orders;")
     cursor.execute("DROP TABLE IF EXISTS patients;")
+    cursor.execute("DROP TABLE IF EXISTS doctors;")
+    cursor.execute("DROP TABLE IF EXISTS admins;")
+    cursor.execute("DROP TABLE IF EXISTS disease_stats;")
     cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
-  
-    # Saare tables create karein
+    # 2. PHIR NAYI TABLES CREATE KAREIN
     cursor.execute(PATIENTS_TABLE_SQL)
     cursor.execute(DOCTOR_TABLE_SQL)
     cursor.execute(ADMINS_TABLE_SQL)
@@ -81,7 +85,6 @@ def create_tables():
     # Super Admin Check & Create
     cursor.execute("SELECT * FROM admins WHERE username = %s", ("adminSaviourAli",))
     admin_exists = cursor.fetchone()
-
     if not admin_exists:
         strong_password = os.getenv("ADMIN_PASSWORD", "Doctor@SecurePassword786!") 
         hashed_pw = hash_password(strong_password)
