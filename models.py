@@ -45,6 +45,7 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ADMINS_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS admins (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(36),
     username VARCHAR(50) UNIQUE NOT NULL,
     hashed_password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -96,24 +97,52 @@ CREATE TABLE IF NOT EXISTS disease_stats (
 #     cursor.close()
 #     conn.close()
 
+# def create_tables():
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+
+#     # 1. Tables Create Karein
+#     cursor.execute(PATIENTS_TABLE_SQL)
+#     cursor.execute(DOCTOR_TABLE_SQL)
+#     cursor.execute(ADMINS_TABLE_SQL)
+#     cursor.execute(DISEASE_STATS_TABLE_SQL)
+
+#     # 2. FORCE RESET ADMIN (Password: admin12!!)
+#     cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
+#     hashed_admin_pw = hash_password("admin12!!")
+#     cursor.execute(
+#         "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)",
+#         ("adminSaviourAli", hashed_admin_pw)
+#     )
+#     print("Admin successfully created with password 'admin12!!'")
+
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+
 def create_tables():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # 1. Tables Create Karein
+    # Tables Create
     cursor.execute(PATIENTS_TABLE_SQL)
     cursor.execute(DOCTOR_TABLE_SQL)
     cursor.execute(ADMINS_TABLE_SQL)
     cursor.execute(DISEASE_STATS_TABLE_SQL)
 
-    # 2. FORCE RESET ADMIN (Password: admin12!!)
+    # Missing column fix for Live DB
+    try:
+        cursor.execute("ALTER TABLE admins ADD COLUMN uuid VARCHAR(36);")
+    except Exception:
+        pass  # Agar pehle se hoga toh bypass kar dega
+
+    # Reset Admin
     cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
     hashed_admin_pw = hash_password("admin12!!")
     cursor.execute(
         "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)",
         ("adminSaviourAli", hashed_admin_pw)
     )
-    print("Admin successfully created with password 'admin12!!'")
 
     conn.commit()
     cursor.close()
