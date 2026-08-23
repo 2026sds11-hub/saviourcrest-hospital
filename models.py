@@ -74,6 +74,20 @@ CREATE TABLE IF NOT EXISTS lab_technician (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
+
+SALARIES_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS salaries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_name VARCHAR(100) NOT NULL,
+    role VARCHAR(50) NOT NULL,
+    department VARCHAR(50) NOT NULL,
+    monthly_salary DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(20) DEFAULT 'Unpaid',
+    last_paid_date DATE DEFAULT NULL,
+    doctor_id INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
 # ---------live graph----------    
 DISEASE_STATS_TABLE_SQL = """
 CREATE TABLE IF NOT EXISTS disease_stats (
@@ -85,63 +99,7 @@ CREATE TABLE IF NOT EXISTS disease_stats (
 );
 """
 
-# def create_tables():
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
 
-
-#  # 1. PEHLE SAB PURANI TABLES DROP KAREIN
-#     # cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
-#     # cursor.execute("DROP TABLE IF EXISTS medical_history;")
-#     # cursor.execute("DROP TABLE IF EXISTS lab_orders;")
-#     # cursor.execute("DROP TABLE IF EXISTS patients;")
-#     # cursor.execute("DROP TABLE IF EXISTS doctors;")
-#     # cursor.execute("DROP TABLE IF EXISTS admins;")
-#     # cursor.execute("DROP TABLE IF EXISTS disease_stats;")
-#     # cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
-
-#     # 2. PHIR NAYI TABLES CREATE KAREIN
-#     cursor.execute(PATIENTS_TABLE_SQL)
-#     cursor.execute(DOCTOR_TABLE_SQL)
-#     cursor.execute(ADMINS_TABLE_SQL)
-#     cursor.execute(DISEASE_STATS_TABLE_SQL)
-
-#     # Super Admin Check & Create
-#     cursor.execute("SELECT * FROM admins WHERE username = %s", ("adminSaviourAli",))
-#     admin_exists = cursor.fetchone()
-#     if not admin_exists:
-#         strong_password = os.getenv("ADMIN_PASSWORD", "Doctor@SecurePassword786!") 
-#         hashed_pw = hash_password(strong_password)
-#         insert_query = "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)"
-#         cursor.execute(insert_query, ("adminSaviourAli", hashed_pw))
-#         print("Super Admin 'adminSaviourAli' created successfully in MySQL!")
-
-#     conn.commit()
-#     cursor.close()
-#     conn.close()
-
-# def create_tables():
-#     conn = get_db_connection()
-#     cursor = conn.cursor()
-
-#     # 1. Tables Create Karein
-#     cursor.execute(PATIENTS_TABLE_SQL)
-#     cursor.execute(DOCTOR_TABLE_SQL)
-#     cursor.execute(ADMINS_TABLE_SQL)
-#     cursor.execute(DISEASE_STATS_TABLE_SQL)
-
-#     # 2. FORCE RESET ADMIN (Password: admin12!!)
-#     cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
-#     hashed_admin_pw = hash_password("admin12!!")
-#     cursor.execute(
-#         "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)",
-#         ("adminSaviourAli", hashed_admin_pw)
-#     )
-#     print("Admin successfully created with password 'admin12!!'")
-
-#     conn.commit()
-#     cursor.close()
-#     conn.close()
 
 def create_tables():
     conn = get_db_connection()
@@ -206,6 +164,38 @@ def create_tables():
         )
     except Exception as e:
         print("Lab Technician seed log:", e)
+
+
+        # Salaries Table Create
+    cursor.execute(SALARIES_TABLE_SQL)
+
+    # Salaries Auto-Seed (Aap ke screenshot 2 ka data)
+    salaries_data = [
+        ('Ali (REC_1222)', 'Receptionist', 'Reception', 55000.00, 'Unpaid'),
+        ('Saood (REC_1999)', 'Receptionist', 'Reception', 55000.00, 'Unpaid'),
+        ('Abdullah (REC_2000)', 'Receptionist', 'Reception', 55000.00, 'Unpaid'),
+        ('Tom (REC_001)', 'Receptionist', 'Reception', 50000.00, 'Unpaid'),
+        ('Ahmad (LAB_2222)', 'Lab Technician', 'Laboratory', 75000.00, 'Unpaid'),
+        ('Qasim', 'Head', 'Manager', 120000.00, 'Unpaid'),
+        ('David Osei', 'Head Nurse', 'Emergency', 85000.00, 'Unpaid'),
+        ('Priya Nair', 'Administrator', 'Management', 100000.00, 'Unpaid'),
+        ('Imran Qureshi', 'Lab Technician', 'Laboratory', 70000.00, 'Unpaid'),
+        ('Farah Siddiqui', 'Pharmacy In-Charge', 'Pharmacy', 90000.00, 'Unpaid'),
+        ('Umar Farooq', 'Billing Officer', 'Accounts', 65000.00, 'Unpaid')
+    ]
+
+    for name, role, dept, salary, status in salaries_data:
+        try:
+            cursor.execute(
+                """
+                INSERT INTO salaries (employee_name, role, department, monthly_salary, status)
+                SELECT %s, %s, %s, %s, %s
+                WHERE NOT EXISTS (SELECT 1 FROM salaries WHERE employee_name = %s);
+                """,
+                (name, role, dept, salary, status, name)
+            )
+        except Exception as e:
+            print("Salary seed log:", e)
 
     conn.commit()
     cursor.close()
