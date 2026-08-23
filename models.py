@@ -61,36 +61,69 @@ CREATE TABLE IF NOT EXISTS disease_stats (
 );
 """
 
+# def create_tables():
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+
+
+#  # 1. PEHLE SAB PURANI TABLES DROP KAREIN
+#     # cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+#     # cursor.execute("DROP TABLE IF EXISTS medical_history;")
+#     # cursor.execute("DROP TABLE IF EXISTS lab_orders;")
+#     # cursor.execute("DROP TABLE IF EXISTS patients;")
+#     # cursor.execute("DROP TABLE IF EXISTS doctors;")
+#     # cursor.execute("DROP TABLE IF EXISTS admins;")
+#     # cursor.execute("DROP TABLE IF EXISTS disease_stats;")
+#     # cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
+
+#     # 2. PHIR NAYI TABLES CREATE KAREIN
+#     cursor.execute(PATIENTS_TABLE_SQL)
+#     cursor.execute(DOCTOR_TABLE_SQL)
+#     cursor.execute(ADMINS_TABLE_SQL)
+#     cursor.execute(DISEASE_STATS_TABLE_SQL)
+
+#     # Super Admin Check & Create
+#     cursor.execute("SELECT * FROM admins WHERE username = %s", ("adminSaviourAli",))
+#     admin_exists = cursor.fetchone()
+#     if not admin_exists:
+#         strong_password = os.getenv("ADMIN_PASSWORD", "Doctor@SecurePassword786!") 
+#         hashed_pw = hash_password(strong_password)
+#         insert_query = "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)"
+#         cursor.execute(insert_query, ("adminSaviourAli", hashed_pw))
+#         print("Super Admin 'adminSaviourAli' created successfully in MySQL!")
+
+#     conn.commit()
+#     cursor.close()
+#     conn.close()
+
 def create_tables():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-
- # 1. PEHLE SAB PURANI TABLES DROP KAREIN
-    # cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
-    # cursor.execute("DROP TABLE IF EXISTS medical_history;")
-    # cursor.execute("DROP TABLE IF EXISTS lab_orders;")
-    # cursor.execute("DROP TABLE IF EXISTS patients;")
-    # cursor.execute("DROP TABLE IF EXISTS doctors;")
-    # cursor.execute("DROP TABLE IF EXISTS admins;")
-    # cursor.execute("DROP TABLE IF EXISTS disease_stats;")
-    # cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
-
-    # 2. PHIR NAYI TABLES CREATE KAREIN
+    # 1. Tables Create Karein
     cursor.execute(PATIENTS_TABLE_SQL)
     cursor.execute(DOCTOR_TABLE_SQL)
     cursor.execute(ADMINS_TABLE_SQL)
     cursor.execute(DISEASE_STATS_TABLE_SQL)
 
-    # Super Admin Check & Create
-    cursor.execute("SELECT * FROM admins WHERE username = %s", ("adminSaviourAli",))
-    admin_exists = cursor.fetchone()
-    if not admin_exists:
-        strong_password = os.getenv("ADMIN_PASSWORD", "Doctor@SecurePassword786!") 
-        hashed_pw = hash_password(strong_password)
-        insert_query = "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)"
-        cursor.execute(insert_query, ("adminSaviourAli", hashed_pw))
-        print("Super Admin 'adminSaviourAli' created successfully in MySQL!")
+    # 2. FORCE RESET ADMIN (Aapka Pasandida Password)
+    cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
+    hashed_admin_pw = hash_password("admin12!!")
+    cursor.execute(
+        "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)",
+        ("adminSaviourAli", hashed_admin_pw)
+    )
+    print("Admin successfully set with password 'admin12!!'")
+
+    # 3. SEED DEFAULT DOCTOR (Khaali Portal Error Khatam Karne Ke Liye)
+    cursor.execute("SELECT COUNT(*) FROM doctors")
+    if cursor.fetchone()[0] == 0:
+        doc_pw = hash_password("Doctor123!")
+        cursor.execute(
+            "INSERT INTO doctors (name, specialization, email, password) VALUES (%s, %s, %s, %s)",
+            ("Dr. Ali Khan", "Cardiology", "drali@saviourcrest.com", doc_pw)
+        )
+        print("Default Doctor Created!")
 
     conn.commit()
     cursor.close()
