@@ -46,7 +46,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
-app.mount("/static", StaticFiles(directory="Static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(
     SessionMiddleware, 
     secret_key=os.getenv("SECRET_KEY")
