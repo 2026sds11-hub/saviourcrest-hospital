@@ -65,6 +65,13 @@ def create_tables():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+    cursor.execute("DROP TABLE IF EXISTS lab_orders;")
+    cursor.execute("DROP TABLE IF EXISTS patients;")
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
+
+  
     # Saare tables create karein
     cursor.execute(PATIENTS_TABLE_SQL)
     cursor.execute(DOCTOR_TABLE_SQL)
