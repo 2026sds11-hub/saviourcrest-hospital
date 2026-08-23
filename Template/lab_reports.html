@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Lab Portal | SaviourCrest Hospital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f6f6;
+        --surface: #ffffff;
+        --ink: #16211f;
+        --ink-soft: #55645f;
+        --line: #dfe6e4;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #b3392b;
+        --amber: #9a6b12;
+        --green: #1e7a46;
+        --radius: 8px;
+      }
+
+      /* Google Translate Overrides */
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.2px;
+      }
+      .container {
+        max-width: 1180px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ---------- Buttons ---------- */
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          rgba(14, 107, 101, 0.9),
+          rgba(10, 79, 75, 1)
+        );
+        color: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .btn-primary:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(14, 107, 101, 1),
+          rgba(10, 79, 75, 1)
+        );
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+      }
+      .btn-line {
+        background: transparent;
+        color: var(--teal-dark);
+        border: 1px solid rgba(14, 107, 101, 0.3);
+      }
+      .btn-line:hover {
+        background: rgba(14, 107, 101, 0.05);
+        border-color: rgba(14, 107, 101, 0.7);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* ---------- Internal top bar ---------- */
+      header.topbar-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        width: 100%;
+      }
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1180px;
+        width: 100%;
+        margin: 0 auto;
+        gap: 15px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .brand img {
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 50%;
+        flex-shrink: 0;
+        aspect-ratio: 1 / 1;
+      }
+      .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--teal-dark);
+        white-space: nowrap;
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--ink-soft);
+        border-left: 1px solid var(--line);
+        padding-left: 9px;
+        margin-left: 2px;
+        white-space: nowrap;
+      }
+
+      /* Compact Translation Dropdown */
+      .lang-switcher-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid var(--teal-dark);
+        border-radius: 9999px;
+        padding: 2px 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        margin-left: 6px;
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink);
+        cursor: pointer;
+        padding-right: 12px;
+        font-family: inherit;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 6px;
+        pointer-events: none;
+        font-size: 7px;
+        color: var(--ink-soft);
+      }
+
+      .id-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12.5px;
+        white-space: nowrap;
+      }
+      .id-actions a.plain {
+        color: var(--ink-soft);
+        transition: color 0.2s;
+        white-space: nowrap;
+      }
+      .id-actions a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      /* ---------- Layout shell ---------- */
+      .shell {
+        display: grid;
+        grid-template-columns: 216px minmax(0, 1fr);
+        min-height: 80vh;
+        width: 100%;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 20px 14px;
+      }
+      .sidebar .who {
+        padding: 2px 8px 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+      .sidebar .who strong {
+        display: block;
+        font-size: 13.5px;
+      }
+      .sidebar .who .role {
+        font-size: 11.5px;
+        color: var(--teal);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .side-nav a {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin-bottom: 2px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+      }
+      .side-nav a:hover {
+        color: var(--teal-dark);
+        background: #f9fdfc;
+      }
+      .side-nav a.active {
+        color: var(--teal-dark);
+        border-left-color: var(--teal-dark);
+        background: #eff5f4;
+        font-weight: 600;
+      }
+
+      .main {
+        padding: 24px 28px 50px;
+        min-width: 0;
+      }
+      .page-title {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .page-title h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      .page-title p {
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+
+      .stat-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 280px));
+        margin-bottom: 24px;
+      }
+      .stat-card {
+        background: var(--surface);
+        padding: 14px 24px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+      .stat-card .num {
+        font-family: "Poppins", sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        color: var(--teal);
+      }
+      .stat-card .label {
+        font-size: 12px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+        font-weight: 500;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        width: 100%;
+        overflow: hidden;
+      }
+      .panel h2 {
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+      .panel .sub {
+        color: var(--ink-soft);
+        font-size: 12.5px;
+        margin-bottom: 20px;
+      }
+
+      /* ---------- Orders table ---------- */
+      .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th,
+      td {
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      th {
+        color: var(--ink-soft);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: #fcfcfc;
+      }
+      tbody tr:not(.upload-row):hover {
+        background-color: #fcfdfd;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      .badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .badge-urgent {
+        background: #fbefed;
+        color: var(--red);
+      }
+      .badge-normal {
+        background: #eff5f4;
+        color: var(--teal-dark);
+      }
+
+      /* ---------- Upload Form Area ---------- */
+      .upload-toggle {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--teal);
+        cursor: pointer;
+        transition: color 0.2s;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: #eff5f4;
+        white-space: nowrap;
+      }
+      .upload-toggle:hover {
+        color: #fff;
+        background: var(--teal);
+      }
+
+      .upload-row {
+        display: none;
+        background: #f8fbfb;
+        border-bottom: 2px solid var(--teal-dark) !important;
+      }
+      .upload-row.open {
+        display: table-row;
+      }
+      .upload-row td {
+        padding: 20px 14px;
+        border-bottom: none;
+      }
+
+      .upload-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        max-width: 700px;
+        width: 100%;
+      }
+      .upload-form .field {
+        margin-bottom: 0;
+      }
+      .upload-form .field.full {
+        grid-column: 1/-1;
+      }
+      .field label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .field input,
+      .field select,
+      .field textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 13px;
+        border: 1px solid #c9d3d1;
+        border-radius: 6px;
+        background: #fff;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+        font-family: "Inter", sans-serif;
+      }
+      .field input:focus,
+      .field select:focus,
+      .field textarea:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(14, 107, 101, 0.1);
+      }
+      .field textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+      .upload-actions {
+        grid-column: 1/-1;
+        margin-top: 8px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      /* ----------------- Toast --------------------- */
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: calc(100vw - 40px);
+      }
+      .toast-msg {
+        min-width: 260px;
+        max-width: 100%;
+        padding: 14px 18px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateX(100%);
+        animation:
+          slideIn 0.3s forwards,
+          fadeOut 0.3s 3.5s forwards;
+      }
+      .toast-success {
+        background-color: #1e7a46;
+      }
+      .toast-error {
+        background-color: #b3392b;
+      }
+      @keyframes slideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        background: var(--ink);
+        color: #c9d3d1;
+        padding: 26px 0 16px;
+        font-size: 12.5px;
+        width: 100%;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      footer a {
+        color: #a7b4b0;
+        transition: color 0.2s;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .footer-bottom {
+        border-top: 1px solid #2a3634;
+        padding-top: 12px;
+        text-align: center;
+        color: #7c8a86;
+        font-size: 11.5px;
+      }
+
+      /* =========================================================
+         SAVIOURCREST LAB PORTAL MOBILE RESPONSIVE SYSTEM (<= 868px)
+         ========================================================= */
+      @media screen and (max-width: 868px) {
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .topbar-inner {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 12px !important;
+          padding: 12px 16px !important;
+        }
+
+        .brand {
+          width: 100% !important;
+          justify-content: flex-start !important;
+        }
+
+        .id-actions {
+          width: 100% !important;
+          justify-content: flex-end !important;
+          border-top: 1px solid var(--line);
+          padding-top: 8px;
+          gap: 12px !important;
+        }
+
+        .shell {
+          grid-template-columns: 1fr !important;
+        }
+
+        .sidebar {
+          border-right: none !important;
+          border-bottom: 1px solid var(--line) !important;
+          padding: 14px !important;
+        }
+
+        .main {
+          padding: 16px !important;
+        }
+
+        .stat-row {
+          grid-template-columns: 1fr !important;
+        }
+
+        .upload-form {
+          grid-template-columns: 1fr !important;
+        }
+
+        table {
+          white-space: nowrap !important;
+        }
+
+        .upload-actions button,
+        .upload-actions .btn {
+          width: 100% !important;
+        }
+
+        .id-actions .btn {
+          width: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast-container"></div>
+
+    <header class="topbar-strip">
+      <div class="topbar-inner">
+        <div class="brand">
+          <a
+            href="/"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 9px;
+              text-decoration: none;
+            "
+          >
+            <img
+              src="static/logo.jpeg"
+              alt="SaviourCrest Hospital Logo"
+              width="100"
+              height="100"
+              style="
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid red;
+                padding: 2px;
+              "
+            />
+            <span class="brand-name">Saviour<span>Crest</span></span>
+          </a>
+          <span class="brand-tag">Lab Portal</span>
+
+          <!-- Google Translate Dropdown -->
+          <div class="lang-switcher-container">
+            <span style="font-size: 11px; margin-right: 2px">🌐</span>
+            <select
+              id="custom_language_selector"
+              onchange="changeLanguage(this.value)"
+            >
+              <option value="" disabled selected>Translate</option>
+              <option value="en">English</option>
+              <option value="ur">Urdu (اردو)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="fa">Persian (فارسی)</option>
+            </select>
+            <span class="custom-arrow">▼</span>
+          </div>
+        </div>
+
+        <div class="id-actions">
+          <a href="/dashboard/lab/profile" class="plain">Profile</a>
+          <a href="/" class="plain">Back to Home</a>
+          <a href="/logout/lab" class="btn btn-line btn-sm">Log Out</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Google Translate Hidden Engine -->
+    <div id="google_translate_element" style="display: none"></div>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="who">
+          <strong>{{ lab_tech.full_name if lab_tech else 'Ahmad' }}</strong></lab_technician></strong>
+          <div class="role">Lab Technician</div>
+        </div>
+        <nav class="side-nav">
+          <a href="#active-orders" class="active">Active Test Orders</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="page-title">
+          <h1>Lab Portal</h1>
+          <p>
+            Upload results for tests ordered by doctors. Approving a report
+            automatically saves the test amount and forwards the report to
+            Doctor and Patient portals.
+          </p>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="num" id="completedCount">0</div>
+            <div class="label">Completed This Week</div>
+          </div>
+        </div>
+
+        <div class="panel" id="active-orders">
+          <h2>Pending Test Orders</h2>
+          <p class="sub">
+            Ordered by doctors from the Doctor Dashboard. Upload the result and
+            enter the test price to send automatically to Doctor and Patient
+            portals.
+          </p>
+
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Test</th>
+                  <th>Urgency</th>
+                  <th>Ordered Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pendingBody">
+                <tr>
+                  <td
+                    colspan="5"
+                    style="
+                      text-align: center;
+                      padding: 20px;
+                      color: var(--ink-soft);
+                    "
+                  >
+                    Loading pending orders...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span
+            >© <span id="year"></span> SaviourCrest Hospital — Internal Lab
+            Portal</span
+          >
+          <span
+            ><a href="tel:+920000000000">Emergency: +92 (---)-(---)</a></span
+          >
+        </div>
+        <div class="footer-bottom">
+          SaviourCrest Hospital · Pakistan, City (---), Area(---)
+        </div>
+      </div>
+    </footer>
+
+    <!-- Google Translate Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      // ====== GOOGLE TRANSLATE ENGINE INIT ======
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          { pageLanguage: "en", autoDisplay: false },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Toast Notification Function
+      function showNotification(message, type) {
+        const container = document.getElementById("toast-container");
+        const toast = document.createElement("div");
+        toast.className =
+          "toast-msg " + (type === "success" ? "toast-success" : "toast-error");
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
+
+      // 1. Fetch Pending Orders dynamically
+      async function loadPendingOrders() {
+        try {
+          const response = await fetch("/api/lab/pending-orders");
+          const result = await response.json();
+
+          if (result.status === "success") {
+            document.getElementById("completedCount").innerText =
+              result.completed_this_week;
+            const tbody = document.getElementById("pendingBody");
+            tbody.innerHTML = "";
+
+            if (result.data.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px;">No pending tests right now. 🎉</td></tr>`;
+              return;
+            }
+
+            result.data.forEach((order) => {
+              // Create main row
+              const tr = document.createElement("tr");
+              const urgencyClass =
+                order.urgency === "Urgent" ? "badge-urgent" : "badge-normal";
+              const dateStr = new Date(order.order_date).toLocaleDateString(
+                "en-US",
+                { month: "short", day: "numeric", year: "numeric" },
+              );
+
+              tr.innerHTML = `
+                <td>
+                  ${order.full_name}<br />
+                  <span class="mono" style="color: var(--ink-soft)">${order.patient_id}</span>
+                </td>
+                <td><strong>${order.test_name}</strong></td>
+                <td><span class="badge ${urgencyClass}">${order.urgency}</span></td>
+                <td>${dateStr}</td>
+                <td><span class="upload-toggle" onclick="toggleUpload(${order.id})">Upload Report</span></td>
+              `;
+              tbody.appendChild(tr);
+
+              // Create upload form row
+              const trUpload = document.createElement("tr");
+              trUpload.className = "upload-row";
+              trUpload.id = `uploadRow${order.id}`;
+
+              trUpload.innerHTML = `
+                <td colspan="5">
+                  <form class="upload-form" onsubmit="submitReport(event, ${order.id}, '${order.patient_id}', '${order.test_name}')">
+                    <div class="field">
+                      <label>Report type</label>
+                      <select name="report_type" required>
+                        <option value="Blood Test">Blood Test</option>
+                        <option value="X-Ray">X-Ray</option>
+                        <option value="Ultrasound">Ultrasound</option>
+                        <option value="MRI">MRI</option>
+                        <option value="CT Scan">CT Scan</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label>Test Amount (Rs.)</label>
+                      <input type="number" name="test_price" placeholder="e.g. 1500" required />
+                    </div>
+                    <div class="field full">
+                      <label>Report file (PDF or Image)</label>
+                      <input type="file" name="report_file" accept=".pdf,.jpg,.jpeg,.png" />
+                    </div>
+                    <div class="field full">
+                      <label>Result summary</label>
+                      <textarea name="result_summary" placeholder="e.g. Hemoglobin 13.2 g/dL, WBC normal..." required></textarea>
+                    </div>
+                    <div class="upload-actions">
+                      <button type="submit" class="btn btn-primary btn-sm">Submit Report to Doctor</button>
+                      <button type="button" class="btn btn-line btn-sm" onclick="toggleUpload(${order.id})">Cancel</button>
+                    </div>
+                  </form>
+                </td>
+              `;
+              tbody.appendChild(trUpload);
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+          showNotification("Failed to load data.", "error");
+        }
+      }
+
+      // 2. Toggle Row Visibility
+      function toggleUpload(orderId) {
+        document.getElementById("uploadRow" + orderId).classList.toggle("open");
+      }
+
+      // 3. Submit Report Form
+      async function submitReport(e, orderId, patientId, testName) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        // Append hidden data needed for backend
+        formData.append("order_id", orderId);
+        formData.append("patient_id", patientId);
+        formData.append("test_name", testName);
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerText = "Sending...";
+        submitBtn.disabled = true;
+
+        try {
+          const response = await fetch("/api/lab/upload-report", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+
+          if (result.status === "success") {
+            showNotification(result.message, "success");
+            loadPendingOrders(); // Reload the list so the completed order disappears
+          } else {
+            showNotification(
+              result.detail || "Error uploading report",
+              "error",
+            );
+          }
+        } catch (error) {
+          console.error("Submit Error:", error);
+          showNotification("Network Error", "error");
+        } finally {
+          submitBtn.innerText = "Submit Report to Doctor";
+          submitBtn.disabled = false;
+        }
+      }
+
+      // Initial Data Load
+      document.addEventListener("DOMContentLoaded", loadPendingOrders);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Receptionist Portal | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="Receptionist portal — register walk-in patients and issue billing invoices."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f6f6;
+        --surface: #ffffff;
+        --ink: #16211f;
+        --ink-soft: #55645f;
+        --line: #dfe6e4;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #b3392b;
+        --green: #1e7a46;
+        --radius: 6px;
+      }
+
+      /* Google Translate Override */
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.2px;
+      }
+
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* Glossy Buttons */
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 9px 18px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+      }
+
+      .btn-primary {
+        background: linear-gradient(180deg, #107a73 0%, #0a4f4b 100%);
+        color: #fff;
+        border-radius: 20px;
+        border: 1px solid #083d3a;
+        box-shadow:
+          inset 0 1px 1px rgba(255, 255, 255, 0.4),
+          0 2px 4px rgba(0, 0, 0, 0.2);
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+      }
+      .btn-primary:hover {
+        background: linear-gradient(180deg, #128c84 0%, #0c5c58 100%);
+        box-shadow:
+          inset 0 1px 1px rgba(255, 255, 255, 0.5),
+          0 4px 8px rgba(0, 0, 0, 0.3);
+        transform: translateY(-1px);
+      }
+      .btn-primary:active {
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        transform: translateY(1px);
+      }
+
+      .btn-line {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn-line:hover {
+        border-color: var(--teal-dark);
+        color: var(--teal-dark);
+      }
+      .btn-sm {
+        padding: 6px 14px;
+        font-size: 12px;
+      }
+
+      /* Top Bar */
+      header.topbar-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 15px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--ink-soft);
+        border-left: 1px solid var(--line);
+        padding-left: 9px;
+        margin-left: 2px;
+      }
+
+      /* Compact Translation Dropdown Style */
+      .lang-switcher-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid var(--teal-dark);
+        border-radius: 9999px;
+        padding: 2px 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        margin-left: 6px;
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink);
+        cursor: pointer;
+        padding-right: 12px;
+        font-family: inherit;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 6px;
+        pointer-events: none;
+        font-size: 7px;
+        color: var(--ink-soft);
+      }
+
+      .id-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12.5px;
+      }
+
+      /* Shell Layout */
+      .shell {
+        display: grid;
+        grid-template-columns: 216px 1fr;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 20px 14px;
+      }
+      .sidebar .who {
+        padding: 2px 8px 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+      .sidebar .who strong {
+        display: block;
+        font-size: 13.5px;
+      }
+      .sidebar .who .role {
+        font-size: 11.5px;
+        color: var(--teal);
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      .side-nav a {
+        display: block;
+        padding: 7px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin-bottom: 1px;
+        border-left: 2px solid transparent;
+      }
+      .side-nav a.active {
+        color: var(--teal-dark);
+        border-left-color: var(--teal-dark);
+        background: #eff5f4;
+        font-weight: 600;
+      }
+
+      .main {
+        padding: 24px 28px 50px;
+      }
+      .page-title {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .page-title h1 {
+        font-size: 19px;
+        margin-bottom: 3px;
+      }
+      .page-title p {
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+
+      /* Dynamic Stat Row */
+      .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        margin-bottom: 24px;
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .stat-card {
+        background: var(--surface);
+        padding: 14px 16px;
+      }
+      .stat-card .num {
+        font-family: "Poppins", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+      .stat-card .label {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 22px;
+      }
+      .panel h2 {
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      .panel .sub {
+        color: var(--ink-soft);
+        font-size: 12.5px;
+        margin-bottom: 16px;
+      }
+
+      /* Forms */
+      .field {
+        margin-bottom: 14px;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+        padding: 9px 11px;
+        font-size: 13.5px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #fbfdfd;
+        outline: none;
+        transition: border-color 0.12s ease;
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+      }
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--teal-dark);
+      }
+      .field-row {
+        display: flex;
+        gap: 12px;
+      }
+      .field-row .field {
+        flex: 1;
+      }
+
+      /* New Patient Box */
+      .new-patient-result {
+        display: none;
+        margin-top: 16px;
+        padding: 16px 18px;
+        background: #eff5f4;
+        border: 1px solid #cfe4e1;
+        border-radius: 8px;
+      }
+      .new-patient-result.show {
+        display: block;
+      }
+      .new-patient-result .id-out {
+        font-size: 20px;
+        font-weight: 700;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--teal-dark);
+        margin: 4px 0 6px;
+      }
+
+      /* Toast Notification */
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .toast-msg {
+        min-width: 260px;
+        padding: 14px 18px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateX(100%);
+        animation:
+          slideIn 0.3s forwards,
+          fadeOut 0.3s 3.5s forwards;
+      }
+      .toast-success {
+        background-color: #28a745;
+        border-left: 6px solid #1e7e34;
+      }
+      .toast-error {
+        background-color: #dc3545;
+        border-left: 6px solid #bd2130;
+      }
+
+      @keyframes slideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
+      /* Auto-Fetched Billing Box */
+      .billing-form-div {
+        display: none;
+        margin-top: 20px;
+        padding: 18px;
+        background: #f8faf9;
+        border: 1px solid #d0deda;
+        border-radius: 8px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        background: #e8f5e9;
+        border: 1px solid #c8e6c9;
+        padding: 14px;
+        border-radius: 6px;
+        margin-bottom: 18px;
+        font-size: 13.5px;
+        color: var(--ink);
+      }
+      .info-grid p {
+        margin: 0;
+      }
+      .info-grid span {
+        font-weight: 700;
+        color: #1e7a46;
+      }
+
+      /* Printable Invoice */
+      .invoice-preview {
+        display: none;
+        margin-top: 18px;
+        padding: 18px 20px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdfd;
+      }
+      .invoice-preview.show {
+        display: block;
+      }
+      .invoice-preview-head {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px dashed var(--line);
+      }
+      .ip-hospital {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 14.5px;
+        color: var(--teal-dark);
+      }
+      .ip-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .ip-table td {
+        padding: 7px 0;
+        font-size: 12.5px;
+      }
+      .ip-total-row td {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--teal-dark);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+
+      footer {
+        background: var(--ink);
+        color: #c9d3d1;
+        padding: 26px 0 16px;
+        font-size: 12.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      @media print {
+        header.topbar-strip,
+        .sidebar,
+        .page-title,
+        .stat-row,
+        #add-patient,
+        #billing-section,
+        #print-bill > h2,
+        #print-bill > .sub,
+        footer,
+        #printBillBtn {
+          display: none !important;
+        }
+        .main {
+          padding: 0;
+        }
+        .panel {
+          border: none;
+          padding: 0;
+        }
+        .invoice-preview {
+          display: block !important;
+          border: none;
+        }
+      }
+
+      /* Mobile Responsive */
+      @media screen and (max-width: 768px) {
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .topbar-inner {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 12px !important;
+          padding: 12px 16px !important;
+        }
+
+        .brand {
+          width: 100% !important;
+          justify-content: flex-start !important;
+        }
+
+        .id-actions {
+          width: 100% !important;
+          justify-content: flex-end !important;
+          border-top: 1px solid var(--line);
+          padding-top: 8px;
+        }
+
+        .shell {
+          grid-template-columns: 1fr !important;
+        }
+
+        .sidebar {
+          border-right: none !important;
+          border-bottom: 1px solid var(--line) !important;
+          padding: 14px !important;
+        }
+
+        .main {
+          padding: 16px !important;
+        }
+
+        .stat-row {
+          grid-template-columns: 1fr !important;
+        }
+
+        .field-row {
+          flex-direction: column !important;
+          gap: 0 !important;
+        }
+
+        #ptidGroup,
+        #phoneGroup {
+          flex-direction: column !important;
+          align-items: stretch !important;
+        }
+
+        #ptidGroup .field,
+        #phoneGroup .field {
+          flex: 1 1 100% !important;
+          width: 100% !important;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr !important;
+        }
+
+        .info-grid p {
+          grid-column: span 1 !important;
+        }
+
+        button,
+        .btn {
+          width: 100% !important;
+        }
+
+        .id-actions .btn {
+          width: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast-container"></div>
+
+    <header class="topbar-strip">
+      <div class="topbar-inner">
+        <div class="brand">
+            <img
+              src="/static/logo.jpeg"
+              alt="SaviourCrest Hospital Logo"
+              width="100"
+              height="100"
+              style="
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid red;
+                padding: 2px;
+              "
+            />
+            <span class="brand-name">Saviour<span>Crest</span></span>
+          </a>
+          <span class="brand-tag">Receptionist Portal</span>
+
+          <!-- Google Translate Dropdown -->
+          <div class="lang-switcher-container">
+            <span style="font-size: 11px; margin-right: 2px">🌐</span>
+            <select
+              id="custom_language_selector"
+              onchange="changeLanguage(this.value)"
+            >
+              <option value="" disabled selected>Translate</option>
+              <option value="en">English</option>
+              <option value="ur">Urdu (اردو)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="fa">Persian (فارسی)</option>
+            </select>
+            <span class="custom-arrow">▼</span>
+          </div>
+        </div>
+
+        <div class="id-actions">
+          <a href="/logout_receptionist" class="btn btn-line btn-sm">Log Out</a>
+        </div>
+      </div>
+    </header>
+
+    <div id="google_translate_element" style="display: none"></div>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="who">
+          <strong
+            >{{receptionist.full_name if receptionist else
+            'Receptionist'}}</strong
+          >
+          <div class="role">Front Desk</div>
+        </div>
+        <nav class="side-nav">
+          <a href="#" class="active">Patient & Billing</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="page-title">
+          <h1>Receptionist Portal</h1>
+          <p>Register patients and issue billing invoices.</p>
+        </div>
+
+        <!-- DYNAMIC STATS ROW -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="num" id="statPatients">
+              {{ stats.patients_today if stats else 0 }}
+            </div>
+            <div class="label">Patients Registered Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statInvoices">
+              {{ stats.invoices_today if stats else 0 }}
+            </div>
+            <div class="label">Invoices Issued Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statAmount">
+              Rs. {{ stats.collected_today if stats else 0 }}
+            </div>
+            <div class="label">Collected Today</div>
+          </div>
+        </div>
+
+        <!-- 1. REGISTER NEW PATIENT -->
+        <div class="panel" id="add-patient">
+          <h2>1. Register New Walk-in Patient</h2>
+          <p class="sub">
+            Register a new walk-in patient to generate their PT ID for billing.
+          </p>
+
+          <form id="registerPatientForm">
+            <div class="field-row">
+              <div class="field">
+                <label for="pFullName">Full name</label>
+                <input
+                  type="text"
+                  id="pFullName"
+                  name="full_name"
+                  placeholder="Jane Doe"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="pPhone">Phone number</label>
+                <input
+                  type="tel"
+                  id="pPhone"
+                  name="phone"
+                  placeholder="0300 1234567"
+                  maxlength="11"
+                  required
+                />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="pAge">Age</label>
+                <input
+                  type="number"
+                  id="pAge"
+                  name="age"
+                  min="0"
+                  placeholder="e.g. 34"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="pGender">Gender</label>
+                <select id="pGender" name="gender">
+                  <option value="" disabled selected>Select</option>
+                  <option>Female</option>
+                  <option>Male</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="pCnic">CNIC (optional)</label>
+                <input
+                  type="text"
+                  id="pCnic"
+                  name="cnic"
+                  placeholder="e.g. 35202-1234567-1"
+                  maxlength="15"
+                />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              Register Patient
+            </button>
+          </form>
+
+          <div class="new-patient-result" id="newPatientResult">
+            <p>Patient registered — give them this ID for their visit:</p>
+            <div class="id-out" id="newPatientId"></div>
+            <p>
+              Use this PT ID below in the "Patient Billing" section to generate
+              their invoice.
+            </p>
+          </div>
+        </div>
+
+        <!-- 2. PATIENT BILLING SECTION -->
+        <div class="panel" id="billing-section">
+          <h2>2. Patient Billing & Invoice</h2>
+          <p class="sub">Fetch patient details to issue their bill.</p>
+
+          <div class="field">
+            <label>Fetch Method</label>
+            <div
+              style="
+                display: flex;
+                gap: 24px;
+                margin-top: 6px;
+                font-size: 13.5px;
+                flex-wrap: wrap;
+              "
+            >
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-weight: 500;
+                  text-transform: none;
+                  cursor: pointer;
+                  color: var(--ink);
+                  white-space: nowrap;
+                "
+              >
+                <input
+                  type="radio"
+                  name="fetch_type"
+                  value="ptid"
+                  checked
+                  onchange="handleFetchTypeChange()"
+                />
+                By PT ID Only
+              </label>
+              <label
+                style="
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  font-weight: 500;
+                  text-transform: none;
+                  cursor: pointer;
+                  color: var(--ink);
+                  white-space: nowrap;
+                "
+              >
+                <input
+                  type="radio"
+                  name="fetch_type"
+                  value="phone"
+                  onchange="handleFetchTypeChange()"
+                />
+                By Name & Phone Number
+              </label>
+            </div>
+          </div>
+
+          <!-- PT ID Fetch Group -->
+          <div id="ptidGroup" class="field-row" style="align-items: flex-end">
+            <div class="field" style="flex: 1">
+              <label for="searchPtId">Enter PT ID</label>
+              <input type="text" id="searchPtId" placeholder="e.g. PT-61646" />
+            </div>
+            <div class="field" style="flex: 0 0 140px">
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="fetchPatientDetails()"
+                style="width: 100%; height: 39px"
+              >
+                Fetch Details
+              </button>
+            </div>
+          </div>
+
+          <!-- Phone Group -->
+          <div
+            id="phoneGroup"
+            class="field-row"
+            style="align-items: flex-end; display: none"
+          >
+            <div class="field" style="flex: 1">
+              <label for="searchPhone">Phone Number</label>
+              <input
+                type="tel"
+                id="searchPhone"
+                placeholder="e.g. 03001234567"
+              />
+            </div>
+            <div class="field" style="flex: 1">
+              <label for="searchName">Patient Name (Optional)</label>
+              <input type="text" id="searchName" placeholder="e.g. Ali" />
+            </div>
+            <div class="field" style="flex: 0 0 140px">
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="fetchPatientDetails()"
+                style="width: 100%; height: 39px"
+              >
+                Fetch Details
+              </button>
+            </div>
+          </div>
+
+          <!-- Auto Fetched Billing Form Div -->
+          <div id="billingFormDiv" class="billing-form-div">
+            <div class="info-grid">
+              <p>Patient ID: <span id="fPtId">—</span></p>
+              <p>Patient Name: <span id="fName">—</span></p>
+              <p>Phone Number: <span id="fPhone">—</span></p>
+              <p>
+                UUID:
+                <span
+                  id="fPtUuid"
+                  class="mono"
+                  style="font-size: 11px; word-break: break-all"
+                  >—</span
+                >
+              </p>
+              <p style="grid-column: span 2; margin-top: 4px">
+                <a
+                  id="fPtPortalLink"
+                  href="#"
+                  target="_blank"
+                  style="
+                    color: var(--teal-dark);
+                    font-weight: 600;
+                    text-decoration: underline;
+                  "
+                >
+                  🔗 View Patient Portal Dashboard
+                </a>
+              </p>
+            </div>
+
+            <form id="invoiceForm" onsubmit="generateInvoice(event)">
+              <input type="hidden" id="invPtId" name="patient_id" />
+              <input type="hidden" id="invPtName" name="patient_name" />
+              <input type="hidden" id="invPtUuid" name="patient_uuid" />
+
+              <div class="field-row">
+                <div class="field">
+                  <label>Service / Consultation</label>
+                  <select id="invService" name="service">
+                    <option value="Consultation Fee">Consultation Fee</option>
+                    <option value="Online Appointment Verification">
+                      Online Appointment Verification
+                    </option>
+                    <option value="Physical Appointment">
+                      Physical Appointment
+                    </option>
+                    <option value="Registration Fee">Registration Fee</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label>Amount (Rs.)</label>
+                  <input
+                    type="number"
+                    id="invAmount"
+                    name="amount"
+                    min="0"
+                    placeholder="e.g. 2000"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label>Payment Method</label>
+                  <select id="invMethod" name="payment_method">
+                    <option value="Cash">Cash</option>
+                    <option value="Card">Card</option>
+                    <option value="JazzCash">JazzCash</option>
+                    <option value="EasyPaisa">EasyPaisa</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                  </select>
+                </div>
+              </div>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                style="margin-top: 10px"
+              >
+                Generate Invoice
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- 3. PRINT BILL -->
+        <div class="panel" id="print-bill">
+          <h2>3. Print Bill</h2>
+          <p class="sub">
+            This preview fills automatically when an invoice is generated from
+            above.
+          </p>
+
+          <div class="invoice-preview" id="invoicePreview">
+            <div class="invoice-preview-head">
+              <div>
+                <div class="ip-hospital">SaviourCrest Hospital</div>
+                <div style="font-size: 11px; color: var(--ink-soft)">
+                  Official Receipt
+                </div>
+              </div>
+              <div
+                style="
+                  font-size: 12px;
+                  font-weight: 700;
+                  color: var(--ink-soft);
+                "
+              >
+                RECEIPT
+              </div>
+            </div>
+            <table class="ip-table">
+              <tbody>
+                <tr>
+                  <td>Patient ID</td>
+                  <td class="mono" id="ipPatientId">—</td>
+                </tr>
+                <tr>
+                  <td>Patient UUID</td>
+                  <td class="mono" id="ipPatientUuid" style="font-size: 11px">
+                    —
+                  </td>
+                </tr>
+                <tr>
+                  <td>Patient Name</td>
+                  <td id="ipPatientName" style="font-weight: 600">—</td>
+                </tr>
+                <tr>
+                  <td>Service</td>
+                  <td id="ipService">—</td>
+                </tr>
+                <tr>
+                  <td>Payment Method</td>
+                  <td id="ipMethod">—</td>
+                </tr>
+                <tr>
+                  <td>Date</td>
+                  <td id="ipDate">—</td>
+                </tr>
+                <tr class="ip-total-row">
+                  <td>Amount Paid</td>
+                  <td id="ipAmount">Rs. 0</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p
+            id="noBillMsg"
+            style="
+              font-size: 12.5px;
+              color: var(--ink-soft);
+              font-style: italic;
+            "
+          >
+            No invoice generated yet.
+          </p>
+
+          <button
+            type="button"
+            class="btn btn-line btn-sm"
+            id="printBillBtn"
+            style="margin-top: 14px"
+            disabled
+          >
+            Print Bill
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span
+            >© <span id="year"></span> SaviourCrest Hospital — Internal
+            Portal</span
+          >
+        </div>
+      </div>
+    </footer>
+
+    <!-- Google Translate Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          { pageLanguage: "en", autoDisplay: false },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+
+      let currentPatients = 0;
+      let currentInvoices = 0;
+      let currentTotalAmount = 0;
+
+      function updateStatsDisplay() {
+        document.getElementById("statPatients").innerText = currentPatients;
+        document.getElementById("statInvoices").innerText = currentInvoices;
+        document.getElementById("statAmount").innerText =
+          "Rs. " + currentTotalAmount.toLocaleString();
+      }
+
+      async function loadReceptionStats() {
+        try {
+          const response = await fetch("/api/reception/stats");
+          if (response.ok) {
+            const data = await response.json();
+            if (
+              data.status === "success" ||
+              data.patients_today !== undefined
+            ) {
+              currentPatients =
+                data.patients_today ?? data.total_patients ?? currentPatients;
+              currentInvoices =
+                data.invoices_today ?? data.total_invoices ?? currentInvoices;
+              currentTotalAmount =
+                data.collected_today ??
+                data.total_collected ??
+                data.total_online_revenue ??
+                currentTotalAmount;
+              updateStatsDisplay();
+            }
+          }
+        } catch (err) {
+          console.error("Failed to load reception stats:", err);
+        }
+      }
+
+      function showNotification(message, type) {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+        const toast = document.createElement("div");
+        toast.className =
+          "toast-msg " + (type === "success" ? "toast-success" : "toast-error");
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
+
+      function handleFetchTypeChange() {
+        const fetchType = document.querySelector(
+          'input[name="fetch_type"]:checked',
+        ).value;
+        const ptidGroup = document.getElementById("ptidGroup");
+        const phoneGroup = document.getElementById("phoneGroup");
+
+        if (fetchType === "ptid") {
+          ptidGroup.style.display = "flex";
+          phoneGroup.style.display = "none";
+          document.getElementById("searchPhone").value = "";
+          document.getElementById("searchName").value = "";
+        } else {
+          ptidGroup.style.display = "none";
+          phoneGroup.style.display = "flex";
+          document.getElementById("searchPtId").value = "";
+        }
+        document.getElementById("billingFormDiv").style.display = "none";
+      }
+
+      // REGISTER NEW WALK-IN PATIENT
+      document
+        .getElementById("registerPatientForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formData = new FormData(this);
+
+          try {
+            const response = await fetch("/register_patient", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await response.json();
+
+            if (data.status === "success" || data.patient_id) {
+              showNotification("Patient Registered Successfully!", "success");
+
+              const ptId = data.patient_id || data.pt_id;
+
+              // Only PT ID shown to Receptionist
+              document.getElementById("newPatientId").innerText = ptId;
+              document.getElementById("newPatientResult").classList.add("show");
+
+              document.querySelector(
+                'input[name="fetch_type"][value="ptid"]',
+              ).checked = true;
+              handleFetchTypeChange();
+              document.getElementById("searchPtId").value = ptId;
+
+              await loadReceptionStats();
+              this.reset();
+            } else {
+              showNotification(
+                data.message || "Error registering patient.",
+                "error",
+              );
+            }
+          } catch (err) {
+            showNotification(
+              "Server error: Could not register patient.",
+              "error",
+            );
+          }
+        });
+
+      // FETCH PATIENT DETAILS
+      async function fetchPatientDetails() {
+        const fetchType = document.querySelector(
+          'input[name="fetch_type"]:checked',
+        ).value;
+        let queryParams = "";
+
+        if (fetchType === "ptid") {
+          let ptInput = document
+            .getElementById("searchPtId")
+            .value.trim()
+            .toUpperCase();
+          if (!ptInput) {
+            showNotification("Please enter PT ID", "error");
+            return;
+          }
+          queryParams = `?pt_id=${ptInput}`;
+        } else {
+          let phoneInput = document.getElementById("searchPhone").value.trim();
+          let nameInput = document.getElementById("searchName").value.trim();
+          if (!phoneInput) {
+            showNotification("Please enter Phone Number", "error");
+            return;
+          }
+          queryParams = `?phone=${phoneInput}&name=${nameInput}`;
+        }
+
+        try {
+          const response = await fetch(`/search_patient${queryParams}`);
+          const data = await response.json();
+
+          if (
+            response.ok &&
+            (data.status === "success" ||
+              data.full_name ||
+              data.name ||
+              data.pt_id)
+          ) {
+            const pId =
+              data.pt_id ||
+              data.patient_id ||
+              document.getElementById("searchPtId").value.trim().toUpperCase();
+            const pName =
+              data.full_name ||
+              data.name ||
+              document.getElementById("searchName").value.trim() ||
+              "Patient";
+            const pPhone =
+              data.phone ||
+              document.getElementById("searchPhone").value.trim() ||
+              "Not provided";
+            const pUuid = data.patient_uuid || data.uuid || "N/A";
+
+            document.getElementById("fPtId").innerText = pId;
+            document.getElementById("fName").innerText = pName;
+            document.getElementById("fPhone").innerText = pPhone;
+            document.getElementById("fPtUuid").innerText = pUuid;
+
+            document.getElementById("invPtId").value = pId;
+            document.getElementById("invPtName").value = pName;
+            document.getElementById("invPtUuid").value = pUuid;
+
+            const portalLink = document.getElementById("fPtPortalLink");
+            if (pUuid && pUuid !== "N/A") {
+              portalLink.href = `/dashboard/patient?uuid=${pUuid}`;
+              portalLink.style.display = "inline";
+            } else {
+              portalLink.style.display = "none";
+            }
+
+            document.getElementById("billingFormDiv").style.display = "block";
+            showNotification("Patient found successfully!", "success");
+          } else {
+            showNotification("Patient not found in database!", "error");
+            document.getElementById("billingFormDiv").style.display = "none";
+          }
+        } catch (error) {
+          showNotification("Error connecting to database.", "error");
+        }
+      }
+
+      // GENERATE INVOICE
+      async function generateInvoice(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+
+        const ptId = document.getElementById("invPtId").value;
+        const ptName = document.getElementById("invPtName").value;
+        const ptUuid = document.getElementById("invPtUuid").value || "N/A";
+        const service = document.getElementById("invService").value;
+        const amount =
+          parseFloat(document.getElementById("invAmount").value) || 0;
+        const method = document.getElementById("invMethod").value;
+
+        try {
+          const response = await fetch("/generate_invoice", {
+            method: "POST",
+            body: formData,
+          });
+          const result = await response.json();
+
+          if (response.ok && (result.status === "success" || result.id)) {
+            showNotification("Invoice Generated Successfully!", "success");
+
+            document.getElementById("ipPatientId").textContent = ptId;
+            document.getElementById("ipPatientUuid").textContent = ptUuid;
+            document.getElementById("ipPatientName").textContent = ptName;
+            document.getElementById("ipService").textContent = service;
+            document.getElementById("ipMethod").textContent = method;
+            document.getElementById("ipDate").textContent =
+              new Date().toLocaleString();
+            document.getElementById("ipAmount").textContent =
+              "Rs. " + amount.toLocaleString();
+
+            document.getElementById("invoicePreview").classList.add("show");
+            document.getElementById("noBillMsg").style.display = "none";
+            document.getElementById("printBillBtn").disabled = false;
+
+            await loadReceptionStats();
+
+            form.reset();
+            document.getElementById("searchPtId").value = "";
+            document.getElementById("searchPhone").value = "";
+            document.getElementById("searchName").value = "";
+            document.getElementById("billingFormDiv").style.display = "none";
+
+            document
+              .getElementById("print-bill")
+              .scrollIntoView({ behavior: "smooth" });
+          } else {
+            showNotification("Error generating invoice.", "error");
+          }
+        } catch (err) {
+          showNotification("Server error generating invoice.", "error");
+        }
+      }
+
+      document
+        .getElementById("printBillBtn")
+        .addEventListener("click", () => window.print());
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      document.addEventListener("DOMContentLoaded", loadReceptionStats);
+    </script>
+  </body>
+</html>

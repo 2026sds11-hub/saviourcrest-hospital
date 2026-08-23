@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Patient Dashboard | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="Patient dashboard — find a doctor by symptom, prescriptions, history and reports."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: #ffffff;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --red-dark: #9e2e22;
+        --green: #1e824c;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ul {
+        list-style: none;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease,
+          background 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+      }
+      .btn-primary {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--red-dark);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--teal-dark);
+        border: 1px solid var(--teal);
+      }
+      .btn-outline:hover {
+        background: var(--teal);
+        color: #fff;
+      }
+      .btn-teal {
+        background: var(--teal);
+        color: #fff;
+      }
+      .btn-teal:hover {
+        background: var(--teal-dark);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* ---------- Top Strip ---------- */
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      /* ---------- Navbar ---------- */
+      header.navbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 20px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        font-weight: 500;
+        font-size: 14.5px;
+      }
+      .nav-links a {
+        color: var(--text);
+        padding: 6px 2px;
+        border-bottom: 2px solid transparent;
+        transition:
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--teal);
+        border-bottom: 2px solid var(--teal);
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 13.5px;
+      }
+      .nav-right a.plain {
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .nav-right a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      /* ---------- Shell Layout ---------- */
+      .shell {
+        display: grid;
+        grid-template-columns: 230px 1fr;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 22px 16px;
+      }
+      .sidebar .who {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        padding: 0 4px;
+      }
+      .sidebar .who strong {
+        display: block;
+        color: var(--text);
+        font-size: 14px;
+      }
+
+      .side-nav a {
+        display: block;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+      }
+      .side-nav a:hover,
+      .side-nav a.active {
+        background: #eaf4f3;
+        color: var(--teal-dark);
+      }
+      .side-nav .group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin: 16px 10px 6px;
+      }
+
+      /* ---------- Main ---------- */
+      .main {
+        padding: 26px 30px 50px;
+      }
+
+      .topbar {
+        margin-bottom: 22px;
+      }
+      .topbar h1 {
+        font-size: 21px;
+        margin-bottom: 4px;
+      }
+      .topbar p {
+        color: var(--text-muted);
+        font-size: 13.5px;
+      }
+
+      /* ---------- Quick-access cards ---------- */
+      .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+      .quick-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 18px 18px;
+        transition:
+          box-shadow 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .quick-card:hover {
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+        border-color: var(--teal);
+      }
+      .quick-card h4 {
+        font-size: 14.5px;
+        margin-bottom: 5px;
+      }
+      .quick-card p {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+      }
+      .quick-card a {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--teal-dark);
+      }
+      .quick-card a:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Panel ---------- */
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 28px;
+      }
+      .panel h2 {
+        font-size: 17px;
+        margin-bottom: 5px;
+      }
+      .panel .sub {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+
+      /* ---------- My Appointments Section ---------- */
+      .appt-card {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin-bottom: 12px;
+        background: #fbfefe;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        transition: border-color 0.15s ease;
+      }
+      .appt-card:hover {
+        border-color: var(--teal);
+      }
+      .appt-card:last-child {
+        margin-bottom: 0;
+      }
+      .appt-info {
+        flex: 1;
+      }
+
+      .appt-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .appt-info h4 {
+        font-size: 15px;
+        margin-bottom: 2px;
+        color: var(--teal-dark);
+      }
+      .appt-info p {
+        font-size: 12.5px;
+        color: var(--text-muted);
+      }
+      .appt-datetime {
+        font-family: "JetBrains Mono", monospace, sans-serif;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text);
+        margin-top: 8px;
+        display: inline-block;
+        background: #eef3f2;
+        padding: 5px 10px;
+        border-radius: 5px;
+        border: 1px solid #dce5e4;
+      }
+
+      .btn-delete-appt {
+        background: transparent;
+        border: none;
+        color: #b0b0b0;
+        font-size: 22px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 0 4px;
+        transition: color 0.15s ease;
+      }
+      .btn-delete-appt:hover {
+        color: var(--red);
+      }
+
+      .badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .badge-pending {
+        background: #fdf3e4;
+        color: #9a6b12;
+      }
+      .badge-confirmed {
+        background: #e8f3ec;
+        color: var(--green);
+      }
+      .badge-rejected {
+        background: #fbefed;
+        color: var(--red);
+      }
+
+      /* ---------- Custom Modal Popup ---------- */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(14, 30, 28, 0.45);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-box {
+        background: var(--surface);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+        border: 1px solid var(--border);
+        transform: translateY(-12px);
+        transition: transform 0.25s ease;
+      }
+      .modal-overlay.active .modal-box {
+        transform: translateY(0);
+      }
+      .modal-box h3 {
+        font-size: 17px;
+        color: var(--teal-dark);
+        margin-bottom: 8px;
+      }
+      .modal-box p {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin-bottom: 22px;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      /* ---------- Symptom Search ---------- */
+      .search-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .search-row input {
+        flex: 1;
+        padding: 11px 13px;
+        font-size: 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fbfefe;
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+      .search-row input:focus {
+        border-color: var(--teal);
+      }
+
+      /* ---------- Specialty Tiles ---------- */
+      .spec-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .spec-tile {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fbfefe;
+        cursor: pointer;
+        text-align: center;
+        transition:
+          border-color 0.15s ease,
+          background 0.15s ease;
+      }
+      .spec-tile:hover,
+      .spec-tile.active {
+        border-color: var(--teal);
+        background: #eff6f5;
+      }
+      .spec-circle {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: var(--teal-dark);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .spec-tile span.label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text);
+      }
+
+      /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: absolute;
+        z-index: 10;
+        top: 190px;
+        right: 30px;
+        left: auto;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 3px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 12px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 8px;
+        color: #64748b;
+      }
+
+      /* ---------- Doctor List Box ---------- */
+      .suggestion-box {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 18px;
+        background: #fbfefe;
+        display: none;
+      }
+      .suggestion-box.show {
+        display: block;
+      }
+      .suggestion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .suggestion-box .sugg-title {
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .suggestion-box .sugg-title strong {
+        color: var(--teal-dark);
+      }
+      .btn-toggle-box {
+        background: transparent;
+        border: none;
+        color: var(--teal-dark);
+        font-size: 16px;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: background 0.15s ease;
+      }
+      .btn-toggle-box:hover {
+        background: #eaf4f3;
+      }
+      .sugg-body {
+        margin-top: 12px;
+      }
+
+      .doc-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--border);
+      }
+      .doc-row:last-child {
+        border-bottom: none;
+      }
+      .doc-row-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .doc-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .doc-name {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .doc-status {
+        font-size: 11.5px;
+        color: var(--text-muted);
+      }
+      .doc-status.online {
+        color: var(--green);
+        font-weight: 500;
+      }
+      .doc-status.offline {
+        color: var(--red);
+      }
+
+      .no-match {
+        color: var(--text-muted);
+        font-size: 13px;
+        padding: 6px 0;
+        display: none;
+      }
+
+      /* ---------- Toast Notification ---------- */
+      .toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+        z-index: 999;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateX(100%) translate(0);
+      }
+
+      .toast.success {
+        background: #1e824c;
+      }
+      .toast.error {
+        background: #c0392b;
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 34px 0 18px;
+        font-size: 13.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      footer a {
+        color: #b9c8c6;
+        transition: color 0.15s ease;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .emergency-line {
+        color: #ffd9d4;
+        font-weight: 600;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 14px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 12.5px;
+      }
+
+      @media (max-width: 1000px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        .quick-grid {
+          grid-template-columns: 1fr;
+        }
+        .spec-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+      @media (max-width: 560px) {
+        .spec-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toast" id="toast"></div>
+
+    <!-- CUSTOM CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="confirmModal">
+      <div class="modal-box">
+        <h3>Remove Appointment</h3>
+        <p>Are you sure you want to hide this appointment from your page?</p>
+        <div class="modal-actions">
+          <button class="btn btn-outline btn-sm" id="modalCancelBtn">
+            Cancel
+          </button>
+          <button class="btn btn-primary btn-sm" id="modalConfirmBtn">
+            Remove
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 24/7 Helpline Strip -->
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (---)-(---)</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>, every day of the year.
+    </div>
+
+    <!-- SITE NAVBAR -->
+    <header class="navbar">
+      <div class="nav-inner">
+        <div class="brand">
+          <img
+            src="/static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="90"
+            height="90"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+        </div>
+
+        <div class="nav-right">
+          <a href="/patient_portal?uuid={{ patient_uuid }}" class="plain"
+            >Profile</a
+          >
+          <div class="toast" id="toast"></div>
+          <!-- removed onclick="handleLogout(event)" to prevent undefined function errors -->
+          <a href="#" id="logoutBtn" class="btn btn-outline btn-sm">Logout</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="who">
+          <strong>{{ patient.full_name or patient.name or 'Patient' }}</strong>
+          Patient ID: {{ patient.patient_id or patient_id or patient.id }}
+        </div>
+
+        <nav class="side-nav">
+          <a href="#overview" class="active">Overview</a>
+          <a href="#my-appointments">My Appointments</a>
+          <a href="#find-doctor">Find &amp; Book Doctor</a>
+
+          <div class="group-label">My Care</div>
+          <a href="/patient_history.html?uuid={{ patient_uuid }}"
+            >Patient History</a
+          >
+          <a href="/blood_reports.html?uuid={{ patient_uuid }}"
+            >Blood Reports</a
+          >
+        </nav>
+      </aside>
+
+      <!-- Google Translations hidden element -->
+      <div
+        id="google_translate_element"
+        style="
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+          width: 0;
+          height: 0;
+          overflow: hidden;
+        "
+      ></div>
+
+      <!-- ============ FULL WIDTH HERO BANNER ============ -->
+      <section class="hero-banner">
+        <div class="lang-switcher-container">
+          <span style="margin-right: 6px; font-size: 15px">🌐</span>
+          <select
+            id="custom_language_selector"
+            onchange="changeLanguage(this.value)"
+          >
+            <option value="" disabled selected>Translate Page</option>
+            <option value="en">English</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="es">Spanish (Español)</option>
+            <option value="fr">French (Français)</option>
+            <option value="fa">Persian(فارسی)</option>
+          </select>
+          <span class="custom-arrow">▼</span>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+          <div class="topbar" id="overview">
+            <h1>
+              Welcome back, {{ patient.full_name or patient.name or 'Patient' }}
+            </h1>
+            <p>Here's a quick look at your health portal.</p>
+          </div>
+
+          <!-- QUICK-ACCESS CARDS -->
+          <div class="quick-grid">
+            <div class="quick-card">
+              <h4>Prescriptions</h4>
+              <p>
+                View medicines and dosage instructions given by your doctors.
+              </p>
+            </div>
+
+            <div class="quick-card">
+              <h4>Patient History</h4>
+              <p>Fever, blood pressure and symptom records from every visit.</p>
+              <a href="/patient_history.html?uuid={{ patient_uuid }}"
+                >View Full History →</a
+              >
+            </div>
+
+            <div class="quick-card">
+              <h4>View Your Blood Reports</h4>
+              <p>
+                All lab results, X-rays and ultrasounds, uploaded by the lab.
+              </p>
+              <a href="/blood_reports.html?uuid={{ patient_uuid }}"
+                >View Reports →</a
+              >
+            </div>
+          </div>
+
+          <!-- MY APPOINTMENTS PANEL -->
+          <div class="panel" id="my-appointments">
+            <h2>My Appointments Status</h2>
+            <p class="sub">
+              Track your latest requests and check the confirmed timings
+              provided by your doctor.
+            </p>
+
+            <div class="request-list" id="appointmentList">
+              <p
+                class="no-requests"
+                id="noApptMsg"
+                style="color: var(--text-muted); font-size: 13px"
+              >
+                Loading your appointments...
+              </p>
+            </div>
+          </div>
+
+          <!-- FIND & BOOK A DOCTOR PANEL -->
+          <div class="panel" id="find-doctor">
+            <h2>Search Your Problem or Doctor</h2>
+            <p class="sub">
+              Type what's bothering you (e.g. "heart") or pick a specialty to
+              view doctors and book an appointment.
+            </p>
+
+            <div class="search-row">
+              <input
+                type="text"
+                id="symptomInput"
+                placeholder="e.g. heart, skin, fever, joint pain..."
+              />
+              <button class="btn btn-teal" id="symptomSearchBtn">Search</button>
+            </div>
+
+            <!-- Doctor List Box -->
+            <div class="suggestion-box" id="suggestionBox">
+              <div class="suggestion-header">
+                <div class="sugg-title">
+                  Specialists in: <strong id="suggSpecName"></strong>
+                </div>
+                <button
+                  type="button"
+                  id="toggleBoxBtn"
+                  class="btn-toggle-box"
+                  title="Hide List"
+                >
+                  ▲
+                </button>
+              </div>
+              <div class="sugg-body" id="suggBody">
+                <div id="suggDoctorList"></div>
+                <p class="no-match" id="noMatchMsg">
+                  No doctors listed under this specialty yet.
+                </p>
+              </div>
+            </div>
+
+            <p class="sub" style="margin-top: 24px; margin-bottom: 12px">
+              Or browse by specialty:
+            </p>
+
+            <div class="spec-grid" id="specGrid">
+              <div class="spec-tile" data-spec="Cardiology">
+                <div class="spec-circle">C</div>
+                <span class="label">Cardiologist</span>
+              </div>
+              <div class="spec-tile" data-spec="Dermatology">
+                <div class="spec-circle">D</div>
+                <span class="label">Dermatologist</span>
+              </div>
+              <div class="spec-tile" data-spec="Pediatrics">
+                <div class="spec-circle">P</div>
+                <span class="label">Pediatrician</span>
+              </div>
+              <div class="spec-tile" data-spec="Orthopedics">
+                <div class="spec-circle">O</div>
+                <span class="label">Orthopedist</span>
+              </div>
+              <div class="spec-tile" data-spec="Neurology">
+                <div class="spec-circle">N</div>
+                <span class="label">Neurologist</span>
+              </div>
+              <div class="spec-tile" data-spec="General Physician">
+                <div class="spec-circle">G</div>
+                <span class="label">General Physician</span>
+              </div>
+              <div class="spec-tile" data-spec="Gynecology">
+                <div class="spec-circle">GY</div>
+                <span class="label">Gynecologist</span>
+              </div>
+              <div class="spec-tile" data-spec="Nephrology">
+                <div class="spec-circle">N</div>
+                <span class="label">Nephrologist</span>
+              </div>
+              <div class="spec-tile" data-spec="Gastrology">
+                <div class="spec-circle">G</div>
+                <span class="label">Gastrologist</span>
+              </div>
+              <div class="spec-tile" data-spec="ENT">
+                <div class="spec-circle">E</div>
+                <span class="label">ENT</span>
+              </div>
+              <div class="spec-tile" data-spec="General Surgery">
+                <div class="spec-circle">GS</div>
+                <span class="label">General Surgery</span>
+              </div>
+              <div class="spec-tile" data-spec="Urology">
+                <div class="spec-circle">U</div>
+                <span class="label">Urology</span>
+              </div>
+              <div class="spec-tile" data-spec="Oncology">
+                <div class="spec-circle">O</div>
+                <span class="label">Oncology</span>
+              </div>
+            </div>
+          </div>
+        </main>
+      </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span
+            >© <span id="year"></span> SaviourCrest Hospital. Open
+            <strong style="color: #fff">24/7</strong>, every day.</span
+          >
+          <span>
+            <a href="tel:+920000000000">Main Helpline</a>
+            &nbsp;·&nbsp;
+            <a href="tel:+920000000000" class="emergency-line"
+              >Emergency Support</a
+            >
+          </span>
+        </div>
+        <div class="footer-bottom">
+          SaviourCrest Hospital · Pakistan · <a href="/">Back to Home</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // =========================================================
+      // DYNAMIC APPOINTMENT FETCHING LOGIC
+      // =========================================================
+      document.addEventListener("DOMContentLoaded", fetchAppointments);
+
+      async function fetchAppointments() {
+        const apptList = document.getElementById("appointmentList");
+        const noMsg = document.getElementById("noApptMsg");
+
+        try {
+          const response = await fetch("/api/patient/my-appointments");
+          const result = await response.json();
+
+          if (response.ok && (result.status === "success" || result.success)) {
+            const appointments = result.appointments || [];
+
+            if (appointments.length === 0) {
+              noMsg.textContent =
+                "You don't have any appointment requests at the moment.";
+              return;
+            }
+
+            apptList.innerHTML = "";
+
+            appointments.forEach((appt) => {
+              let badgeClass = "badge-pending";
+              let statusText = "Pending";
+              let dateTimeHtml = "";
+
+              const deleteBtnHtml = `<button onclick="askHideAppointment(this)" class="btn-delete-appt" title="Hide appointment">&times;</button>`;
+              const currentStatus = (appt.status || "").toLowerCase();
+
+              if (
+                currentStatus === "approved" ||
+                currentStatus === "confirmed"
+              ) {
+                badgeClass = "badge-confirmed";
+                statusText = "Confirmed";
+                dateTimeHtml = `<div class="appt-datetime">📅 ${appt.appointment_date || ""} &nbsp;|&nbsp; ⏰ ${appt.confirmed_time || ""}</div>`;
+              } else if (currentStatus === "rejected") {
+                badgeClass = "badge-rejected";
+                statusText = "Rejected";
+                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--red);">This appointment could not be confirmed.</div>`;
+              } else {
+                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--text-muted);">Requested Date: ${appt.appointment_date || "N/A"}</div>`;
+              }
+
+              const card = document.createElement("div");
+              card.className = "appt-card";
+              card.innerHTML = `
+                <div class="appt-info">
+                  <div class="appt-header">
+                    <h4>Consultation with ${appt.doctor_name || "Assigned Doctor"}</h4>
+                    ${deleteBtnHtml}
+                  </div>
+                  <p>Department: ${appt.specialty || "General"}</p>
+                  ${dateTimeHtml}
+                </div>
+                <div class="appt-status">
+                  <span class="badge ${badgeClass}">${statusText}</span>
+                </div>
+              `;
+              apptList.appendChild(card);
+            });
+          } else {
+            noMsg.textContent = result.message || "No appointments found.";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          noMsg.textContent = "You have no active appointments right now.";
+        }
+      }
+
+      // =========================================================
+      // MODAL & HIDE LOGIC
+      // =========================================================
+      let cardTargetToHide = null;
+
+      function askHideAppointment(btnElement) {
+        cardTargetToHide = btnElement.closest(".appt-card");
+        document.getElementById("confirmModal").classList.add("active");
+      }
+
+      document
+        .getElementById("modalCancelBtn")
+        .addEventListener("click", () => {
+          document.getElementById("confirmModal").classList.remove("active");
+          cardTargetToHide = null;
+        });
+
+      document
+        .getElementById("modalConfirmBtn")
+        .addEventListener("click", () => {
+          if (cardTargetToHide) {
+            cardTargetToHide.remove();
+            showToast("Appointment hidden from list", "success");
+
+            const apptList = document.getElementById("appointmentList");
+            if (apptList.querySelectorAll(".appt-card").length === 0) {
+              apptList.innerHTML = `
+            <p class="no-requests" style="color: var(--text-muted); font-size: 13px">
+              You don't have any appointment requests at the moment.
+            </p>`;
+            }
+          }
+          document.getElementById("confirmModal").classList.remove("active");
+          cardTargetToHide = null;
+        });
+
+      // =========================================================
+      // SYMPTOM SEARCH & DOCTORS DATA
+      // =========================================================
+      const symptomMap = {
+        heart: "Cardiology",
+        "chest pain": "Cardiology",
+        "blood pressure": "Cardiology",
+        skin: "Dermatology",
+        rash: "Dermatology",
+        acne: "Dermatology",
+        child: "Pediatrics",
+        baby: "Pediatrics",
+        kid: "Pediatrics",
+        joint: "Orthopedics",
+        bone: "Orthopedics",
+        fracture: "Orthopedics",
+        "back pain": "Orthopedics",
+        headache: "Neurology",
+        migraine: "Neurology",
+        nerve: "Neurology",
+        dizziness: "Neurology",
+        fever: "General Physician",
+        cough: "General Physician",
+        cold: "General Physician",
+        pregnant: "Gynecology",
+        kidney: "Nephrology",
+        stomach: "Gastrology",
+        ear: "ENT",
+        nose: "ENT",
+        throat: "ENT",
+        surgery: "General Surgery",
+        urine: "Urology",
+        cancer: "Oncology",
+      };
+
+      const specialtyLabels = {
+        Cardiology: "Cardiologist",
+        Dermatology: "Dermatologist",
+        Pediatrics: "Pediatrician",
+        Orthopedics: "Orthopedist",
+        Neurology: "Neurologist",
+        "General Physician": "General Physician",
+        Gynecology: "Gynecologist",
+        Nephrology: "Nephrologist",
+        Gastrology: "Gastrologist",
+        ENT: "ENT Specialist",
+        "General Surgery": "General Surgeon",
+        Urology: "Urologist",
+        Oncology: "Oncologist",
+      };
+
+      const doctorsBySpecialty = {
+        Cardiology: [
+          {
+            id: 3,
+            name: "Dr. Noor",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Dermatology: [
+          {
+            id: 16,
+            name: "Dr. Saba Asif",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Pediatrics: [
+          {
+            id: 17,
+            name: "Dr. Qasim",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Orthopedics: [
+          {
+            id: 18,
+            name: "Dr. Hina",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Neurology: [
+          {
+            id: 19,
+            name: "Dr. Javed",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        "General Physician": [
+          {
+            id: 21,
+            name: "Dr. Uthman",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Gynecology: [
+          {
+            id: 22,
+            name: "Dr. Ayesha",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Nephrology: [
+          {
+            id: 23,
+            name: "Dr. Hassan Imran",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Gastrology: [
+          {
+            id: 24,
+            name: "Dr. Ahmad Afzal",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        ENT: [
+          {
+            id: 25,
+            name: "Dr. Maryam",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        "General Surgery": [
+          {
+            id: 26,
+            name: "Dr. Nawaz Kamran",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Urology: [
+          {
+            id: 27,
+            name: "Dr. Umar ",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Oncology: [
+          {
+            id: 28,
+            name: "Dr. Ibrahim",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+      };
+
+      const suggestionBox = document.getElementById("suggestionBox");
+      const suggSpecName = document.getElementById("suggSpecName");
+      const suggDocList = document.getElementById("suggDoctorList");
+      const noMatchMsg = document.getElementById("noMatchMsg");
+      const suggBody = document.getElementById("suggBody");
+      const toggleBoxBtn = document.getElementById("toggleBoxBtn");
+
+      // Hide/Show Toggle logic for Doctor Box
+      toggleBoxBtn.addEventListener("click", () => {
+        if (suggBody.style.display === "none") {
+          suggBody.style.display = "block";
+          toggleBoxBtn.textContent = "▲";
+          toggleBoxBtn.title = "Hide List";
+        } else {
+          suggBody.style.display = "none";
+          toggleBoxBtn.textContent = "▼";
+          toggleBoxBtn.title = "Show List";
+        }
+      });
+
+      function showSuggestion(specKey) {
+        const doctors = doctorsBySpecialty[specKey] || [];
+        suggSpecName.textContent = specialtyLabels[specKey] || specKey;
+        suggDocList.innerHTML = "";
+
+        // Reset visibility state when selecting a specialty
+        suggBody.style.display = "block";
+        toggleBoxBtn.textContent = "▲";
+
+        if (doctors.length === 0) {
+          noMatchMsg.textContent =
+            "No doctors listed under this specialty yet.";
+          noMatchMsg.style.display = "block";
+        } else {
+          noMatchMsg.style.display = "none";
+          doctors.forEach((doc) => {
+            const row = document.createElement("div");
+            row.className = "doc-row";
+            row.innerHTML = `
+              <div class="doc-row-left">
+                <img class="doc-avatar" src="${doc.photo}" alt="${doc.name}">
+                <div>
+                  <div class="doc-name">${doc.name}</div>
+                  <div class="doc-status ${doc.online ? "online" : "offline"}">${doc.online ? "Available now" : "Offline"}</div>
+                </div>
+              </div>
+              <a class="btn btn-teal btn-sm" href="/Book_appointment_p.html?doctor_id=${doc.id}&doctor_name=${encodeURIComponent(doc.name)}&uuid={{ patient_uuid }}">Book Appointment</a>
+            `;
+            suggDocList.appendChild(row);
+          });
+        }
+        suggestionBox.classList.add("show");
+
+        document.querySelectorAll(".spec-tile").forEach((t) => {
+          t.classList.toggle("active", t.dataset.spec === specKey);
+        });
+      }
+
+      document
+        .getElementById("symptomSearchBtn")
+        .addEventListener("click", () => {
+          const query = document
+            .getElementById("symptomInput")
+            .value.toLowerCase()
+            .trim();
+          let matchedSpec = null;
+          for (const key in symptomMap) {
+            if (query.includes(key)) {
+              matchedSpec = symptomMap[key];
+              break;
+            }
+          }
+          if (matchedSpec) {
+            showSuggestion(matchedSpec);
+          } else {
+            suggBody.style.display = "block";
+            toggleBoxBtn.textContent = "▲";
+            suggestionBox.classList.add("show");
+            suggSpecName.textContent = "—";
+            suggDocList.innerHTML = "";
+            noMatchMsg.textContent =
+              "No matching specialist found — try browsing by specialty below.";
+            noMatchMsg.style.display = "block";
+          }
+        });
+
+      document.querySelectorAll(".spec-tile").forEach((tile) => {
+        tile.addEventListener("click", () => showSuggestion(tile.dataset.spec));
+      });
+
+      // Toast Notification
+      function showToast(message, type) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast show " + type;
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 2200);
+      }
+
+      // Logout handler
+      document
+        .getElementById("logoutBtn")
+        .addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            await fetch("/logout");
+          } catch (err) {
+            console.log(err);
+          }
+
+          // Added: Fire the toast message
+          showToast("Logged out successfully!", "success");
+
+          // Added: Delay redirecting by 2 seconds so the pop-up has time to animate
+          setTimeout(() => {
+            window.location.href = "/patient_login.html";
+          }, 2000);
+        });
+    </script>
+    <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+  </body>
+</html>

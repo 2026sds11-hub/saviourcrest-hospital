@@ -1,0 +1,87 @@
+import mysql.connector
+import os
+from auth import hash_password 
+
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", 3307)),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME", "saviours_hospital")
+    )
+def create_tables():
+    conn=get_db_connection()
+    cursor= conn.cursor()
+
+
+
+PATIENTS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS patients (
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  patient_id    VARCHAR(20) UNIQUE,
+  full_name     VARCHAR(120) NOT NULL,
+  email         VARCHAR(150) UNIQUE NOT NULL,
+  phone         VARCHAR(20),
+  password_hash VARCHAR(255) NOT NULL,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+#-------------- Doctor Signup -------------------------
+DOCTOR_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS doctors (
+id INT AUTO_INCREMENT PRIMARY KEY,
+PMDC_ID VARCHAR(20) NOT NULL UNIQUE,
+full_name VARCHAR(120) NOT NULL,
+cnic VARCHAR (15) NOT NULL,
+email VARCHAR(100) NOT NULL,
+password_hash VARCHAR(255) NOT NULL,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+#======================================================================
+#Admin
+#======================================================================
+ADMINS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""    
+# ---------live graph----------    
+DISEASE_STATS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS disease_stats (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  disease_name VARCHAR(100) NOT NULL,
+  cases        INT NOT NULL,
+  region       VARCHAR(100) DEFAULT 'National',
+  recorded_on  DATE NOT NULL
+);
+"""
+
+def create_tables():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Saare tables create karein
+    cursor.execute(PATIENTS_TABLE_SQL)
+    cursor.execute(DOCTOR_TABLE_SQL)
+    cursor.execute(ADMINS_TABLE_SQL)
+    cursor.execute(DISEASE_STATS_TABLE_SQL)
+
+    # Super Admin Check & Create
+    cursor.execute("SELECT * FROM admins WHERE username = %s", ("adminSaviourAli",))
+    admin_exists = cursor.fetchone()
+
+    if not admin_exists:
+        strong_password = os.getenv("ADMIN_PASSWORD", "Doctor@SecurePassword786!") 
+        hashed_pw = hash_password(strong_password)
+        insert_query = "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)"
+        cursor.execute(insert_query, ("adminSaviourAli", hashed_pw))
+        print("Super Admin 'adminSaviourAli' created successfully in MySQL!")
+
+    conn.commit()
+    cursor.close()
+    conn.close()

@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>My Blood Reports | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="View your blood test, X-ray and ultrasound reports, uploaded by the lab."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: #ffffff;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --amber: #b7791f;
+        --blue: #2a5b9e;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        overflow-x: hidden;
+        width: 100%;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      p,
+      span,
+      div,
+      a {
+        overflow-wrap: break-word;
+        word-break: break-word;
+      }
+      h1,
+      h2 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease,
+          background 0.15s ease,
+          color 0.15s ease;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--teal-dark);
+        border: 1px solid var(--teal);
+      }
+      .btn-outline:hover {
+        background: var(--teal);
+        color: #fff;
+      }
+      .btn-outline-danger {
+        background: transparent;
+        color: var(--red);
+        border: 1px solid var(--red);
+      }
+      .btn-outline-danger:hover {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn-outline-success {
+        background: transparent;
+        color: var(--teal);
+        border: 1px solid var(--teal);
+      }
+      .btn-outline-success:hover {
+        background: var(--teal);
+        color: #fff;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      header.navbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand img {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid red;
+        padding: 2px;
+        flex-shrink: 0;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        color: var(--teal-dark);
+        white-space: nowrap;
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        font-weight: 500;
+        font-size: 14.5px;
+      }
+      .nav-links a {
+        color: var(--text);
+        padding: 6px 2px;
+        border-bottom: 2px solid transparent;
+        transition:
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--teal);
+        border-bottom: 2px solid var(--teal);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 13.5px;
+      }
+      .nav-right a.plain {
+        color: var(--text-muted);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .nav-right a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 230px 1fr;
+        min-height: calc(100vh - 120px);
+        max-width: 100%;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 22px 16px;
+      }
+      .sidebar .who {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        padding: 0 4px;
+      }
+      .sidebar .who strong {
+        display: block;
+        color: var(--text);
+        font-size: 14px;
+      }
+      .side-nav a {
+        display: block;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+      }
+      .side-nav a:hover,
+      .side-nav a.active {
+        background: #eaf4f3;
+        color: var(--teal-dark);
+      }
+      .side-nav .group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin: 16px 10px 6px;
+      }
+
+      .main {
+        padding: 26px 30px 50px;
+        width: 100%;
+        min-width: 0;
+      }
+      .topbar {
+        margin-bottom: 22px;
+      }
+      .topbar h1 {
+        font-size: 21px;
+        margin-bottom: 4px;
+      }
+      .topbar p {
+        color: var(--text-muted);
+        font-size: 13.5px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 26px;
+        width: 100%;
+      }
+      .panel h2 {
+        font-size: 17px;
+        margin-bottom: 5px;
+      }
+      .panel .sub {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+
+      /* Filter chips */
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .filter-chip {
+        font-size: 12.5px;
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: #eff6f5;
+        color: var(--teal-dark);
+        border: 1px solid transparent;
+        cursor: pointer;
+        user-select: none;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+        white-space: nowrap;
+      }
+      .filter-chip.active {
+        background: var(--teal-dark);
+        color: #fff;
+      }
+      .filter-chip.hidden-chip {
+        background: #fdf3e4;
+        color: var(--amber);
+        border: 1px dashed var(--amber);
+      }
+      .filter-chip.hidden-chip.active {
+        background: var(--amber);
+        color: #fff;
+      }
+
+      /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: absolute;
+        z-index: 10;
+        top: 190px;
+        right: 30px;
+        left: auto;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 3px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 12px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 8px;
+        color: #64748b;
+      }
+
+      /* Report list */
+      .report-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background: var(--border);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .report-item {
+        background: var(--surface);
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        transition:
+          opacity 0.25s ease,
+          transform 0.25s ease;
+      }
+      .report-item .left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        min-width: 240px;
+      }
+      .report-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: #eaf4f3;
+        color: var(--teal-dark);
+        border: 1px solid var(--border);
+      }
+      .report-icon.xray {
+        background: #fdf3e4;
+        color: var(--amber);
+      }
+      .report-icon.ultrasound {
+        background: #eaf1fb;
+        color: var(--blue);
+      }
+      .report-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .report-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .report-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .no-reports {
+        color: var(--text-muted);
+        font-size: 13px;
+        padding: 16px 4px;
+        display: none;
+      }
+
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 34px 0 18px;
+        font-size: 13.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 16px;
+        max-width: 1180px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 24px;
+      }
+      footer a {
+        color: #b9c8c6;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .emergency-line {
+        color: #ffd9d4;
+        font-weight: 600;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 14px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 12.5px;
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      /* Responsiveness Adjustments */
+      @media (max-width: 1000px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+          padding: 16px 20px;
+        }
+        .side-nav {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+        }
+        .side-nav .group-label {
+          width: 100%;
+          margin: 10px 0 2px;
+        }
+        .side-nav a {
+          margin-bottom: 0;
+          background: #eff6f5;
+        }
+        .nav-links {
+          display: none;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .top-strip {
+          font-size: 11.5px;
+          padding: 6px 10px;
+        }
+        .main {
+          padding: 18px 14px 36px;
+        }
+        .panel {
+          padding: 16px 12px;
+        }
+        .nav-inner {
+          padding: 10px 16px;
+          gap: 10px;
+        }
+        .brand img {
+          width: 38px;
+          height: 38px;
+        }
+        .brand-name {
+          font-size: 17px;
+        }
+        .nav-right {
+          gap: 8px;
+          font-size: 12.5px;
+        }
+        .nav-right .btn-sm {
+          padding: 5px 10px;
+          font-size: 11.5px;
+        }
+        .report-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 14px 12px;
+        }
+        .report-item .left {
+          width: 100%;
+          min-width: unset;
+        }
+        .report-actions {
+          width: 100%;
+          justify-content: flex-start;
+        }
+        .report-actions .btn,
+        .report-actions button {
+          flex: 1 1 auto;
+          text-align: center;
+        }
+        .filter-row {
+          overflow-x: auto;
+          white-space: nowrap;
+          padding-bottom: 8px;
+          margin-bottom: 14px;
+          -webkit-overflow-scrolling: touch;
+        }
+        .filter-chip {
+          font-size: 12px;
+          padding: 5px 12px;
+        }
+        .footer-inner {
+          flex-direction: column;
+          text-align: center;
+          gap: 10px;
+        }
+      }
+
+      @media (max-width: 400px) {
+        .brand-name {
+          font-size: 15px;
+        }
+        .nav-right a.plain {
+          display: none;
+        }
+        .report-actions .btn,
+        .report-actions button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (42)-111-728-468</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>, every day of the year.
+    </div>
+
+    <header class="navbar">
+      <div class="nav-inner">
+        <img 
+          src="/static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="90"
+            height="90"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            " />
+       <span class="brand-name">Saviour<span>Crest</span></span>
+        </a>
+        <div class="nav-right">
+          <a
+            href="/dashboard/patient{% if patient_uuid %}?uuid={{ patient_uuid }}{% elif patient and patient.patient_id %}?uuid={{ patient.patient_id }}{% endif %}"
+            class="plain"
+            >Profile</a
+          >
+          <!-- <a href="/logout" class="btn btn-outline btn-sm">Logout</a> -->
+          <!-- <a href="/" class="plain">Back to Home</a> -->
+        </div>
+      </div>
+    </header>
+
+     <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+      <div class="lang-switcher-container">
+        <span style="margin-right: 6px; font-size: 15px">🌐</span>
+        <select
+          id="custom_language_selector"
+          onchange="changeLanguage(this.value)"
+        >
+          <option value="" disabled selected>Translate Page</option>
+          <option value="en">English</option>
+          <option value="ur">Urdu (اردو)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="fa">Persian(فارسی)</option>
+        </select>
+        <span class="custom-arrow">▼</span>
+      </div>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="who">
+          <strong
+            >{% if patient %}{{ patient.full_name }}{% else %}Patient{% endif
+            %}</strong
+          >
+          Patient ID: {% if patient %}{{ patient.patient_id }}{% else %}N/A{%
+          endif %}
+        </div>
+
+        <nav class="side-nav">
+          <a
+            href="/dashboard/patient{% if patient_uuid %}?uuid={{ patient_uuid }}{% elif patient and patient.patient_id %}?uuid={{ patient.patient_id }}{% endif %}"
+            >Overview</a
+          >
+          <a
+            href="/dashboard/patient{% if patient_uuid %}?uuid={{ patient_uuid }}{% elif patient and patient.patient_id %}?uuid={{ patient.patient_id }}{% endif %}"
+            >Find a Doctor</a
+          >
+          <div class="group-label">My Care</div>
+          <a
+            href="/Book_appointment_p.html{% if patient_uuid %}?uuid={{ patient_uuid }}{% elif patient and patient.patient_id %}?uuid={{ patient.patient_id }}{% endif %}"
+            >Appointments</a
+          >
+          <a
+            href="/patient_history.html{% if patient_uuid %}?uuid={{ patient_uuid }}{% elif patient and patient.patient_id %}?uuid={{ patient.patient_id }}{% endif %}"
+            >Patient History</a
+          >
+          <a
+            href="/blood_reports.html{% if patient_uuid %}?uuid={{ patient_uuid }}{% elif patient and patient.patient_id %}?uuid={{ patient.patient_id }}{% endif %}"
+            class="active"
+            >Blood Reports</a
+          >
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <h1>My Blood & Lab Reports</h1>
+          <p>Uploaded directly by the lab the moment your results are ready.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Report History</h2>
+          <p class="sub">
+            Includes blood tests, X-rays and ultrasounds — newest first.
+          </p>
+
+          <div class="filter-row" id="filterRow">
+            <span class="filter-chip active" data-type="all">All Reports</span>
+            <span class="filter-chip" data-type="Blood Test">Blood Test</span>
+            <span class="filter-chip" data-type="X-Ray">X-Ray</span>
+            <span class="filter-chip" data-type="Ultrasound">Ultrasound</span>
+            <span
+              class="filter-chip hidden-chip"
+              data-type="hidden-view"
+              id="hiddenChip"
+              style="display: none"
+              >Hidden Reports (<span id="hiddenCount">0</span>)</span
+            >
+          </div>
+
+          <div class="report-list" id="reportList">
+            {% if reports %} {% for r in reports %}
+            <div
+              class="report-item"
+              data-type="{{ r.report_type }}"
+              data-id="{{ r.id }}"
+            >
+              <div class="left">
+                <div
+                  class="report-icon {% if r.report_type == 'X-Ray' %}xray{% elif r.report_type == 'Ultrasound' %}ultrasound{% endif %}"
+                >
+                  {% if r.file_path and '.pdf' in r.file_path.lower() %}PDF{%
+                  else %}IMG{% endif %}
+                </div>
+                <div>
+                  <div class="report-title">{{ r.test_name }}</div>
+                  <div class="report-meta">
+                    {{ r.report_type }} · Reported on: {{ r.reported_at }} ·
+                    Uploaded by Lab {% if r.result_summary %}
+                    <br /><span
+                      style="color: var(--teal-dark); font-weight: 500"
+                      >Remarks: {{ r.result_summary }}</span
+                    >
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="report-actions">
+                {% if r.file_path %}
+                <a
+                  href="{{ r.file_path }}"
+                  target="_blank"
+                  class="btn btn-outline btn-sm view-file-btn"
+                  >View File</a
+                >
+                <a
+                  href="{{ r.file_path }}"
+                  download
+                  class="btn btn-outline btn-sm download-btn"
+                  >Download</a
+                >
+                {% else %}
+                <span
+                  style="
+                    font-size: 12px;
+                    color: var(--text-muted);
+                    font-style: italic;
+                  "
+                  >No attachment</span
+                >
+                {% endif %}
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm toggle-hide-btn"
+                  title="Hide this report"
+                >
+                  Hide
+                </button>
+              </div>
+            </div>
+            {% endfor %} {% else %}
+            <div
+              id="emptyState"
+              style="
+                padding: 30px;
+                text-align: center;
+                color: var(--text-muted);
+                background: #fff;
+              "
+            >
+              <p style="font-size: 14px; font-weight: 500">
+                No report is uploaded yet!
+              </p>
+              <span style="font-size: 12px"
+                >When Lab Technician will upload reports soon it will show
+                here!.</span
+              >
+            </div>
+            {% endif %}
+          </div>
+
+          <p class="no-reports" id="noReportsMsg">
+            No reports found for this filter category.
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span
+          >© <span id="year"></span> SaviourCrest Hospital. Open
+          <strong style="color: #fff">24/7</strong>, every day.</span
+        >
+        <span>
+          <a href="tel:+9242111728468">Main: +92 (42)-111-728-468</a>
+          &nbsp;·&nbsp;
+          <a href="tel:+9242111728468" class="emergency-line"
+            >Emergency: +92 (42)-111-728-468</a
+          >
+        </span>
+      </div>
+      <div class="footer-bottom">
+        SaviourCrest Hospital · Pakistan · <a href="/">Back to Home</a>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      const chips = document.querySelectorAll(".filter-chip");
+      const items = document.querySelectorAll(".report-item");
+      const noReportsMsg = document.getElementById("noReportsMsg");
+      const hiddenChip = document.getElementById("hiddenChip");
+      const hiddenCountSpan = document.getElementById("hiddenCount");
+
+      function updateVisibility() {
+        const activeChip = document.querySelector(".filter-chip.active");
+        const type = activeChip ? activeChip.dataset.type : "all";
+        let visible = 0;
+        let hiddenTotal = 0;
+
+        items.forEach((item) => {
+          const isHidden = item.classList.contains("hidden-by-user");
+          if (isHidden) hiddenTotal++;
+
+          let show = false;
+          if (type === "hidden-view") {
+            show = isHidden;
+          } else {
+            const matchesType = type === "all" || item.dataset.type === type;
+            show = !isHidden && matchesType;
+          }
+
+          item.style.display = show ? "flex" : "none";
+          if (show) visible++;
+        });
+
+        // Update Hidden Chip count & display
+        hiddenCountSpan.textContent = hiddenTotal;
+        hiddenChip.style.display = hiddenTotal > 0 ? "inline-block" : "none";
+
+        // If user is currently viewing the hidden tab and all hidden items are restored, switch back to 'all'
+        if (type === "hidden-view" && hiddenTotal === 0) {
+          chips.forEach((c) => c.classList.remove("active"));
+          document.querySelector('[data-type="all"]').classList.add("active");
+          updateVisibility();
+          return;
+        }
+
+        if (items.length > 0) {
+          noReportsMsg.style.display = visible === 0 ? "block" : "none";
+        }
+      }
+
+      // Filter Chips Listener
+      chips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          chips.forEach((c) => c.classList.remove("active"));
+          chip.classList.add("active");
+          updateVisibility();
+        });
+      });
+
+      // Toggle Hide/Restore Action Listener
+      document.querySelectorAll(".toggle-hide-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const item = e.target.closest(".report-item");
+          if (!item) return;
+
+          const isCurrentlyHidden = item.classList.contains("hidden-by-user");
+
+          if (!isCurrentlyHidden) {
+            // Hide the item
+            item.style.opacity = "0";
+            item.style.transform = "scale(0.96)";
+            setTimeout(() => {
+              item.classList.add("hidden-by-user");
+              btn.textContent = "Restore";
+              btn.classList.remove("btn-outline-danger");
+              btn.classList.add("btn-outline-success");
+              item.style.opacity = "1";
+              item.style.transform = "scale(1)";
+              updateVisibility();
+            }, 250);
+          } else {
+            // Restore the item back to regular list
+            item.style.opacity = "0";
+            item.style.transform = "scale(0.96)";
+            setTimeout(() => {
+              item.classList.remove("hidden-by-user");
+              btn.textContent = "Hide";
+              btn.classList.remove("btn-outline-success");
+              btn.classList.add("btn-outline-danger");
+              item.style.opacity = "1";
+              item.style.transform = "scale(1)";
+              updateVisibility();
+            }, 250);
+          }
+        });
+      });
+    </script>
+    <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1480 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Admin Portal | SaviourCrest Hospital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #f3f6f6;
+        --surface: #ffffff;
+        --ink: #16211f;
+        --ink-soft: #55645f;
+        --line: #dfe6e4;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #b3392b;
+        --amber: #9a6b12;
+        --green: #1e7a46;
+        --radius: 6px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 14px;
+        top: 0 !important;
+        position: static !important;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.2px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .btn-primary {
+        background: var(--teal-dark);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--teal);
+      }
+      .btn-line {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn-line:hover {
+        border-color: var(--teal-dark);
+        color: var(--teal-dark);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .btn-delete {
+        color: var(--red);
+        background: #fbefed;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 4px;
+      }
+      .btn-delete:hover {
+        background: var(--red);
+        color: white;
+      }
+
+      /* Paid Button Styles */
+      .btn-paid-status {
+        background: #f3f6f6;
+        color: var(--ink-soft);
+        border: 1px solid var(--line);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .btn-paid-status.paid {
+        background: #e8f3ec;
+        color: var(--green);
+        border-color: #a3d9b1;
+      }
+
+      /* Custom Glassmorphism Confirmation Modal */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(22, 33, 31, 0.4);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        width: 100%;
+        max-width: 420px;
+        padding: 24px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        transform: translateY(10px);
+        transition: transform 0.2s ease;
+      }
+      .modal-overlay.active .modal-card {
+        transform: translateY(0);
+      }
+      .modal-title {
+        font-size: 17px;
+        margin-bottom: 8px;
+        color: var(--ink);
+      }
+      .modal-body {
+        font-size: 13.5px;
+        color: var(--ink-soft);
+        margin-bottom: 20px;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      /* Topbar Strip */
+      header.topbar-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+      }
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1300px;
+        margin: 0 auto;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .brand-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--ink-soft);
+        border-left: 1px solid var(--line);
+        padding-left: 9px;
+        font-weight: 600;
+      }
+      .id-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 13px;
+        flex-wrap: wrap;
+      }
+      .id-actions a.plain {
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+      .id-actions a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      /* Google Translation Switcher */
+      .skiptranslate iframe,
+      #goog-gt-tt,
+      .goog-te-banner-frame {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: relative;
+        z-index: 90;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 4px 12px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 8px;
+        color: #64748b;
+      }
+
+      /* Layout shell */
+      .shell {
+        display: grid;
+        grid-template-columns: 216px 1fr;
+        max-width: 1300px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 20px 14px;
+      }
+      .sidebar .who {
+        padding: 2px 8px 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+      .sidebar .who strong {
+        display: block;
+        font-size: 13.5px;
+      }
+      .sidebar .who .role {
+        font-size: 11.5px;
+        color: var(--teal);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .side-nav a {
+        display: block;
+        padding: 7px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin-bottom: 1px;
+        border-left: 2px solid transparent;
+      }
+      .side-nav a:hover {
+        color: var(--teal-dark);
+      }
+      .side-nav a.active {
+        color: var(--teal-dark);
+        border-left-color: var(--teal-dark);
+        background: #eff5f4;
+        font-weight: 600;
+      }
+      .side-nav .group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ink-soft);
+        margin: 16px 8px 6px;
+      }
+
+      .main {
+        padding: 24px 28px 50px;
+        min-width: 0;
+        width: 100%;
+      }
+
+      .page-title {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .page-title h1 {
+        font-size: 19px;
+        margin-bottom: 3px;
+      }
+      .page-title p {
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+
+      .stat-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        margin-bottom: 24px;
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .stat-card {
+        background: var(--surface);
+        padding: 14px 16px;
+      }
+      .stat-card .num {
+        font-family: "Poppins", sans-serif;
+        font-size: 19px;
+        font-weight: 700;
+      }
+      .stat-card .label {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 22px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      .panel-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .panel h2 {
+        font-size: 15px;
+      }
+      .panel .sub {
+        color: var(--ink-soft);
+        font-size: 12.5px;
+        margin-bottom: 16px;
+        word-break: break-word;
+      }
+
+      .chip-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 12px;
+        background: #f3f6f6;
+        color: var(--ink-soft);
+        border: 1px solid var(--line);
+        cursor: pointer;
+      }
+      .chip.active {
+        background: var(--teal-dark);
+        color: #fff;
+        border-color: var(--teal-dark);
+      }
+
+      canvas {
+        max-height: 280px;
+        width: 100% !important;
+      }
+
+      /* Toast Notifications */
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .toast {
+        background: rgba(232, 243, 236, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(30, 122, 70, 0.2);
+        border-left: 4px solid var(--green);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        padding: 14px 18px;
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transform: translateX(120%);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        min-width: 280px;
+      }
+      .toast.error {
+        background: rgba(251, 239, 237, 0.95);
+        border: 1px solid rgba(179, 57, 43, 0.2);
+        border-left: 4px solid var(--red);
+      }
+      .toast.show {
+        transform: translateX(0);
+      }
+      .toast-icon {
+        background: rgba(30, 122, 70, 0.15);
+        color: var(--green);
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .toast.error .toast-icon {
+        background: rgba(179, 57, 43, 0.15);
+        color: var(--red);
+      }
+
+      /* Tables */
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+      }
+      th,
+      td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        vertical-align: middle;
+      }
+      th {
+        color: var(--ink-soft);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 3px;
+        text-transform: uppercase;
+      }
+      .badge-good {
+        background: #e8f3ec;
+        color: var(--green);
+      }
+      .badge-low {
+        background: #fbefed;
+        color: var(--red);
+      }
+
+      /* Forms */
+      .field-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+      .field {
+        margin-bottom: 14px;
+        flex: 1 1 200px;
+        min-width: 0;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+      }
+      .field input,
+      .field select {
+        width: 100%;
+        padding: 9px 11px;
+        font-size: 13.5px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #fbfdfd;
+        outline: none;
+      }
+
+      footer {
+        background: var(--ink);
+        color: #c9d3d1;
+        padding: 26px 0 16px;
+        font-size: 12.5px;
+        width: 100%;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        max-width: 1300px;
+        margin: 0 auto 12px auto;
+        padding: 0 24px;
+      }
+      .footer-bottom {
+        border-top: 1px solid #2a3634;
+        padding-top: 12px;
+        text-align: center;
+        color: #7c8a86;
+        font-size: 11.5px;
+      }
+
+      @media (max-width: 1024px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          border-right: none;
+          border-bottom: 1px solid var(--line);
+        }
+        .stat-row {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .topbar-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .id-actions {
+          width: 100%;
+          justify-content: space-between;
+        }
+        .main {
+          padding: 16px 12px 40px;
+        }
+        .stat-row {
+          grid-template-columns: 1fr;
+        }
+        .field-row {
+          flex-direction: column;
+        }
+        table {
+          min-width: 600px;
+        }
+      }
+    </style>
+    <script>
+      // Auth & UUID Preservation
+      const urlParams = new URLSearchParams(window.location.search);
+      const adminUuid = urlParams.get("uuid");
+      const adminToken =
+        localStorage.getItem("access_token") ||
+        localStorage.getItem("admin_token");
+
+      if (!adminToken && !adminUuid) {
+        window.location.replace("/admin_login");
+      } else {
+        document.addEventListener("DOMContentLoaded", () => {
+          document.body.style.display = "block";
+          if (adminUuid) {
+            const patientRecLink = document.querySelector(
+              'a[href="/patient_records"]',
+            );
+            if (patientRecLink) {
+              patientRecLink.href = `/patient_records?uuid=${adminUuid}`;
+            }
+          }
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div id="google_translate_element" style="display: none"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Custom Modern Confirm Modal -->
+    <div class="modal-overlay" id="customConfirmModal">
+      <div class="modal-card">
+        <h3 class="modal-title" id="modalTitle">Confirm Action</h3>
+        <p class="modal-body" id="modalMessage">
+          Are you sure you want to proceed?
+        </p>
+        <div class="modal-actions">
+          <button class="btn btn-line btn-sm" id="modalCancelBtn">
+            Cancel
+          </button>
+          <button
+            class="btn btn-primary btn-sm"
+            id="modalConfirmBtn"
+            style="background: var(--red)"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <header class="topbar-strip">
+      <div class="topbar-inner">
+        <div class="brand">
+          <img
+            src="/static/logo.jpeg"
+            alt="SaviourCrest Logo"
+            width="45"
+            height="45"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <div class="brand-text">
+            <span class="brand-name">Saviour<span>Crest</span></span>
+            <span class="brand-tag">Admin Portal</span>
+          </div>
+        </div>
+
+        <div class="id-actions">
+          <div class="lang-switcher-container">
+            <span style="margin-right: 6px; font-size: 15px">🌐</span>
+            <select
+              id="custom_language_selector"
+              onchange="changeLanguage(this.value)"
+            >
+              <option value="" disabled selected>Translate Page</option>
+              <option value="en">English</option>
+              <option value="ur">Urdu (اردو)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="es">Spanish (Español)</option>
+            </select>
+            <span class="custom-arrow">▼</span>
+          </div>
+
+          <!-- Is line ko dhoond kar replace karein -->
+          <a href="javascript:void(0)" class="plain" onclick="confirmLogout()"
+            >Log Out</a
+          >
+
+          <!-- <a href="/admin_login" class="plain" onclick="localStorage.clear()"
+            >Log Out</a
+          > -->
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="who">
+          <strong>admin</strong>
+          <div class="role">Administrator</div>
+        </div>
+
+        <nav class="side-nav">
+          <div class="group-label">Hospital Operations</div>
+          <a href="#overview" class="active">Overview</a>
+          <a href="#doctor-management">Doctor Management</a>
+          <a href="#registered-doctors">Registered Doctors</a>
+          <a href="#financial-analytics">Revenue & Expenses</a>
+          <a href="#salaries">Salaries</a>
+          <a href="#equipment">Equipment</a>
+          <a href="#lab-material">Lab Material</a>
+          <a href="/patient_records?uuid={{admin_uuid}}">Patient Records</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="page-title" id="overview">
+          <h1>Admin Portal</h1>
+          <p>
+            Real-time operations, revenue aggregation, and hospital analytics.
+          </p>
+        </div>
+
+        <!-- OVERVIEW STATS (DYNAMIC REVENUE MULTI-SOURCE) -->
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="num" id="topRevenueVal">Rs. 0</div>
+            <div class="label">
+              <span>Revenue Total</span>
+              <div class="chip-row">
+                <span
+                  class="chip active"
+                  onclick="switchRevenueFilter('today', this)"
+                  >Today</span
+                >
+                <span class="chip" onclick="switchRevenueFilter('week', this)"
+                  >Week</span
+                >
+                <span class="chip" onclick="switchRevenueFilter('month', this)"
+                  >Month</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="topStaffVal">128</div>
+            <div class="label">Doctors & Staff</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="topPatientsVal">312</div>
+            <div class="label">Patients This Month</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="topExpensesVal">Rs. 18,000</div>
+            <div class="label">Expenses This Week</div>
+          </div>
+        </div>
+
+        <!-- DOCTOR ACCOUNTS MANAGEMENT -->
+        <div class="panel" id="doctor-management">
+          <div class="panel-head"><h2>Doctor Accounts Management</h2></div>
+          <p class="sub">Create new official doctor accounts securely.</p>
+
+          <form id="addDoctorForm" class="field-row">
+            <div class="field">
+              <label>Full Name</label>
+              <input
+                type="text"
+                id="docName"
+                placeholder="e.g. Dr. Sarah Khan"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>PMDC ID</label>
+              <input
+                type="text"
+                id="docPmdc"
+                placeholder="e.g. 45214-M"
+                maxlength="7"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>CNIC</label>
+              <input
+                type="text"
+                id="docCnic"
+                placeholder="e.g. 35202-1234567-1"
+                maxlength="15"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input
+                type="email"
+                id="docEmail"
+                placeholder="doctor@example.com"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Specialization</label>
+              <input
+                type="text"
+                id="docSpecialization"
+                placeholder="e.g. Cardiologist"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Temp Password</label>
+              <input
+                type="text"
+                id="docPass"
+                placeholder="e.g. Doctor@123"
+                required
+              />
+            </div>
+            <div class="field" style="align-self: flex-end">
+              <button type="submit" class="btn btn-primary">
+                Create Account
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- REGISTERED DOCTORS DIRECTORY -->
+        <div class="panel" id="registered-doctors">
+          <div class="panel-head"><h2>Registered Doctors Directory</h2></div>
+          <p class="sub">List of all registered medical staff in the system.</p>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>PMDC ID</th>
+                  <th>CNIC</th>
+                  <th>Email</th>
+                  <th>Specialization</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="doctorsDirectoryBody">
+                {% for doctor in doctors %}
+                <tr id="doc-row-{{ doctor.id }}">
+                  <td>{{ doctor.full_name }}</td>
+                  <td class="mono">{{ doctor.pmdc_id }}</td>
+                  <td class="mono">{{ doctor.cnic }}</td>
+                  <td>{{ doctor.email }}</td>
+                  <td>{{ doctor.specialization }}</td>
+                  <td>
+                    <button
+                      class="btn btn-delete btn-sm"
+                      onclick="promptDeleteDoctor('{{ doctor.id }}', '{{ doctor.full_name }}')"
+                    >
+                      ✖
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- REVENUE VS EXPENSES & BREAKDOWN (CONSOLIDATED) -->
+        <div class="panel" id="financial-analytics">
+          <div class="panel-head">
+            <h2>Revenue & Expenses Analytics</h2>
+          </div>
+          <p class="sub">
+            Aggregated payments from Reception, Lab Tests & Online Appointments
+            against hospital expenses.
+          </p>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 2fr 1fr;
+              gap: 20px;
+              align-items: center;
+            "
+          >
+            <div>
+              <canvas id="revExpChart" height="110"></canvas>
+            </div>
+            <div>
+              <canvas id="revenueBreakdownChart" height="110"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- SALARIES (ALL DEPARTMENTS INCLUDED) -->
+        <div class="panel" id="salaries">
+          <div class="panel-head"><h2>Staff & Doctors Salaries</h2></div>
+          <p class="sub">
+            Manage monthly payouts across all departments (Doctor, Reception,
+            Lab, Staff).
+          </p>
+
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Employee Name</th>
+                  <th>Role / Dept</th>
+                  <th>Monthly Salary</th>
+                  <th>Last Paid Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="salariesTableBody">
+                <!-- Dynamically persistent rows -->
+                <tr data-id="1">
+                  <td>Dr. A. Karim</td>
+                  <td>Doctor (Cardiology)</td>
+                  <td class="mono">Rs. 280,000</td>
+                  <td class="paid-date">Jun 30, 2026</td>
+                  <td>
+                    <button
+                      class="btn-paid-status"
+                      onclick="toggleSalaryPaid(this, '1')"
+                    >
+                      Mark Paid
+                    </button>
+                  </td>
+                </tr>
+                <tr data-id="2">
+                  <td>Sarah Ali</td>
+                  <td>Receptionist</td>
+                  <td class="mono">Rs. 55,000</td>
+                  <td class="paid-date">Jul 30, 2026</td>
+                  <td>
+                    <button
+                      class="btn-paid-status paid"
+                      onclick="toggleSalaryPaid(this, '2')"
+                    >
+                      ✓ Paid
+                    </button>
+                  </td>
+                </tr>
+                <tr data-id="3">
+                  <td>Usman Tariq</td>
+                  <td>Lab Technician</td>
+                  <td class="mono">Rs. 75,000</td>
+                  <td class="paid-date">Jul 30, 2026</td>
+                  <td>
+                    <button
+                      class="btn-paid-status paid"
+                      onclick="toggleSalaryPaid(this, '3')"
+                    >
+                      ✓ Paid
+                    </button>
+                  </td>
+                </tr>
+                <tr data-id="4">
+                  <td>Bilal Ahmed</td>
+                  <td>General Staff</td>
+                  <td class="mono">Rs. 35,000</td>
+                  <td class="paid-date">Jun 28, 2026</td>
+                  <td>
+                    <button
+                      class="btn-paid-status"
+                      onclick="toggleSalaryPaid(this, '4')"
+                    >
+                      Mark Paid
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- EQUIPMENT -->
+        <div class="panel" id="equipment">
+          <div class="panel-head"><h2>Equipment</h2></div>
+          <p class="sub">Medical equipment inventory management.</p>
+
+          <div class="table-responsive" style="margin-bottom: 18px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Equipment</th>
+                  <th>Department</th>
+                  <th>Quantity</th>
+                  <th>Status</th>
+                  <th>Last Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ECG Machine</td>
+                  <td>Cardiology</td>
+                  <td>3</td>
+                  <td><span class="badge badge-good">Working</span></td>
+                  <td>Jul 15, 2026</td>
+                </tr>
+                <tr>
+                  <td>Ultrasound Scanner</td>
+                  <td>Radiology</td>
+                  <td>2</td>
+                  <td>
+                    <span class="badge badge-low">Needs Maintenance</span>
+                  </td>
+                  <td>Jul 05, 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <form id="equipmentForm" class="field-row">
+            <div class="field">
+              <label>Equipment name</label>
+              <input
+                type="text"
+                name="equipment_name"
+                placeholder="e.g. Oxygen Concentrator"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Department</label>
+              <input
+                type="text"
+                name="department"
+                placeholder="e.g. Emergency"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Quantity</label>
+              <input
+                type="number"
+                name="quantity"
+                min="1"
+                placeholder="e.g. 2"
+                required
+              />
+            </div>
+            <div class="field" style="align-self: flex-end">
+              <button type="submit" class="btn btn-primary">
+                Add Equipment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- LAB MATERIAL -->
+        <div class="panel" id="lab-material">
+          <div class="panel-head"><h2>Lab Material</h2></div>
+          <p class="sub">Consumable stock for laboratory diagnostics.</p>
+
+          <div class="table-responsive" style="margin-bottom: 18px">
+            <table>
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Remaining Stock</th>
+                  <th>Unit</th>
+                  <th>Last Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Blood Test Vials</td>
+                  <td>340</td>
+                  <td>pcs</td>
+                  <td>Jul 19, 2026</td>
+                </tr>
+                <tr>
+                  <td>Reagent Kits (CBC)</td>
+                  <td>22</td>
+                  <td>kits</td>
+                  <td>Jul 17, 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <form id="labMaterialForm" class="field-row">
+            <div class="field">
+              <label>Material name</label>
+              <input
+                type="text"
+                name="material_name"
+                placeholder="e.g. Syringes"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Quantity</label>
+              <input
+                type="number"
+                name="quantity"
+                min="1"
+                placeholder="e.g. 100"
+                required
+              />
+            </div>
+            <div class="field">
+              <label>Unit</label>
+              <input type="text" name="unit" placeholder="e.g. pcs" required />
+            </div>
+            <div class="field" style="align-self: flex-end">
+              <button type="submit" class="btn btn-primary">
+                Add Material
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span
+          >© <span id="year"></span> SaviourCrest Hospital — Internal Admin
+          Portal</span
+        >
+      </div>
+      <div class="footer-bottom">SaviourCrest Hospital · Pakistan</div>
+    </footer>
+
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      // 1. Custom Confirmation Modal Logic
+      function customConfirm(title, message, onConfirm) {
+        const modal = document.getElementById("customConfirmModal");
+        document.getElementById("modalTitle").textContent = title;
+        document.getElementById("modalMessage").textContent = message;
+
+        modal.classList.add("active");
+
+        const cancelBtn = document.getElementById("modalCancelBtn");
+        const confirmBtn = document.getElementById("modalConfirmBtn");
+
+        const close = () => modal.classList.remove("active");
+
+        cancelBtn.onclick = () => close();
+        confirmBtn.onclick = () => {
+          close();
+          onConfirm();
+        };
+      }
+
+      // 2. Delete Doctor Prompt
+      function promptDeleteDoctor(doctorId, doctorName) {
+        customConfirm(
+          "Delete Doctor Account",
+          `Are you sure you want to delete ${doctorName}?`,
+          () => {
+            deleteDoctor(doctorId, doctorName);
+          },
+        );
+      }
+
+      async function deleteDoctor(doctorId, doctorName) {
+        try {
+          const response = await fetch(`/admin/delete-doctor/${doctorId}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const row = document.getElementById(`doc-row-${doctorId}`);
+            if (row) row.remove();
+            showToast(
+              "Deleted Successfully!",
+              `${doctorName} has been removed.`,
+            );
+          } else {
+            const result = await response.json();
+            showToast(
+              "Deletion Failed",
+              result.detail || "Error deleting.",
+              true,
+            );
+          }
+        } catch (error) {
+          showToast("System Error", "Could not complete request.", true);
+        }
+      }
+
+      // 3. Persistent Salary Status
+      function loadSalaryStates() {
+        const savedStates = JSON.parse(
+          localStorage.getItem("salaryStates") || "{}",
+        );
+        document.querySelectorAll("#salariesTableBody tr").forEach((row) => {
+          const id = row.getAttribute("data-id");
+          if (savedStates[id]) {
+            const btn = row.querySelector(".btn-paid-status");
+            const dateCell = row.querySelector(".paid-date");
+            btn.classList.add("paid");
+            btn.textContent = "✓ Paid";
+            if (savedStates[id].date)
+              dateCell.textContent = savedStates[id].date;
+          }
+        });
+      }
+
+      async function toggleSalaryPaid(btn, empId) {
+        const isPaid = btn.classList.contains("paid");
+        const newStatus = !isPaid;
+        const todayStr = new Date().toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        });
+
+        if (newStatus) {
+          btn.classList.add("paid");
+          btn.textContent = "✓ Paid";
+          btn.closest("tr").querySelector(".paid-date").textContent = todayStr;
+        } else {
+          btn.classList.remove("paid");
+          btn.textContent = "Mark Paid";
+        }
+
+        // Local Storage Sync (Guarantees persistence across refresh)
+        const savedStates = JSON.parse(
+          localStorage.getItem("salaryStates") || "{}",
+        );
+        savedStates[empId] = newStatus ? { paid: true, date: todayStr } : false;
+        localStorage.setItem("salaryStates", JSON.stringify(savedStates));
+
+        // Backend Sync (If API available)
+        try {
+          await fetch(`/admin/update-salary-status`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              employee_id: empId,
+              status: newStatus ? "Paid" : "Unpaid",
+            }),
+          });
+        } catch (e) {
+          console.log("Backend offline, state saved locally.");
+        }
+
+        showToast("Salary Updated", `Status updated for employee #${empId}`);
+      }
+
+      // 4. Live Revenue Stats Filter
+      const revenueData = {
+        today: "Rs. 46,200",
+        week: "Rs. 308,500",
+        month: "Rs. 1,280,000",
+      };
+
+      function switchRevenueFilter(period, element) {
+        document
+          .querySelectorAll(".stat-card .chip")
+          .forEach((c) => c.classList.remove("active"));
+        element.classList.add("active");
+        document.getElementById("topRevenueVal").textContent =
+          revenueData[period];
+        localStorage.setItem("selectedRevenueFilter", period);
+      }
+
+      // 5. Render Financial Charts
+      function renderCharts() {
+        // Revenue vs Expenses Monthly Chart
+        new Chart(document.getElementById("revExpChart").getContext("2d"), {
+          type: "bar",
+          data: {
+            labels: ["Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+            datasets: [
+              {
+                label: "Revenue",
+                data: [1020000, 940000, 1105000, 1180000, 1250000, 1090000],
+                backgroundColor: "#0E6B65",
+                borderRadius: 4,
+              },
+              {
+                label: "Expenses",
+                data: [420000, 385000, 460000, 410000, 495000, 388000],
+                backgroundColor: "#B3392B",
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: "top" } },
+            scales: {
+              y: { ticks: { callback: (v) => "Rs. " + v.toLocaleString() } },
+            },
+          },
+        });
+
+        // Revenue Breakdown (Reception vs Lab vs Appointments)
+        new Chart(
+          document.getElementById("revenueBreakdownChart").getContext("2d"),
+          {
+            type: "doughnut",
+            data: {
+              labels: ["Reception Bills", "Lab Tests", "Online Appointments"],
+              datasets: [
+                {
+                  data: [520000, 340000, 230000],
+                  backgroundColor: ["#0E6B65", "#14958C", "#9A6B12"],
+                  borderWidth: 0,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { position: "bottom" } },
+            },
+          },
+        );
+      }
+
+      // Toast Notifications
+      function showToast(title, message, isError = false) {
+        let container = document.getElementById("toastContainer");
+        const toast = document.createElement("div");
+        toast.className = isError ? "toast error" : "toast";
+        toast.innerHTML = `
+          <div class="toast-icon">${isError ? "✖" : "✓"}</div>
+          <div>
+            <h4 style="font-size: 13.5px; font-weight:600;">${title}</h4>
+            <p style="font-size: 12px; color: var(--ink-soft);">${message}</p>
+          </div>
+        `;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add("show"), 10);
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => toast.remove(), 400);
+        }, 4000);
+      }
+
+      // Page Init
+      document.addEventListener("DOMContentLoaded", () => {
+        loadSalaryStates();
+        renderCharts();
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        const savedFilter =
+          localStorage.getItem("selectedRevenueFilter") || "today";
+        const chip = document.querySelector(
+          `.stat-card .chip[onclick*='${savedFilter}']`,
+        );
+        if (chip) switchRevenueFilter(savedFilter, chip);
+      });
+
+      // Add Doctor Form Event Listener (Toast Pop-up + API Call)
+      document
+        .getElementById("addDoctorForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const docData = {
+            full_name: document.getElementById("docName").value,
+            pmdc_id: document.getElementById("docPmdc").value,
+            cnic: document.getElementById("docCnic").value,
+            email: document.getElementById("docEmail").value,
+            specialization: document.getElementById("docSpecialization").value,
+            password: document.getElementById("docPass").value,
+          };
+
+          try {
+            const res = await fetch("/admin/register-doctor", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(docData),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+              showToast(
+                "Success",
+                data.message || "Doctor registered successfully!",
+              );
+              document.getElementById("addDoctorForm").reset();
+              setTimeout(() => window.location.reload(), 1200); // Dynamic reload
+            } else {
+              showToast(
+                "Error",
+                data.detail || "Failed to register doctor",
+                true,
+              );
+            }
+          } catch (err) {
+            showToast("System Error", "Could not connect to server", true);
+          }
+        });
+
+      // Google Translate Init
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          { pageLanguage: "en", autoDisplay: false },
+          "google_translate_element",
+        );
+      }
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        }
+      }
+
+      function confirmLogout() {
+        const modal = document.getElementById("customConfirmModal");
+        const title = document.getElementById("modalTitle");
+        const message = document.getElementById("modalMessage");
+        const confirmBtn = document.getElementById("modalConfirmBtn");
+        const cancelBtn = document.getElementById("modalCancelBtn");
+
+        // Pop-up details & red style setup
+        title.innerText = "Logout Confirmation";
+        message.innerText =
+          "Kya aap waniqan Admin Portal se Log Out karna chahte hain?";
+        confirmBtn.innerText = "Yes, Log Out";
+        confirmBtn.style.background = "var(--red)";
+
+        // Show Modal
+        modal.classList.add("active");
+
+        // On Confirm Click
+        confirmBtn.onclick = function () {
+          localStorage.clear();
+          window.location.href = "/admin_login";
+        };
+
+        // On Cancel Click
+        cancelBtn.onclick = function () {
+          modal.classList.remove("active");
+        };
+      }
+    </script>
+  </body>
+</html>

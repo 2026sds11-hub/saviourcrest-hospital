@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Patient History | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="View your complete medical history and prescribed medicines."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: #ffffff;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --red-dark: #9e2e22;
+        --green: #1e824c;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 10px;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13.5px;
+        padding: 9px 18px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease,
+          background 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--teal-dark);
+        border: 1px solid var(--teal);
+      }
+      .btn-outline:hover {
+        background: var(--teal);
+        color: #fff;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      header.navbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 20px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-left: 6px;
+        border-left: 2px solid var(--border);
+        padding-left: 10px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 26px;
+        font-weight: 500;
+        font-size: 14.5px;
+      }
+      .nav-links a {
+        color: var(--text);
+        padding: 6px 2px;
+        border-bottom: 2px solid transparent;
+        transition:
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--teal);
+        border-bottom: 2px solid var(--teal);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 13.5px;
+      }
+      .nav-right a.plain {
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .nav-right a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 230px 1fr;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        padding: 22px 16px;
+      }
+      .sidebar .who {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        padding: 0 4px;
+      }
+      .sidebar .who strong {
+        display: block;
+        color: var(--text);
+        font-size: 14px;
+      }
+      .side-nav a {
+        display: block;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease;
+      }
+      .side-nav a:hover,
+      .side-nav a.active {
+        background: #eaf4f3;
+        color: var(--teal-dark);
+      }
+      .side-nav .group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin: 16px 10px 6px;
+      }
+      .side-nav .sub-link {
+        padding-left: 22px;
+        font-size: 13px;
+      }
+
+      .main {
+        padding: 26px 30px 50px;
+      }
+      .topbar {
+        margin-bottom: 18px;
+      }
+      .topbar h1 {
+        font-size: 21px;
+        margin-bottom: 4px;
+      }
+      .topbar p {
+        color: var(--text-muted);
+        font-size: 13.5px;
+      }
+
+      /* -------- SEARCH BAR STYLES -------- */
+      .search-box-container {
+        position: relative;
+        margin-bottom: 22px;
+      }
+      .search-box-container input {
+        width: 100%;
+        padding: 12px 16px 12px 42px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        background: var(--surface);
+        color: var(--text);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+      .search-box-container input:focus {
+        border-color: var(--teal);
+        box-shadow: 0 0 0 3px rgba(14, 107, 101, 0.15);
+        outline: none;
+      }
+      .search-box-container .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 16px;
+        color: var(--text-muted);
+        pointer-events: none;
+      }
+
+      /* -------- Patient History Cards -------- */
+      .history-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 24px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+      }
+      .history-header {
+        background: #eff6f5;
+        padding: 16px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .history-header h3 {
+        font-size: 16px;
+        color: var(--teal-dark);
+        margin: 0;
+      }
+      .header-actions-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .history-header .visit-date {
+        font-weight: 700;
+        color: var(--teal-dark);
+        font-size: 14px;
+        background: #fff;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid #d0e3e1;
+      }
+
+      .history-body {
+        padding: 24px;
+        transition: all 0.3s ease;
+      }
+
+      
+      /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: absolute;
+        z-index: 10;
+        top: 190px;
+        right: 30px;
+        left: auto;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 3px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 12px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 8px;
+        color: #64748b;
+      }
+
+
+      /* Vitals Grid */
+      .vitals-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .vital-item {
+        background: var(--bg);
+        padding: 10px 16px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        font-size: 13.5px;
+        min-width: 140px;
+      }
+      .vital-item span {
+        display: block;
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 11px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+
+      /* Notes Section */
+      .notes-section {
+        margin-bottom: 24px;
+      }
+      .notes-section h4 {
+        font-size: 14px;
+        margin-bottom: 8px;
+        color: var(--text);
+      }
+      .notes-section p {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        background: #fbfdfd;
+        padding: 14px 16px;
+        border-left: 3px solid var(--teal);
+        border-radius: 0 6px 6px 0;
+        line-height: 1.6;
+      }
+
+      /* Meds Table inside Card */
+      .med-table-wrapper h4 {
+        font-size: 14px;
+        margin-bottom: 10px;
+        color: var(--text);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      th,
+      td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        background: #f9fbfb;
+        color: var(--text-muted);
+        font-family: "Poppins", sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      .note-line {
+        font-size: 12.5px;
+        color: var(--text-muted);
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px dashed var(--border);
+      }
+      .note-line a {
+        color: var(--teal-dark);
+        font-weight: 600;
+      }
+      .note-line a:hover {
+        text-decoration: underline;
+      }
+
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 34px 0 18px;
+        font-size: 13.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 16px;
+        max-width: 1180px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 24px;
+      }
+      footer a {
+        color: #b9c8c6;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .emergency-line {
+        color: #ffd9d4;
+        font-weight: 600;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 14px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 12.5px;
+      }
+
+      @media (max-width: 1000px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        .nav-links {
+          display: none;
+        }
+        table {
+          font-size: 12.5px;
+        }
+      }
+
+      @media screen and (max-width: 768px) {
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .container,
+        .wrapper,
+        main,
+        .main-content,
+        .content-area,
+        .portal-container {
+          width: 100% !important;
+          max-width: 100% !important;
+          padding-left: 12px !important;
+          padding-right: 12px !important;
+          box-sizing: border-box !important;
+        }
+
+        header,
+        nav,
+        .navbar {
+          height: auto !important;
+        }
+
+        .nav-inner,
+        .header-container {
+          flex-wrap: wrap !important;
+          padding: 10px 12px !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+        }
+
+        .brand {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-start !important;
+          gap: 10px !important;
+          width: auto !important;
+        }
+
+        .brand img,
+        header img,
+        .navbar img {
+          width: 55px !important;
+          height: 55px !important;
+          min-width: 55px !important;
+          min-height: 55px !important;
+          max-width: 55px !important;
+          max-height: 55px !important;
+          object-fit: cover !important;
+          border-radius: 50% !important;
+          flex-shrink: 0 !important;
+        }
+
+        .brand-name {
+          margin: 0 !important;
+          white-space: nowrap !important;
+        }
+
+        .menu-toggle {
+          display: flex !important;
+        }
+
+        .nav-links {
+          display: none !important;
+          flex-direction: column !important;
+          width: 100% !important;
+          text-align: center !important;
+          gap: 10px !important;
+          padding: 12px 0 0 0 !important;
+          order: 3 !important;
+        }
+
+        .nav-links.active {
+          display: flex !important;
+        }
+
+        .user-actions,
+        .header-actions,
+        .nav-right,
+        .profile-section,
+        .back-home-wrapper {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: flex-end !important;
+          gap: 8px !important;
+          width: auto !important;
+        }
+
+        .back-home,
+        .back-home-wrapper a,
+        .header-actions a,
+        .header-actions button,
+        .profile-section a,
+        .profile-section button {
+          width: auto !important;
+          white-space: nowrap !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          font-size: 13px !important;
+          padding: 6px 12px !important;
+        }
+
+        form button,
+        form .btn,
+        .auth-card .btn,
+        .card .btn,
+        .login-card .btn,
+        .full-width-btn {
+          width: 100% !important;
+          display: block !important;
+        }
+
+        input,
+        select,
+        textarea {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+
+        header .btn,
+        .navbar .btn,
+        .header-actions .btn,
+        .nav-inner .btn {
+          width: auto !important;
+        }
+
+        .grid,
+        .row,
+        .login-grid,
+        .services-grid,
+        .about-stats,
+        .facility-grid,
+        .feedback-grid,
+        .dash-grid,
+        .footer-grid,
+        .portal-grid,
+        .stats-grid,
+        .cards-grid,
+        .two-column,
+        .three-column {
+          grid-template-columns: 1fr !important;
+          flex-direction: column !important;
+          gap: 16px !important;
+        }
+
+        .card,
+        .login-card,
+        .service-card,
+        .stat-box,
+        .facility-card,
+        .feedback-card,
+        .dash-card,
+        .donate-box,
+        .auth-card,
+        .panel,
+        form {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+
+        table,
+        .table-responsive {
+          display: block !important;
+          width: 100% !important;
+          overflow-x: auto !important;
+          white-space: nowrap !important;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        canvas,
+        svg,
+        iframe {
+          max-width: 100% !important;
+          height: auto !important;
+        }
+
+        canvas {
+          max-height: 280px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (---)-(---)</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>, every day of the year.
+    </div>
+
+    <header class="navbar">
+      <div class="nav-inner">
+        <!-- <a href="/dashboard/patient" class="brand"> -->
+          <img
+            src="/static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="100"
+            height="100"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+          <span class="brand-tag">History Portal</span>
+        </a>
+
+        <div class="nav-right">
+          <a href="/dashboard/patient/{patient_uuid_path}" class="plain">Profile</a>
+          <a href="/patient_login" class="btn btn-outline btn-sm">Logout</a>
+        </div>
+      </div>
+    </header>
+
+      <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+      <div class="lang-switcher-container">
+        <span style="margin-right: 6px; font-size: 15px">🌐</span>
+        <select
+          id="custom_language_selector"
+          onchange="changeLanguage(this.value)"
+        >
+          <option value="" disabled selected>Translate Page</option>
+          <option value="en">English</option>
+          <option value="ur">Urdu (اردو)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="fa">Persian(فارسی)</option>
+        </select>
+        <span class="custom-arrow">▼</span>
+      </div>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <!-- Dynamic Patient Info in Sidebar -->
+        <div class="who">
+          <strong
+            >{{ patient.full_name if patient and patient.full_name else
+            'Patient' }}</strong
+          >
+          Patient ID: {{ patient.patient_uuid if patient and
+          patient.patient_uuid else (patient.patient_id if patient and
+          patient.patient_id else patient_id) }}
+        </div>
+
+        <nav class="side-nav">
+          <a href="/dashboard/patient">Overview</a>
+          <a href="/dashboard/patient/{patient_uuid}#find-doctor">Find a Doctor</a>
+          <div class="group-label">My Care</div>
+          <a href="/patient_history" class="active">Patient History</a>
+
+          <div class="group-label">Reports</div>
+          <a href="/blood_reports" class="sub-link">Blood Reports</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <h1>Patient Medical History</h1>
+          <p>
+            Complete record of your previous visits, doctor's notes, vitals, and
+            prescribed medicines.
+          </p>
+        </div>
+
+        <!-- ============ SEARCH BAR ============ -->
+        {% if history_records %}
+        <div class="search-box-container">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="historySearchInput"
+            placeholder="Search by Doctor name, Diagnosis, or Date..."
+            onkeyup="filterHistory()"
+          />
+        </div>
+        {% endif %}
+
+        <!-- Container for dynamically filtered cards or fallback -->
+        <div id="historyCardsList">
+          <!-- ============ DYNAMIC VISIT CARDS LOOP ============ -->
+          {% if history_records %} {% for visit in history_records %}
+          <div class="history-card">
+            <div class="history-header">
+              <h3>
+                Visit with {{ visit.doctor_name if visit.doctor_name else
+                (visit.doctor_pmdc_id if visit.doctor_pmdc_id else 'Doctor') }}
+              </h3>
+
+              <div class="header-actions-right">
+                <span class="visit-date">
+                  🗓️ {{ visit.visit_date if visit.visit_date else 'Recent Visit'
+                  }}
+                </span>
+                <!-- Hide / View Details Button -->
+                <button
+                  class="btn btn-outline btn-sm toggle-btn"
+                  onclick="toggleDetails(this)"
+                >
+                  Hide Details
+                </button>
+              </div>
+            </div>
+
+            <div class="history-body">
+              <!-- Vitals Saved by Doctor -->
+              <div class="vitals-grid">
+                <div class="vital-item">
+                  <span>Temperature</span>
+                  {{ visit.temperature if visit.temperature else 'N/A' }}
+                </div>
+                <div class="vital-item">
+                  <span>Blood Pressure</span>
+                  {{ visit.blood_pressure if visit.blood_pressure else 'N/A' }}
+                </div>
+              </div>
+
+              <!-- Doctor Notes/Diagnosis -->
+              <div class="notes-section">
+                <h4>Doctor's Notes & Diagnosis</h4>
+                <p>
+                  {{ visit.diagnosis_notes if visit.diagnosis_notes else 'No
+                  notes recorded for this visit.' }}
+                </p>
+              </div>
+
+              <!-- Medicines Prescribed -->
+              {% if visit.medicines %}
+              <div class="med-table-wrapper">
+                <h4>Prescribed Medicines</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Medicine</th>
+                      <th>Dosage</th>
+                      <th>Frequency</th>
+                      <th>Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for med in visit.medicines %}
+                    <tr>
+                      <td><strong>{{ med.medicine_name }}</strong></td>
+                      <td>{{ med.dosage }}</td>
+                      <td>{{ med.frequency }}</td>
+                      <td>{{ med.duration }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <!-- FALLBACK IF NO HISTORY FOUND AT ALL -->
+          <div class="history-card" style="padding: 30px; text-align: center">
+            <h3>No Medical History Found</h3>
+            <p style="color: var(--text-muted); margin-top: 8px">
+              You have no past consultation records or prescriptions saved yet.
+            </p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- SEARCH NO MATCH FALLBACK MESSAGE -->
+        <div
+          id="noSearchMatch"
+          class="history-card"
+          style="display: none; padding: 30px; text-align: center"
+        >
+          <h3>No Matching Records Found</h3>
+          <p style="color: var(--text-muted); margin-top: 8px">
+            No history records matched your search query. Try typing a different
+            doctor name or keyword.
+          </p>
+        </div>
+
+        <p class="note-line">
+          Waiting on test results instead? Check your
+          <a href="/blood_reports">Blood Reports</a>, uploaded by the Lab
+          Technician Portal.
+        </p>
+      </main>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span
+          >© <span id="year"></span> SaviourCrest Hospital. Open
+          <strong style="color: #fff">24/7</strong>, every day.</span
+        >
+        <span>
+          <a href="tel:+92 (---)-(--)">Main: +92 (---)-(--)</a>
+          &nbsp;·&nbsp;
+          <a href="tel:+92 (---)-(---)" class="emergency-line"
+            >Emergency: +92 (---)-(---)</a
+          >
+        </span>
+      </div>
+      <div class="footer-bottom">
+        SaviourCrest Hospital · Pakistan ·
+        <a href="/dashboard/patient">Back to Home</a>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Toggle details function for history cards
+      function toggleDetails(button) {
+        const cardBody = button
+          .closest(".history-card")
+          .querySelector(".history-body");
+        if (cardBody.style.display === "none") {
+          cardBody.style.display = "block";
+          button.textContent = "Hide Details";
+        } else {
+          cardBody.style.display = "none";
+          button.textContent = "View Details";
+        }
+      }
+
+      // Live Instant Search & Filter Function
+      function filterHistory() {
+        const input = document.getElementById("historySearchInput");
+        const filter = input.value.toLowerCase().trim();
+        const cards = document.querySelectorAll(".history-card");
+        const noMatchBox = document.getElementById("noSearchMatch");
+        let visibleCount = 0;
+
+        cards.forEach((card) => {
+          // Skip fallback card if present
+          if (card.id === "noSearchMatch") return;
+
+          const cardText = card.innerText.toLowerCase();
+          if (cardText.includes(filter)) {
+            card.style.display = "";
+            visibleCount++;
+          } else {
+            card.style.display = "none";
+          }
+        });
+
+        // Show "No Matching Records Found" box if search query returns zero results
+        if (visibleCount === 0 && cards.length > 0) {
+          noMatchBox.style.display = "block";
+        } else {
+          noMatchBox.style.display = "none";
+        }
+      }
+    </script>
+       <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+venv/
+
+static/uploads/
+private_uploads/
+
+hospital_data.sql
+.vscode/

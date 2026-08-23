@@ -1,0 +1,1047 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Appointment Requests | SaviourCrest Hospital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f6f6;
+        --surface: #ffffff;
+        --ink: #16211f;
+        --ink-soft: #55645f;
+        --line: #dfe6e4;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #b3392b;
+        --amber: #9a6b12;
+        --green: #1e7a46;
+        --radius: 6px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.2px;
+      }
+
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          background 0.12s ease,
+          border-color 0.12s ease,
+          color 0.12s ease;
+      }
+      .btn-primary {
+        background: var(--teal-dark);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--teal);
+      }
+      .btn-line {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn-line:hover {
+        border-color: var(--teal-dark);
+        color: var(--teal-dark);
+      }
+      .btn-reject {
+        background: transparent;
+        color: var(--red);
+        border: 1px solid #e4c4bf;
+      }
+      .btn-reject:hover {
+        background: #fbefed;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      header.topbar-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--ink-soft);
+        border-left: 1px solid var(--line);
+        padding-left: 9px;
+        margin-left: 2px;
+      }
+      .id-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12.5px;
+      }
+      .id-actions a.plain {
+        color: var(--ink-soft);
+      }
+      .id-actions a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 216px 1fr;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 20px 14px;
+      }
+      .sidebar .who {
+        padding: 2px 8px 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+      .sidebar .who strong {
+        display: block;
+        font-size: 13.5px;
+      }
+      .sidebar .who .spec {
+        font-size: 11.5px;
+        color: var(--teal);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .side-nav a {
+        display: block;
+        padding: 7px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin-bottom: 1px;
+        border-left: 2px solid transparent;
+      }
+      .side-nav a:hover {
+        color: var(--teal-dark);
+      }
+      .side-nav a.active {
+        color: var(--teal-dark);
+        border-left-color: var(--teal-dark);
+        background: #eff5f4;
+        font-weight: 600;
+      }
+      .side-nav .group-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ink-soft);
+        margin: 16px 8px 6px;
+      }
+
+      .main {
+        padding: 24px 28px 50px;
+      }
+
+      .page-title {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .page-title h1 {
+        font-size: 19px;
+        margin-bottom: 3px;
+      }
+      .page-title p {
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+
+      .stat-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        margin-bottom: 24px;
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .stat-card {
+        background: var(--surface);
+        padding: 14px 16px;
+      }
+      .stat-card .num {
+        font-family: "Poppins", sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      .stat-card .label {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 22px;
+      }
+      .panel h2 {
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      .panel .sub {
+        color: var(--ink-soft);
+        font-size: 12.5px;
+        margin-bottom: 16px;
+      }
+
+      /* ---------- Request cards ---------- */
+      .request-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .request-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 16px 18px;
+      }
+      .request-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+      .req-patient {
+        font-size: 14.5px;
+        font-weight: 700;
+      }
+      .req-id {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+      }
+      .req-meta {
+        font-size: 12.5px;
+        color: var(--ink-soft);
+        margin-top: 4px;
+      }
+
+      .badge {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .badge-paid {
+        background: #e8f3ec;
+        color: var(--green);
+      }
+      .badge-pending {
+        background: #fdf3e4;
+        color: var(--amber);
+      }
+
+      .req-payment-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8fafa;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 10px 14px;
+        margin-bottom: 14px;
+        font-size: 12.5px;
+      }
+      .req-payment-row .amount {
+        font-weight: 700;
+        font-family: "JetBrains Mono", monospace;
+      }
+      .req-payment-row a {
+        color: var(--teal-dark);
+        font-weight: 600;
+        font-size: 12px;
+      }
+      .req-payment-row a:hover {
+        text-decoration: underline;
+      }
+
+      .req-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: absolute;
+        z-index: 10;
+        top: 83px;
+        left: 170px;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 4px 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 14px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 10px;
+        color: #64748b;
+      }
+
+      /* ---------- Inline approve form ---------- */
+      .approve-form {
+        display: none;
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: #f8fafa;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
+      .approve-form.open {
+        display: block;
+      }
+      .approve-fields {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .approve-fields .field {
+        flex: 1;
+        min-width: 140px;
+      }
+      .field label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .field input {
+        width: 100%;
+        padding: 9px 11px;
+        font-size: 13px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #fff;
+        outline: none;
+      }
+      .field input:focus {
+        border-color: var(--teal-dark);
+      }
+
+      .no-requests {
+        color: var(--ink-soft);
+        font-size: 13px;
+        text-align: center;
+        padding: 20px 0;
+        display: none;
+      }
+
+      /* ---------- Decision log ---------- */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12.5px;
+      }
+      th,
+      td {
+        padding: 9px 10px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+      }
+      th {
+        color: var(--ink-soft);
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .badge-confirmed {
+        background: #e8f3ec;
+        color: var(--green);
+      }
+      .badge-rejected {
+        background: #fbefed;
+        color: var(--red);
+      }
+
+      footer {
+        background: var(--ink);
+        color: #c9d3d1;
+        padding: 26px 0 16px;
+        font-size: 12.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+        max-width: 1180px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 24px;
+      }
+      footer a {
+        color: #a7b4b0;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .footer-bottom {
+        border-top: 1px solid #2a3634;
+        padding-top: 12px;
+        text-align: center;
+        color: #7c8a86;
+        font-size: 11.5px;
+      }
+
+      @media (max-width: 1000px) {
+        .shell {
+          grid-template-columns: 1fr;
+        }
+        .stat-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ---------- Modern Toast Notification ---------- */
+      #toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .toast-msg {
+        background: var(--teal-dark);
+        color: #fff;
+        padding: 14px 20px;
+        border-radius: var(--radius);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        font-size: 13.5px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+      .toast-msg.show {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      .toast-msg.error {
+        background: var(--red);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar-strip">
+      <div class="topbar-inner">
+        <div class="brand">
+          <a href="admin_login.html" class="brand">
+            <img
+              src="/static/logo.jpeg"
+              alt="SaviourCrest Hospital Logo"
+              width="100"
+              height="100"
+              style="
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid red;
+                padding: 2px;
+              "
+            />
+            <span class="brand-name">Saviour<span>Crest</span></span>
+          </a>
+          <span class="brand-tag">Doctor Portal</span>
+        </div>
+
+
+    <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+      <div class="lang-switcher-container">
+        <span style="margin-right: 6px; font-size: 15px">🌐</span>
+        <select
+          id="custom_language_selector"
+          onchange="changeLanguage(this.value)"
+        >
+          <option value="" disabled selected>Translate Page</option>
+          <option value="en">English</option>
+          <option value="ur">Urdu (اردو)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="fa">Persian(فارسی)</option>
+        </select>
+        <span class="custom-arrow">▼</span>
+      </div>
+
+        <div class="id-actions">
+          <!-- <a href="doctor_portal.html" class="plain">Doctor Portal</a> -->
+          <!-- <a href="main_page.html" class="plain">Home</a> -->
+          <a href="doctor_portal.html" class="btn btn-line btn-sm"
+            >Back to dashbaord</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <!-- <div class="who">
+          <strong>{{ doctor.full_name }}</strong>
+          <div class="spec">{{ doctor.specialization }}</div>
+        </div> -->
+
+        <nav class="side-nav">
+          <a href="doctor_portal.html">Overview</a>
+          <a href="doctor_appointment.html" class="active"
+            >Appointment Requests</a
+          >
+          <a href="doctor_patient_report.html">Patient Reports</a>
+
+          <!-- <div class="group-label">Other Files</div>
+          <a href="lab_reports.html">Lab Portal</a>
+          <a href="reception_portal.html">Receptionist Portal</a>
+          <a href="Book_appointment_p.html">Booking Page</a> -->
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="page-title">
+          <h1>Appointment Requests</h1>
+          <p>
+            Review payment status, then approve with a confirmed date or reject.
+          </p>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="num" id="statPendingCount">0</div>
+            <div class="label">Pending Requests</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statConfirmedCount">0</div>
+            <div class="label">Confirmed This Week</div>
+          </div>
+          <div class="stat-card">
+            <div class="num" id="statRejectedCount">0</div>
+            <div class="label">Rejected This Week</div>
+          </div>
+        </div>
+
+        <!-- ============ PENDING REQUESTS ============ -->
+        <div class="panel" id="pending-requests">
+          <h2>Pending Online Requests</h2>
+          <p class="sub">
+            Sent by patients from the booking page — check payment before
+            approving.
+          </p>
+
+          <div class="request-list" id="requestList">
+            <!-- Dynamic Cards Loaded Via JS -->
+          </div>
+
+          <p class="no-requests" id="noRequestsMsg">
+            No pending requests right now.
+          </p>
+        </div>
+
+        <!-- ============ RECENT DECISIONS ============ -->
+        <div class="panel" id="recent-decisions">
+          <h2>Recent Decisions</h2>
+          <p class="sub">Appointments you've already approved or rejected.</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Confirmed Date & Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="decisionsBody">
+              <!-- Action logs will be added dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span
+          >© <span id="year"></span> SaviourCrest Hospital — Internal Doctor
+          Portal</span
+        >
+        <span><a href="tel:+18005550199">Emergency: +1 (800) 555-0199</a></span>
+      </div>
+      <div class="footer-bottom">
+        SaviourCrest Hospital · 123 Wellness Avenue, Your City
+      </div>
+    </footer>
+    <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container"></div>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      const API_BASE_URL = "http://127.0.0.1:8000";
+
+      // =================================================================
+      // TOAST NOTIFICATION FUNCTION
+      // =================================================================
+      function showToast(message, type = "success") {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        toast.className = `toast-msg ${type}`;
+
+        const icon = type === "success" ? "✅" : "❌";
+        toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+
+        container.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => toast.classList.add("show"), 10);
+
+        // Remove automatically after 3.5 seconds
+        setTimeout(() => {
+          toast.classList.remove("show");
+          setTimeout(() => toast.remove(), 300); // Wait for transition
+        }, 3500);
+      }
+
+      // Load pending requests on startup
+      document.addEventListener("DOMContentLoaded", loadPendingAppointments);
+
+      // =================================================================
+      // FETCH & RENDER PENDING APPOINTMENTS FROM FASTAPI
+      // =================================================================
+      async function loadPendingAppointments() {
+        const listContainer = document.getElementById("requestList");
+        const pendingEl = document.getElementById("statPendingCount");
+
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/api/doctor/appointments`,
+          );
+          const result = await response.json();
+
+          if (response.ok && result.status === "success") {
+            const appointments = result.appointments || [];
+
+            if (pendingEl) pendingEl.textContent = appointments.length;
+
+            listContainer.innerHTML = "";
+
+            if (appointments.length === 0) {
+              checkEmptyState();
+              return;
+            }
+
+            appointments.forEach((appt) => {
+              const card = document.createElement("div");
+              card.className = "request-card";
+
+              // Original UUID is stored here for API calls
+              card.dataset.requestId = appt.appointment_id;
+
+              const isPaid =
+                (appt.payment_status || "Paid").toLowerCase() === "paid";
+              const paymentBadge = isPaid
+                ? `<span class="badge badge-paid">Paid</span>`
+                : `<span class="badge badge-pending">Pending Verification</span>`;
+
+              const proofLink = appt.payment_proof
+                ? `<a href="${appt.payment_proof}" target="_blank">View Proof</a>`
+                : `<a href="#" onclick="showToast('No proof image uploaded.', 'error'); return false;">View Proof</a>`;
+
+              // UUID Patient ID Fix (Short view for UI display)
+              const rawPatientId = String(
+                appt.patient_id ||
+                  appt.patient_uuid ||
+                  appt.patient_code ||
+                  appt.user_id ||
+                  appt.appointment_id ||
+                  "",
+              );
+
+              // Display short 8-char UUID (e.g. PT-A1B2C3D4)
+              const realPatientId =
+                rawPatientId.length > 8
+                  ? rawPatientId.substring(0, 8).toUpperCase()
+                  : rawPatientId;
+
+              card.innerHTML = `
+            <div class="request-top">
+              <div>
+                <div class="req-patient">${appt.full_name}</div>
+                <div class="req-id mono">PT-${realPatientId}</div>
+                <div class="req-meta">Requested Date: ${appt.appointment_date || "Today"}</div>
+              </div>
+            </div>
+            <div class="req-payment-row">
+              <span>Amount: <span class="amount">Rs. ${appt.amount || "2,000"}</span></span>
+              ${paymentBadge}
+              ${proofLink}
+            </div>
+            <div class="req-actions">
+              <button type="button" class="btn btn-primary btn-sm approve-toggle-btn">Approve</button>
+              <button type="button" class="btn btn-reject btn-sm reject-btn">Reject</button>
+            </div>
+            <div class="approve-form" id="approveForm-${appt.appointment_id}">
+              <div class="approve-fields">
+                <div class="field">
+                  <label>Confirmed date</label>
+                  <input type="date" class="confirm-date" value="${appt.appointment_date || ""}" />
+                </div>
+                <div class="field">
+                  <label>Confirmed time</label>
+                  <input type="time" class="confirm-time" />
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm confirm-send-btn">Confirm &amp; Send</button>
+              <button type="button" class="btn btn-line btn-sm cancel-approve-btn">Cancel</button>
+            </div>
+          `;
+              listContainer.appendChild(card);
+            });
+
+            checkEmptyState();
+          }
+        } catch (err) {
+          console.error("Error fetching appointments:", err);
+        }
+      }
+
+      // =================================================================
+      // HELPER: UPDATE STATS COUNTER
+      // =================================================================
+      function updateStats(type) {
+        const pendingEl = document.getElementById("statPendingCount");
+        const confirmedEl = document.getElementById("statConfirmedCount");
+        const rejectedEl = document.getElementById("statRejectedCount");
+
+        let pending = parseInt(pendingEl?.textContent) || 0;
+        if (pending > 0 && pendingEl) pendingEl.textContent = pending - 1;
+
+        if (type === "confirm" && confirmedEl) {
+          let confirmed = parseInt(confirmedEl.textContent) || 0;
+          confirmedEl.textContent = confirmed + 1;
+        } else if (type === "reject" && rejectedEl) {
+          let rejected = parseInt(rejectedEl.textContent) || 0;
+          rejectedEl.textContent = rejected + 1;
+        }
+      }
+
+      function checkEmptyState() {
+        const remaining = document.querySelectorAll(".request-card").length;
+        const msg = document.getElementById("noRequestsMsg");
+        if (msg) msg.style.display = remaining === 0 ? "block" : "none";
+      }
+
+      // =================================================================
+      // APPROVE TOGGLE — Open/Close confirmed date/time form
+      // =================================================================
+      document.addEventListener("click", function (e) {
+        if (e.target.classList.contains("approve-toggle-btn")) {
+          const card = e.target.closest(".request-card");
+          const form = card.querySelector(".approve-form");
+          form.classList.toggle("open");
+        }
+
+        if (e.target.classList.contains("cancel-approve-btn")) {
+          const form = e.target.closest(".approve-form");
+          form.classList.remove("open");
+        }
+      });
+
+      // =================================================================
+      // CONFIRM & SEND (FASTAPI LIVE CONNECTED)
+      // =================================================================
+      document.addEventListener("click", async function (e) {
+        if (e.target.classList.contains("confirm-send-btn")) {
+          const btn = e.target;
+          const card = btn.closest(".request-card");
+          const id = card.dataset.requestId; // Sends exact UUID string
+          const date = card.querySelector(".confirm-date").value;
+          const time = card.querySelector(".confirm-time").value;
+          const patientName = card.querySelector(".req-patient").textContent;
+
+          if (!date || !time) {
+            showToast("Please select a confirmed date and time.", "error");
+            return;
+          }
+
+          btn.disabled = true;
+          btn.textContent = "Sending...";
+
+          try {
+            const response = await fetch(
+              `${API_BASE_URL}/api/appointments/approve`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  appointment_id: id, // Full UUID String
+                  confirmed_date: date,
+                  confirmed_time: time,
+                }),
+              },
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.detail || "Approval failed");
+            }
+
+            const decisionsBody = document.getElementById("decisionsBody");
+            if (decisionsBody) {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+            <td>${patientName}</td>
+            <td>${date} ${time}</td>
+            <td><span class="badge badge-confirmed">Confirmed</span></td>
+          `;
+              decisionsBody.prepend(row);
+            }
+
+            card.remove();
+            updateStats("confirm");
+            checkEmptyState();
+
+            showToast(
+              `Successfully confirmed ${patientName}'s appointment for ${date} at ${time}.`,
+              "success",
+            );
+          } catch (err) {
+            showToast("Error updating appointment: " + err.message, "error");
+            btn.disabled = false;
+            btn.textContent = "Confirm & Send";
+          }
+        }
+      });
+
+      // =================================================================
+      // REJECT APPOINTMENT (FASTAPI LIVE CONNECTED)
+      // =================================================================
+      document.addEventListener("click", async function (e) {
+        if (e.target.classList.contains("reject-btn")) {
+          const btn = e.target;
+          const card = btn.closest(".request-card");
+          const id = card.dataset.requestId; // Sends exact UUID string
+          const patientName = card.querySelector(".req-patient").textContent;
+
+          if (
+            !confirm(
+              `Are you sure you want to reject the appointment request from ${patientName}?`,
+            )
+          ) {
+            return;
+          }
+
+          try {
+            const response = await fetch(
+              `${API_BASE_URL}/api/appointments/reject`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  appointment_id: id, // Full UUID String
+                }),
+              },
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+              throw new Error(result.detail || "Rejection failed");
+            }
+
+            const decisionsBody = document.getElementById("decisionsBody");
+            if (decisionsBody) {
+              const row = document.createElement("tr");
+              row.innerHTML = `
+            <td>${patientName}</td>
+            <td>—</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+          `;
+              decisionsBody.prepend(row);
+            }
+
+            card.remove();
+            updateStats("reject");
+            checkEmptyState();
+
+            showToast(
+              `Appointment for ${patientName} has been rejected.`,
+              "success",
+            );
+          } catch (err) {
+            showToast("Error rejecting appointment: " + err.message, "error");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

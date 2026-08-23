@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Doctors List | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="Meet the doctors at SaviourCrest Hospital, their specialties, and availability."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: #ffffff;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --red-dark: #9e2e22;
+        --green: #1e824c;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.5;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ul {
+        list-style: none;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+
+      .container {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* ---------- 24/7 strip ---------- */
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      /* ---------- Navbar ---------- */
+      header.navbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        max-width: 1080px;
+        margin: 0 auto;
+        position: relative;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        font-weight: 500;
+        font-size: 15px;
+      }
+      .nav-links a {
+        color: var(--text);
+        padding: 6px 2px;
+        border-bottom: 2px solid transparent;
+        transition:
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--teal);
+        border-bottom: 2px solid var(--teal);
+      }
+      .nav-links a.active {
+        color: var(--teal-dark);
+        border-bottom: 2px solid var(--teal-dark);
+      }
+
+      /* ---------- 3-Bar Animated Hamburger Icon ---------- */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 24px;
+        height: 18px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 101;
+      }
+      .hamburger span {
+        width: 100%;
+        height: 2.5px;
+        background: var(--teal-dark);
+        border-radius: 2px;
+        transition: all 0.3s ease-in-out;
+      }
+      .hamburger.active span:nth-child(1) {
+        transform: translateY(7.75px) rotate(45deg);
+      }
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active span:nth-child(3) {
+        transform: translateY(-7.75px) rotate(-45deg);
+      }
+
+      .btn {
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+      .btn-primary {
+        background: var(--red);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--red-dark);
+      }
+
+      /* ---------- Page Header ---------- */
+      .page-head {
+        text-align: center;
+        padding: 20px 0 16px;
+      }
+      .eyebrow {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--teal);
+        background: #eaf4f3;
+        padding: 3px 8px;
+        border-radius: 20px;
+        margin-bottom: 6px;
+      }
+      .page-head h1 {
+        font-size: 22px;
+        margin-bottom: 4px;
+      }
+      .page-head p {
+        color: var(--text-muted);
+        max-width: 500px;
+        margin: 0 auto;
+        font-size: 13px;
+      }
+
+      .back-home {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--teal-dark);
+      }
+      .back-home:hover {
+        text-decoration: underline;
+      }
+
+      /* ---------- Compact Doctor Grid & Full Image Display Fix ---------- */
+      section {
+        padding-bottom: 40px;
+      }
+      .doctor-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+      }
+      .doctor-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        transition: box-shadow 0.15s ease;
+      }
+      .doctor-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      /* Pure Image Wrapper Fix */
+      .doctor-photo-wrapper {
+        width: 100%;
+        height: 150px;
+        background: #eaf4f3;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        padding-top: 10px;
+      }
+      .doctor-photo {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .doctor-info {
+        padding: 12px 10px;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      }
+      .doctor-info h3 {
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .doctor-info .spec {
+        font-size: 12px;
+        color: var(--teal);
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .doctor-info .exp {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+      .doctor-info .time {
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 12px;
+        margin-top: auto;
+      }
+      .doctor-info .time span {
+        font-weight: 600;
+        color: var(--text);
+        display: block;
+      }
+
+      .doctor-actions .btn {
+        width: 100%;
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 24px 0 14px;
+        font-size: 13px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      footer a {
+        color: #b9c8c6;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .emergency-line {
+        color: #ffd9d4;
+        font-weight: 600;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 12px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 12px;
+      }
+
+      /* ---------- Mobile Responsive & Top-To-Bottom Menu Animation ---------- */
+      @media (max-width: 900px) {
+        .doctor-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .hamburger {
+          display: flex;
+        }
+
+        .nav-links {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background: var(--surface);
+          flex-direction: column;
+          align-items: center;
+          padding: 0;
+          gap: 0;
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          visibility: hidden;
+          box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08);
+          border-bottom: 1px solid var(--border);
+          transition:
+            max-height 0.35s ease-in-out,
+            opacity 0.25s ease,
+            padding 0.3s ease,
+            visibility 0.3s;
+        }
+
+        .nav-links.active {
+          max-height: 300px;
+          opacity: 1;
+          visibility: visible;
+          padding: 16px 0;
+        }
+
+        .nav-links a {
+          width: 100%;
+          text-align: center;
+          padding: 10px 0;
+          font-size: 15px;
+          border-bottom: none;
+        }
+        .nav-links a.active {
+          border-bottom: none;
+          background: #f0f7f6;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .doctor-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 24/7 strip -->
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (---)-(---)</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>, every day of the year.
+    </div>
+
+    <!-- ============ NAVBAR ============ -->
+    <header class="navbar">
+      <div class="nav-inner">
+       
+          <img
+            src="static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="55"
+            height="55"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+        </a>
+
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="nav-links" id="navMenu">
+          <a href="/about">About Us</a>
+          <a href="/doctors_list" class="active">Doctors List</a>
+          <a href="/staff_cont">Staff Contact</a>
+          <a href="/blood_bank">Blood Bank</a>
+          <a href="/feedback_page">Feedback</a>
+          <a
+            href="/patient_login.html"
+            class="btn btn-primary"
+            style="color: white; margin-top: 4px"
+            >Book Appointment</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <!-- ============ PAGE HEADER ============ -->
+    <div class="page-head">
+      <div class="container">
+        <a href="/" class="back-home">← Back to Home</a>
+        <br />
+        <span class="eyebrow">Our Specialists</span>
+        <h1>Doctors List</h1>
+        <p>Browse our doctors, their specialties, and available hours.</p>
+      </div>
+    </div>
+
+    <!-- ============ DOCTOR GRID ============ -->
+    <section>
+      <div class="container">
+        <div class="doctor-grid" id="doctorGrid">
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageF.png"
+                alt="Dr. Noor"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Noor</h3>
+              <div class="spec">Cardiology</div>
+              <div class="exp">15+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>09:00 AM – 05:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageM.png"
+                alt="Dr. Qasim"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Qasim</h3>
+              <div class="spec">Pediatrics</div>
+              <div class="exp">10+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>10:00 AM – 04:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageF.png"
+                alt="Dr. Hina"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Hina</h3>
+              <div class="spec">Orthopedics</div>
+              <div class="exp">35+ Years (Gold Medallist 🎖️)</div>
+              <!-- <div class="time">
+                Available: <span>08:00 AM – 02:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageM.png"
+                alt="Dr. Javed"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Javed</h3>
+              <div class="spec">Neurology</div>
+              <div class="exp">25+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>11:00 AM – 06:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageF.png"
+                alt="Dr. Saba Asif"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Saba Asif</h3>
+              <div class="spec">Dermatology</div>
+              <div class="exp">10+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>09:30 AM – 01:30 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageM.png"
+                alt="Dr. Nawaz Kamran"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Nawaz Kamran</h3>
+              <div class="spec">General Surgery</div>
+              <div class="exp">20+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>12:00 PM – 08:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageF.png"
+                alt="Dr. Maryam"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Maryam</h3>
+              <div class="spec">ENT Specialist</div>
+              <div class="exp">10+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>09:00 AM – 03:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="doctor-card">
+            <div class="doctor-photo-wrapper">
+              <img
+                class="doctor-photo"
+                src="static/imageF.png"
+                alt="Dr. Ayesha"
+              />
+            </div>
+            <div class="doctor-info">
+              <h3>Dr. Ayesha</h3>
+              <div class="spec">Gynecology</div>
+              <div class="exp">25+ Years Experience</div>
+              <!-- <div class="time">
+                Available: <span>10:00 AM – 06:00 PM</span>
+              </div> -->
+              <div class="doctor-actions">
+                <a href="/patient_login.html" class="btn btn-primary">Book</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span
+            >© <span id="year"></span> SaviourCrest Hospital. Open
+            <strong style="color: #fff">24/7</strong>, every day.</span
+          >
+          <span>
+            <a href="tel:+92 (---)-(--)">Main: +92 (---)-(--)</a>
+            &nbsp;·&nbsp;
+            <a href="tel:+92 (---)-(---)" class="emergency-line"
+              >Emergency: +92 (---)-(---)</a
+            >
+          </span>
+        </div>
+        <div class="footer-bottom">
+          SaviourCrest Hospital · Pakistan, City (---), Area(---)
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // Auto Update Year
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Top to Bottom Mobile Menu Toggle
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const navMenu = document.getElementById("navMenu");
+
+      hamburgerBtn.addEventListener("click", () => {
+        hamburgerBtn.classList.toggle("active");
+        navMenu.classList.toggle("active");
+      });
+    </script>
+  </body>
+</html>

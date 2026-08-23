@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Admin | SaviourCrest Hospital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #101817;
+        --surface: #17211f;
+        --line: #2a3634;
+        --teal: #14958c;
+        --teal-dark: #0e6b65;
+        --red: #c0392b;
+        --text: #eaf1ef;
+        --text-muted: #8fa19f;
+        --radius: 8px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        width: 100%;
+        overflow-x: hidden;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 16px;
+      }
+
+      h1 {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .lock-card {
+        box-shadow: 0px 10px 20px rgba(9, 105, 107, 0.4);
+        width: 100%;
+        max-width: 380px;
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 32px 30px 28px;
+        margin: auto;
+      }
+
+      .lock-head {
+        text-align: center;
+        margin-bottom: 26px;
+      }
+
+      .lock-badge {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 14px;
+        border-radius: 50%;
+        background: #0f2b28;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        padding: 2px;
+      }
+
+      .lock-badge img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgb(14, 128, 128);
+      }
+
+      .lock-head h1 {
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+
+      .lock-head p {
+        font-size: 12.5px;
+        color: var(--text-muted);
+      }
+
+      .field {
+        margin-bottom: 16px;
+      }
+
+      .field label {
+        display: block;
+        font-size: 11.5px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .field input {
+        width: 100%;
+        padding: 11px 12px;
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: #0f1817;
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+
+      .field input:focus {
+        border-color: var(--teal);
+      }
+
+      .field input::placeholder {
+        color: #4c5c59;
+      }
+
+      .error-msg {
+        background: #2a1714;
+        color: #e4a79c;
+        border: 1px solid #4a2a22;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 12.5px;
+        margin-bottom: 16px;
+      }
+
+      .success-msg {
+        background: #122824;
+        color: #9ce4dc;
+        border: 1px solid #1f4a44;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 12.5px;
+        margin-bottom: 16px;
+        text-align: center;
+        font-weight: 500;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      .back-home {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #0e6b65;
+        border-radius: 20px;
+        padding: 8px 16px;
+        gap: 6px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: white;
+        margin: 22px 0 0;
+        transition:
+          transform 0.15s ease,
+          background-color 0.15s ease;
+      }
+
+      .back-home:hover {
+        transform: translateY(-2px);
+        background-color: var(--teal);
+      }
+
+      .btn-login {
+        width: 100%;
+        padding: 11px;
+        font-size: 13.5px;
+        font-weight: 600;
+        background: var(--teal-dark);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+
+      .btn-login:hover {
+        background: var(--teal);
+      }
+
+      .lock-footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 11px;
+        color: #4c5c59;
+      }
+
+      /* Mobile Responsiveness */
+      @media screen and (max-width: 480px) {
+        body {
+          padding: 16px 12px;
+        }
+
+        .lock-card {
+          padding: 24px 20px 22px;
+          max-width: 100%;
+        }
+
+        .lock-badge {
+          width: 56px;
+          height: 56px;
+        }
+
+        .lock-head h1 {
+          font-size: 17px;
+        }
+
+        .lock-head p {
+          font-size: 12px;
+        }
+
+        .field input {
+          font-size: 16px;
+          padding: 12px;
+        }
+
+        .btn-login {
+          padding: 12px;
+          font-size: 14px;
+        }
+
+        .back-home {
+          width: 100%;
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="lock-card">
+      <div class="lock-head">
+        
+       <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+       <div class="lock-badge">
+          <img src="/static/logo.jpeg" alt="SaviourCrest Hospital Logo" />
+        </div>
+        <h1>Admin Access</h1>
+        <p>Restricted area. Authorized personnel only.</p>
+      </div>
+
+      <div class="error-msg" id="errorMsg" style="display: none"></div>
+      <div class="success-msg" id="successMsg" style="display: none"></div>
+
+      <form id="adminLoginForm" method="POST" action="/admin/login">
+        <div class="field">
+          <label for="adminUsername">Username</label>
+          <input
+            type="text"
+            id="adminUsername"
+            name="username"
+            placeholder="Enter username"
+            autocomplete="off"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="adminPassword">Password</label>
+          <input
+            type="password"
+            id="adminPassword"
+            name="password"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+        <button type="submit" class="btn-login">Log In</button>
+      </form>
+
+      <div class="lock-footer">SaviourCrest Hospital — Internal System</div>
+      <div class="container">
+        <a href="/" class="back-home">↑ Back to Home</a>
+      </div>
+    </div>
+   
+    <script>
+      document
+        .getElementById("adminLoginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const errorBox = document.getElementById("errorMsg");
+          const successBox = document.getElementById("successMsg");
+          
+          errorBox.style.display = "none";
+          successBox.style.display = "none";
+
+          try {
+            const res = await fetch("/admin/login", {
+              method: "POST",
+              body: formData,
+            });
+
+            const data = await res.json();
+
+            // Check if response is successful and contains token or success status
+            if (res.ok && (data.access_token || data.status === "success")) {
+              if (data.access_token) {
+                localStorage.setItem("admin_token", data.access_token);
+              }
+
+              // Show success pop-up message
+              successBox.textContent = "Login successful! Redirecting...";
+              successBox.style.display = "block";
+
+              // Redirect priority: custom redirect_url -> uuid parameter -> default /admin_portal.html
+              let destination = "/admin_portal.html";
+              if (data.redirect_url) {
+                destination = data.redirect_url;
+              } else if (data.uuid) {
+                destination = `/admin_portal.html?uuid=${data.uuid}`;
+              }
+
+              // Wait 1.2 seconds so the user can see the success pop-up before navigation
+              setTimeout(() => {
+                window.location.href = destination;
+              }, 1200);
+
+            } else {
+              errorBox.textContent =
+                data.detail || "Invalid username or password.";
+              errorBox.style.display = "block";
+            }
+          } catch (error) {
+            console.error("Login request failed", error);
+            errorBox.textContent = "Server connection error. Please try again.";
+            errorBox.style.display = "block";
+          }
+        });
+    </script>
+  </body>
+</html>

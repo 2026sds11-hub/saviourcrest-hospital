@@ -1,0 +1,2713 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>SaviourCrest Hospital | Care Around the Clock</title>
+    <meta
+      name="description"
+      content="SaviourCrest Hospital — patient portal, doctor booking, blood bank and 24/7 emergency care."
+    />
+
+    <!-- Google Fonts: Poppins for headings, Inter for body text, Montserrat for Hero -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: #ffffff;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --red-dark: #9e2e22;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.65;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      ul {
+        list-style: none;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ---------- Top emergency strip (24/7) ---------- */
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+        letter-spacing: 0.2px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      /* ---------- Navbar ---------- */
+      header.navbar {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.92),
+          rgba(255, 255, 255, 0.72)
+        );
+        backdrop-filter: blur(14px) saturate(160%);
+        -webkit-backdrop-filter: blur(14px) saturate(160%);
+        border-bottom: 1.5px solid var(--red-dark);
+        box-shadow: 0 8px 24px rgba(10, 79, 75, 0.08);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 22px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 20px;
+        position: relative;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        font-weight: 500;
+        font-size: 15px;
+      }
+      .nav-links a {
+        color: var(--text);
+        padding: 6px 2px;
+        border-bottom: 2px solid transparent;
+        transition:
+          border-color 0.15s ease,
+          color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--teal);
+        border-bottom: 2px solid var(--teal);
+      }
+
+      /* ---------- 3-Bar Hamburger Menu ---------- */
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 28px;
+        height: 20px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 60;
+      }
+      .hamburger span {
+        width: 100%;
+        height: 3px;
+        background-color: var(--teal-dark);
+        border-radius: 3px;
+        transition: all 0.3s ease-in-out;
+      }
+      .hamburger.active span:nth-child(1) {
+        transform: translateY(8.5px) rotate(45deg);
+      }
+      .hamburger.active span:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active span:nth-child(3) {
+        transform: translateY(-8.5px) rotate(-45deg);
+      }
+
+      /* ---------- Glassmorphism Buttons ---------- */
+      .btn {
+        position: relative;
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 12px 28px;
+        border-radius: 50px;
+        cursor: pointer;
+        overflow: hidden;
+        isolation: isolate;
+        text-align: center;
+        transition:
+          transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+          box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+          background 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      .btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.4),
+          rgba(255, 255, 255, 0) 50%
+        );
+        pointer-events: none;
+        z-index: 1;
+      }
+      .btn:hover {
+        transform: translateY(-3px);
+      }
+
+      .btn-primary {
+        background: rgba(14, 107, 101, 0.65);
+        color: #fff;
+        box-shadow:
+          0 8px 32px rgba(14, 107, 101, 0.3),
+          inset 0 1px 2px rgba(255, 255, 255, 0.5),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      .btn-primary:hover {
+        background: rgba(14, 107, 101, 0.85);
+        box-shadow:
+          0 12px 40px rgba(14, 107, 101, 0.4),
+          inset 0 1px 2px rgba(255, 255, 255, 0.6),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-outline {
+        background: rgba(255, 255, 255, 0.4);
+        color: var(--teal-dark);
+        box-shadow:
+          0 8px 32px rgba(0, 0, 0, 0.05),
+          inset 0 1px 2px rgba(255, 255, 255, 0.8),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+      }
+      .btn-outline:hover {
+        background: rgba(255, 255, 255, 0.6);
+        color: var(--teal-dark);
+        box-shadow:
+          0 12px 40px rgba(0, 0, 0, 0.1),
+          inset 0 1px 2px rgba(255, 255, 255, 0.9),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .donate-box .btn-primary {
+        background: rgba(192, 57, 43, 0.65);
+        box-shadow:
+          0 8px 32px rgba(192, 57, 43, 0.3),
+          inset 0 1px 2px rgba(255, 255, 255, 0.5),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+      }
+      .donate-box .btn-primary:hover {
+        background: rgba(192, 57, 43, 0.85);
+        box-shadow:
+          0 12px 40px rgba(192, 57, 43, 0.4),
+          inset 0 1px 2px rgba(255, 255, 255, 0.6),
+          inset 0 -1px 2px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ---------- Section Background Variations ---------- */
+      .bg-white {
+        background-color: #ffffff;
+      }
+      .alt-bg {
+        background: #eff6f5;
+      }
+      .bg-default {
+        background: var(--bg);
+      }
+
+      section {
+        padding: 72px 0;
+      }
+
+      /* ---------- Full Width Hero Banner & Animation ---------- */
+      .hero-banner {
+        position: relative;
+        padding: 110px 0 100px;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .hero-banner::after {
+        content: "";
+        position: absolute;
+        inset: -10%; /* Extra space to allow zooming */
+        /* Better online hospital image */
+        background-image: url("/static/BUILDING.jpeg");
+        background-size: cover;
+        background-position: center;
+        z-index: 0;
+        animation: heroBgZoom 20s infinite alternate ease-in-out;
+      }
+
+      @keyframes heroBgZoom {
+        0% {
+          transform: scale(1);
+        }
+        100% {
+          transform: scale(1.15);
+        }
+      }
+
+      .hero-banner::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(10, 79, 75, 0.8),
+          rgba(14, 107, 101, 0.65)
+        ); /* Dark overlay to make text pop beautifully */
+        z-index: 1;
+      }
+
+      .hero-banner .container {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero-banner .eyebrow {
+        background: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+
+      .hero-banner h1 {
+        font-family: "Montserrat", sans-serif;
+        font-weight: 700;
+        font-size: 48px;
+        color: #ffffff;
+        margin-bottom: 16px;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.5px;
+      }
+
+      .hero-banner p.hero-desc {
+        font-family: "Montserrat", sans-serif;
+        color: #eaf4f3;
+        max-width: 750px;
+        margin: 0 auto 30px;
+        font-size: 18px;
+        font-weight: 400;
+        line-height: 1.7;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+
+      .hero-quote {
+        max-width: 850px;
+        margin: 0 auto;
+        font-size: 17px;
+        font-weight: 500;
+        color: #ffffff;
+        line-height: 1.8;
+        font-style: italic;
+        background: rgba(0, 0, 0, 0.25);
+        padding: 24px;
+        border-radius: var(--radius);
+        border-left: 4px solid var(--red);
+        backdrop-filter: blur(8px);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      }
+
+      /* ---------- Login Grid Section ---------- */
+      .login-section {
+        padding: 80px 0;
+      }
+
+      .login-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .login-card {
+        position: relative;
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.9),
+          rgba(234, 244, 243, 0.55)
+        );
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        padding: 30px 20px;
+        box-shadow:
+          0 6px 18px rgba(14, 107, 101, 0.08),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        overflow: hidden;
+        text-align: center;
+        transition:
+          box-shadow 0.15s ease,
+          transform 0.15s ease;
+      }
+      .login-card::after {
+        content: "";
+        position: absolute;
+        top: -60%;
+        left: -20%;
+        width: 60%;
+        height: 220%;
+        background: linear-gradient(
+          120deg,
+          rgba(255, 255, 255, 0.4),
+          rgba(255, 255, 255, 0) 60%
+        );
+        transform: rotate(20deg);
+        pointer-events: none;
+      }
+      .login-card:hover {
+        box-shadow:
+          0 14px 30px rgba(14, 107, 101, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transform: translateY(-4px);
+      }
+      .login-card .icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(155deg, #ffffff, #eaf4f3);
+        box-shadow:
+          0 4px 10px rgba(14, 107, 101, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 18px;
+        font-size: 24px;
+      }
+      .login-card h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .login-card p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      /* ---------- General Typography shared ---------- */
+      .section-head {
+        text-align: center;
+        margin-bottom: 40px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .section-head h2 {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+      .section-head p {
+        color: var(--text-muted);
+        font-size: 16px;
+      }
+      .eyebrow {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--teal);
+        background: #eaf4f3;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+      }
+
+      /* ---------- Scroll-reveal animation ---------- */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @keyframes heroIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hero-anim {
+        opacity: 0;
+        animation: heroIn 0.8s ease forwards;
+      }
+
+      /* ---------- Our Services ---------- */
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+      }
+      .service-card {
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(240, 247, 246, 0.7)
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        transition:
+          box-shadow 0.15s ease,
+          transform 0.15s ease;
+      }
+      .service-card:hover {
+        box-shadow:
+          0 16px 32px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        transform: translateY(-5px);
+      }
+      .service-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+      }
+      .service-body {
+        padding: 20px 18px;
+      }
+      .service-body h4 {
+        font-size: 17px;
+        margin-bottom: 8px;
+      }
+      .service-body p {
+        font-size: 14px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      /* ---------- About split + stats ---------- */
+      .about-split {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 50px;
+        align-items: center;
+        margin-bottom: 60px;
+      }
+      .about-split p {
+        color: var(--text-muted);
+        font-size: 15.5px;
+        margin-bottom: 18px;
+      }
+      .about-split img {
+        border-radius: var(--radius);
+        width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      .about-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .stat-box {
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(234, 244, 243, 0.6)
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        text-align: center;
+        padding: 30px 20px;
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transition:
+          box-shadow 0.15s ease,
+          transform 0.15s ease;
+      }
+      .stat-box:hover {
+        box-shadow:
+          0 16px 30px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transform: translateY(-5px);
+      }
+      .stat-num {
+        font-family: "Poppins", sans-serif;
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+      .stat-label {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 6px;
+        font-weight: 500;
+      }
+
+      /* ---------- New Text Heavy Sections Styles ---------- */
+      .text-heavy-content {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      .text-heavy-content h3 {
+        font-size: 24px;
+        margin: 30px 0 15px;
+        color: var(--teal-dark);
+      }
+      .text-heavy-content p {
+        font-size: 16px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        line-height: 1.8;
+      }
+      .feature-list {
+        margin: 20px 0 30px 20px;
+      }
+      .feature-list li {
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: var(--text-muted);
+        position: relative;
+        padding-left: 24px;
+      }
+      .feature-list li::before {
+        content: "✓";
+        position: absolute;
+        left: 0;
+        color: var(--teal);
+        font-weight: bold;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-top: 40px;
+      }
+      .info-card {
+        background: #fff;
+        padding: 30px;
+        border-radius: var(--radius);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--border);
+      }
+      .info-card h4 {
+        margin-bottom: 12px;
+        font-size: 18px;
+        color: var(--teal-dark);
+      }
+      .info-card p {
+        font-size: 14.5px;
+        color: var(--text-muted);
+      }
+
+      /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: absolute;
+        z-index: 10;
+        top: 20px;
+        left: 30px;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 4px 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 14px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 10px;
+        color: #64748b;
+      }
+
+      /* ---------- Doctor thumbnail ---------- */
+      .doc-thumb {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 16px;
+        border: 2px solid var(--border);
+      }
+
+      /* ---------- Facilities gallery ---------- */
+      .facility-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .facility-card {
+        position: relative;
+        border-radius: var(--radius);
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        transition:
+          box-shadow 0.15s ease,
+          transform 0.15s ease;
+      }
+      .facility-card:hover {
+        box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+      }
+      .facility-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+      .facility-cap {
+        position: relative;
+        padding: 12px 16px;
+        font-size: 14.5px;
+        font-weight: 600;
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(234, 244, 243, 0.7)
+        );
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-top: none;
+      }
+
+      /* ---------- Patient feedback ---------- */
+      .feedback-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .feedback-card {
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(234, 244, 243, 0.55)
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        padding: 26px 22px;
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transition:
+          box-shadow 0.15s ease,
+          transform 0.15s ease;
+      }
+      .feedback-card:hover {
+        box-shadow:
+          0 16px 30px rgba(0, 0, 0, 0.1),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transform: translateY(-5px);
+      }
+      .fb-stars {
+        color: #e0a82e;
+        font-size: 18px;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
+      }
+      .fb-comment {
+        font-size: 14.5px;
+        color: var(--text);
+        margin-bottom: 16px;
+        line-height: 1.6;
+      }
+      .fb-name {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--teal-dark);
+      }
+
+      /* ---------- Dashboards ---------- */
+      .dash-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 20px;
+      }
+      .dash-card {
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(234, 244, 243, 0.55)
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        padding: 26px 18px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow:
+          0 6px 16px rgba(0, 0, 0, 0.05),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transition:
+          box-shadow 0.15s ease,
+          transform 0.15s ease,
+          border-color 0.15s ease;
+      }
+      .dash-card:hover {
+        box-shadow:
+          0 16px 32px rgba(0, 0, 0, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        transform: translateY(-5px);
+        border-color: var(--teal);
+      }
+      .dash-card h4 {
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      .dash-card p {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+      }
+      .dash-card a {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--teal-dark);
+      }
+
+      /* ---------- Disease graph ---------- */
+      .graph-wrap {
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(240, 247, 246, 0.7)
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        padding: 30px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      }
+      .graph-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 22px;
+        font-size: 14px;
+        color: var(--text-muted);
+      }
+      .live-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--red);
+        display: inline-block;
+        margin-right: 8px;
+      }
+      canvas {
+        max-height: 400px;
+      }
+
+      /* ---------- Blood bank ---------- */
+      .blood-flex {
+        display: flex;
+        gap: 40px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+      .blood-table {
+        flex: 1 1 500px;
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(240, 247, 246, 0.7)
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+      }
+      th,
+      td {
+        padding: 16px 20px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        background: #eaf4f3;
+        color: var(--teal-dark);
+        font-family: "Poppins", sans-serif;
+        font-size: 14.5px;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      .level-good {
+        color: #1e824c;
+        font-weight: 600;
+      }
+      .level-low {
+        color: var(--red);
+        font-weight: 600;
+      }
+
+      .donate-box {
+        position: relative;
+        flex: 1 1 350px;
+        background: linear-gradient(
+          155deg,
+          #12746d 0%,
+          var(--teal-dark) 55%,
+          #073c38 100%
+        );
+        color: #fff;
+        border-radius: var(--radius);
+        padding: 35px 30px;
+        overflow: hidden;
+        box-shadow:
+          0 12px 30px rgba(10, 79, 75, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      }
+      .donate-box::after {
+        content: "";
+        position: absolute;
+        top: -70%;
+        left: -20%;
+        width: 60%;
+        height: 240%;
+        background: linear-gradient(
+          120deg,
+          rgba(255, 255, 255, 0.16),
+          rgba(255, 255, 255, 0) 60%
+        );
+        transform: rotate(20deg);
+        pointer-events: none;
+      }
+      .donate-box h3 {
+        color: #fff;
+        font-size: 22px;
+        margin-bottom: 12px;
+      }
+      .donate-box p {
+        font-size: 15px;
+        color: #d8edeb;
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+
+      /* ---------- Footer ---------- */
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 60px 0 25px;
+        margin-top: 0;
+        font-size: 14.5px;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1.2fr;
+        gap: 40px;
+        margin-bottom: 35px;
+      }
+      footer h4 {
+        color: #fff;
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+      footer a {
+        color: #b9c8c6;
+        display: block;
+        margin-bottom: 10px;
+        transition: color 0.15s ease;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 20px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 13.5px;
+      }
+      .emergency-line {
+        color: #ffd9d4;
+        font-weight: 600;
+      }
+
+      /* ---------- FLOATING WIDGETS (GLOBAL BASE STYLES) ---------- */
+      #scrollTopBtn {
+        position: fixed;
+        bottom: 25px;
+        left: 25px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(155deg, #14837c, var(--teal-dark) 70%);
+        color: #fff;
+        border: none;
+        font-size: 20px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 99;
+        box-shadow:
+          0 8px 18px rgba(10, 79, 75, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        transition:
+          transform 0.12s ease,
+          background 0.15s ease;
+      }
+      #scrollTopBtn:hover {
+        transform: translateY(-4px);
+        background: linear-gradient(155deg, #1a9c93, var(--teal) 70%);
+      }
+
+      @keyframes slide-up-fade {
+        from {
+          opacity: 0;
+          transform: translateY(20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      @keyframes pop-in {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      #chatToggle {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(155deg, #14837c, var(--teal-dark) 100%);
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        z-index: 99;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow:
+          0 8px 20px rgba(0, 0, 0, 0.18),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        transition:
+          transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+          background 0.15s ease;
+      }
+      #chatToggle:hover {
+        transform: translateY(-5px) scale(1.05);
+        background: linear-gradient(155deg, #1a9c93, var(--teal) 100%);
+      }
+      #chatToggle svg {
+        fill: currentColor;
+        width: 32px;
+        height: 32px;
+        transition: transform 0.3s ease;
+      }
+      #chatToggle.open svg {
+        transform: rotate(90deg) scale(0);
+        opacity: 0;
+      }
+
+      #chatPanel {
+        position: fixed;
+        bottom: 105px;
+        right: 25px;
+        width: 360px;
+        height: 480px;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 18px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        z-index: 100;
+        transform-origin: bottom right;
+      }
+      #chatPanel.open {
+        display: flex;
+        animation: slide-up-fade 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)
+          forwards;
+      }
+
+      .chat-head {
+        background: linear-gradient(135deg, var(--teal-dark), var(--teal));
+        color: #fff;
+        padding: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+      }
+      .chat-profile {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .chat-avatar {
+        width: 40px;
+        height: 40px;
+        background: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .chat-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .chat-title {
+        font-family: "Poppins", sans-serif;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 1.2;
+      }
+      .chat-status {
+        font-size: 12px;
+        color: #a6d8d4;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 3px;
+        font-family: "Inter", sans-serif;
+      }
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        background: #2ecc71;
+        border-radius: 50%;
+        box-shadow: 0 0 8px #2ecc71;
+      }
+      .chat-head button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s ease;
+      }
+      .chat-head button:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      .chat-body {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        background: linear-gradient(
+          165deg,
+          rgba(255, 255, 255, 0.4),
+          rgba(240, 247, 246, 0.2)
+        );
+      }
+      .chat-msg {
+        padding: 14px 18px;
+        border-radius: 20px;
+        font-size: 14.5px;
+        line-height: 1.5;
+        max-width: 85%;
+        animation: pop-in 0.3s ease forwards;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+        font-family: "Inter", sans-serif;
+      }
+      .msg-bot {
+        background: #fff;
+        color: var(--text);
+        border-bottom-left-radius: 4px;
+        align-self: flex-start;
+        border: 1px solid var(--border);
+      }
+      .msg-user {
+        background: linear-gradient(135deg, var(--teal), #14837c);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+        align-self: flex-end;
+      }
+
+      .chat-input {
+        display: flex;
+        padding: 14px;
+        background: #fff;
+        border-top: 1px solid var(--border);
+        gap: 12px;
+      }
+      .chat-input input {
+        flex: 1;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 12px 18px;
+        font-size: 14.5px;
+        outline: none;
+        background: #f8fafc;
+        transition: border-color 0.2s ease;
+        font-family: "Inter", sans-serif;
+      }
+      .chat-input input:focus {
+        border-color: var(--teal);
+        background: #fff;
+      }
+      .chat-input button {
+        background: var(--teal);
+        color: #fff;
+        border: none;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease;
+      }
+      .chat-input button:hover {
+        transform: scale(1.05);
+        background: var(--teal-dark);
+      }
+
+      /* ---------- Responsive Breakpoints ---------- */
+      @media (max-width: 900px) {
+        .login-grid,
+        .dash-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .footer-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .services-grid,
+        .info-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .about-split {
+          grid-template-columns: 1fr;
+        }
+        .about-stats {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .facility-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 520px) {
+        .login-grid,
+        .dash-grid,
+        .services-grid,
+        .info-grid,
+        .about-stats,
+        .facility-grid,
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* =========================================================
+         SAVIOURCREST MASTER MOBILE RESPONSIVE SYSTEM (<= 768px)
+         ========================================================= */
+      @media screen and (max-width: 768px) {
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .container,
+        .wrapper,
+        main,
+        .main-content {
+          width: 100% !important;
+          max-width: 100% !important;
+          padding-left: 15px !important;
+          padding-right: 15px !important;
+        }
+
+        header,
+        nav,
+        .navbar {
+          height: auto !important;
+        }
+
+        .nav-inner {
+          flex-direction: row !important;
+          flex-wrap: wrap !important;
+          padding: 12px 15px !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+        }
+
+        /* 3-Bar Hamburger display logic */
+        .hamburger {
+          display: flex !important;
+        }
+
+        .nav-links {
+          display: none !important;
+          flex-direction: column !important;
+          width: 100% !important;
+          text-align: center !important;
+          gap: 10px !important;
+          padding: 15px 0 5px 0 !important;
+          background: rgba(255, 255, 255, 0.98);
+          border-radius: 12px;
+          margin-top: 10px;
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-links.active {
+          display: flex !important;
+        }
+
+        .nav-links a {
+          display: block !important;
+          padding: 8px 0 !important;
+          font-size: 15px !important;
+          border-bottom: 1px solid var(--border, #e1eae9);
+        }
+
+        .lang-switcher-container {
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          margin: 8px auto !important;
+          display: inline-flex !important;
+        }
+
+        .login-grid,
+        .services-grid,
+        .info-grid,
+        .about-stats,
+        .facility-grid,
+        .feedback-grid,
+        .dash-grid,
+        .footer-grid,
+        .row,
+        .grid {
+          grid-template-columns: 1fr !important;
+          flex-direction: column !important;
+          gap: 16px !important;
+        }
+
+        .about-split {
+          grid-template-columns: 1fr !important;
+          gap: 20px !important;
+        }
+
+        .login-card,
+        .service-card,
+        .info-card,
+        .stat-box,
+        .facility-card,
+        .feedback-card,
+        .dash-card,
+        .donate-box,
+        .card,
+        form {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+
+        /* EXCLUDE floating buttons & icons from 100% width forced stretching */
+        input,
+        select,
+        textarea,
+        button:not(#scrollTopBtn):not(#chatToggle):not(#chatClose):not(
+            .chat-input button
+          ):not(.hamburger),
+        .btn {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+
+        /* Floating buttons fix on small screens */
+        #scrollTopBtn {
+          bottom: 16px;
+          left: 16px;
+          width: 45px !important;
+          height: 45px !important;
+        }
+
+        #chatToggle {
+          bottom: 16px;
+          right: 16px;
+          width: 55px !important;
+          height: 55px !important;
+        }
+
+        #chatPanel {
+          width: calc(100vw - 32px) !important;
+          max-width: 360px !important;
+          bottom: 80px !important;
+          right: 16px !important;
+          height: 410px !important;
+        }
+
+        table {
+          display: block !important;
+          width: 100% !important;
+          overflow-x: auto !important;
+          white-space: nowrap !important;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        canvas {
+          width: 100% !important;
+          height: auto !important;
+          max-height: 280px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 24/7 strip -->
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (---)-(---)</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>, every day of the year.
+    </div>
+
+    <!-- ============ NAVBAR ============ -->
+    <header class="navbar">
+      <div class="nav-inner">
+        <!-- HIDDEN ADMIN LOGIN ATTACHED HERE VIA ID="hospitalLogo" -->
+        <a href="/" class="brand" id="hospitalLogo">
+          <img
+            src="static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="100"
+            height="100"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+        </a>
+
+        <!-- 3-Bar Hamburger Button for Mobile -->
+        <button
+          class="hamburger"
+          id="hamburgerBtn"
+          aria-label="Toggle navigation menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav class="nav-links">
+          <a href="/about">About Us</a>
+          <a href="/doctors_list">Doctors List</a>
+          <a href="/staff_cont">Staff Contact</a>
+          <a href="/blood_bank">Blood Bank</a>
+          <a href="/feedback_page">Feedback</a>
+
+          <div class="user-info-box">
+            {% if user_name %}
+            <!-- Jab user logged in hoga toh naam dikhega -->
+            <span class="user-name-display">👤 {{ user_name }}</span>
+            {% else %}
+            <!-- Agar login nahi hai toh login button dikhega -->
+            <a href="/login/lab" class="login-btn">Login</a>
+            {% endif %}
+          </div>
+        </nav>
+
+        <a href="patient_login.html" class="btn btn-primary"
+          >Book Appointment</a
+        >
+      </div>
+    </header>
+
+    <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+      <div class="lang-switcher-container">
+        <span style="margin-right: 6px; font-size: 15px">🌐</span>
+        <select
+          id="custom_language_selector"
+          onchange="changeLanguage(this.value)"
+        >
+          <option value="" disabled selected>Translate Page</option>
+          <option value="en">English</option>
+          <option value="ur">Urdu (اردو)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="fa">Persian(فارسی)</option>
+        </select>
+        <span class="custom-arrow">▼</span>
+      </div>
+
+      <div class="container">
+        <span class="eyebrow hero-anim" style="animation-delay: 0.05s"
+          >Welcome to SaviourCrest Hospital</span
+        >
+        <h1 class="hero-anim" style="animation-delay: 0.12s">
+          Care that shows up, day or night.
+        </h1>
+        <p class="hero-desc hero-anim" style="animation-delay: 0.18s">
+          Choose how you'd like to sign in — booking an appointment, managing
+          patients as a doctor, or handling front-desk operations as reception
+          staff. Whatever brings you here, our team and our systems are built to
+          get you the right care with the least friction possible. Your health
+          is too important to wait. With our comprehensive portals, managing
+          your healthcare journey has never been more straightforward or secure.
+          Experience a deeply integrated environment where medical records, fast
+          bookings, and direct communication converge seamlessly.
+        </p>
+
+        <div class="hero-anim" style="animation-delay: 0.24s">
+          <p class="hero-quote">
+            "Healing hands, caring hearts, and a commitment to excellence. At
+            SaviourCrest, we believe that true healthcare goes beyond
+            medicine—it encompasses compassion, innovation, and an unwavering
+            dedication to every life we touch. Your journey to wellness begins
+            with a single step into our welcoming doors, where state-of-the-art
+            facilities meet human empathy to ensure you receive the finest care,
+            whenever you need it most."
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LOGIN OPTIONS SECTION ============ -->
+    <section id="login" class="login-section bg-default">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Access Portals</span>
+          <h2>Select Your Domain</h2>
+          <p>
+            Secure, tailored dashboards designed specifically for your role.
+            Whether you are seeking care, delivering it, or organizing the
+            backbone of our hospital operations.
+          </p>
+        </div>
+
+        <div class="login-grid">
+          <!-- Patient login -->
+          <div class="login-card reveal">
+            <div class="icon">🧑‍⚕️</div>
+            <h3>Patient Login</h3>
+            <p>
+              Book appointments, view prescriptions and reports, and securely
+              message your consulting doctor anytime.
+            </p>
+            <a href="patient_login.html" class="btn btn-outline"
+              >Login as Patient</a
+            >
+          </div>
+
+          <!-- Doctor login -->
+          <div class="login-card reveal" style="animation-delay: 0.1s">
+            <div class="icon">🩺</div>
+            <h3>Doctor Login</h3>
+            <p>
+              View your upcoming schedule, access detailed patient histories,
+              and update confidential case notes instantly.
+            </p>
+            <a href="doctor_login.html" class="btn btn-outline"
+              >Login as Doctor</a
+            >
+          </div>
+
+          <!-- Receptionist login -->
+          <div class="login-card reveal" style="animation-delay: 0.2s">
+            <div class="icon">🗂️</div>
+            <h3>Receptionist Login</h3>
+            <p>
+              Manage fast patient check-ins, streamline appointments, and
+              maintain daily hospital administration.
+            </p>
+            <a href="reception_login.html" class="btn btn-outline"
+              >Login as Receptionist</a
+            >
+          </div>
+
+          <!-- Lab Technician login -->
+          <div class="login-card reveal" style="animation-delay: 0.3s">
+            <div class="icon">🔬</div>
+            <h3>Lab Technician</h3>
+            <p>
+              Manage critical patient blood reports, process pathology results,
+              and handle Hospital Blood bank data.
+            </p>
+            <a href="lab_login.html" class="btn btn-outline"
+              >Login as Technician</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NEW SECTION: WHY CHOOSE US ============ -->
+    <section id="why-choose-us" class="bg-white">
+      <div class="container">
+        <div class="about-split reveal">
+          <img
+            src="https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?w=800&q=80"
+            alt="Doctor consulting with a patient in a bright room"
+          />
+          <div>
+            <span class="eyebrow">Comprehensive Healing</span>
+            <h2>Dedicated to Your Well-being</h2>
+            <p>
+              At SaviourCrest, we look beyond the symptoms to treat the whole
+              person. Our multidisciplinary teams collaborate closely to ensure
+              that your treatment plan is specifically tailored to your body,
+              your lifestyle, and your goals. We believe that open communication
+              between doctors and patients is the foundation of effective
+              healthcare.
+            </p>
+            <ul class="feature-list">
+              <li>Round-the-clock specialized care and monitoring</li>
+              <li>
+                Integrated electronic health records for seamless continuity
+              </li>
+              <li>
+                A strictly patient-first approach in all medical decisions
+              </li>
+              <li>Transparent communication about treatments and procedures</li>
+            </ul>
+            <p>
+              By combining deeply experienced medical professionals with an
+              environment built around comfort and dignity, we strive to take
+              the anxiety out of hospital visits. You aren't just a file to us;
+              you are a valued member of our community, deserving of absolute
+              focus and dedication.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OUR SERVICES ============ -->
+    <section id="services" class="alt-bg">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">What We Treat</span>
+          <h2>Our Core Services</h2>
+          <p>
+            Specialist departments covering the most common reasons people come
+            to us — each staffed by doctors you can search for by name or by
+            symptom to receive focused, dedicated support.
+          </p>
+        </div>
+
+        <div class="services-grid">
+          <div class="service-card reveal">
+            <img src="static/heart.jpg" alt="Cardiology" />
+            <div class="service-body">
+              <h4>Cardiology</h4>
+              <p>
+                Comprehensive heart health checkups, ECGs, and ongoing,
+                proactive care for blood pressure management and chest pain
+                diagnosis.
+              </p>
+            </div>
+          </div>
+          <div class="service-card reveal">
+            <img src="static/child.jpg" alt="Pediatrics" />
+            <div class="service-body">
+              <h4>Pediatrics</h4>
+              <p>
+                Regular growth checkups, timely vaccinations, and gentle care
+                built entirely around what makes young children feel
+                comfortable.
+              </p>
+            </div>
+          </div>
+          <div class="service-card reveal">
+            <img src="static/bones.jpg" alt="Orthopedics" />
+            <div class="service-body">
+              <h4>Orthopedics</h4>
+              <p>
+                Treatment for joint pain, rapid fracture repair, and targeted
+                physical therapy from doctors who focus heavily on your
+                long-term mobility.
+              </p>
+            </div>
+          </div>
+          <div class="service-card reveal">
+            <img
+              src="https://images.unsplash.com/photo-1559757175-5700dde675bc?w=500&q=80"
+              alt="Emergency Care"
+            />
+            <div class="service-body">
+              <h4>Emergency Care</h4>
+              <p>
+                A fully staffed, highly responsive emergency ward open 24/7. We
+                are always ready for the urgent moments that simply cannot wait.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NEW SECTION: THE PATIENT JOURNEY ============ -->
+    <section id="patient-journey" class="bg-white">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">How It Works</span>
+          <h2>A Seamless Patient Journey</h2>
+          <p>
+            Navigating healthcare can sometimes feel overwhelming. That’s why we
+            have completely redesigned the hospital experience from the moment
+            you walk through our doors to the day you return home.
+          </p>
+        </div>
+
+        <div class="text-heavy-content reveal">
+          <p>
+            When you first arrive at SaviourCrest Hospital, our front-desk
+            triage team is ready to guide you. If it is an emergency, you bypass
+            all administrative wait times and are immediately escorted to our
+            trauma or urgent care wards. If you are here for a scheduled
+            appointment, our digital check-in systems ensure your doctor is
+            notified the moment you step inside.
+          </p>
+          <p>
+            During your consultation, our specialists have instant access to
+            your complete medical history through our secure internal network.
+            This means you never have to repeat your story or carry heavy files.
+            Every lab test, X-ray, and past prescription is visible on their
+            dashboard, allowing them to make highly informed, rapid decisions
+            regarding your ongoing treatment.
+          </p>
+
+          <div class="info-grid">
+            <div class="info-card">
+              <h4>1. Fast Digital Check-in</h4>
+              <p>
+                Use your patient portal to book ahead. Upon arrival, simply
+                confirm your presence, reducing waiting room time drastically.
+              </p>
+            </div>
+            <div class="info-card">
+              <h4>2. Integrated Diagnostics</h4>
+              <p>
+                Our in-house labs push results directly to your doctor's
+                dashboard the moment they are verified, speeding up your
+                diagnosis.
+              </p>
+            </div>
+            <div class="info-card">
+              <h4>3. Post-Care Follow up</h4>
+              <p>
+                Care doesn’t end when you leave. Your portal allows you to
+                review discharge notes and ask follow-up questions directly.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT US ============ -->
+    <section id="about" class="alt-bg">
+      <div class="container">
+        <div class="about-split reveal">
+          <div>
+            <span class="eyebrow">Who We Are</span>
+            <h2>About SaviourCrest Hospital</h2>
+            <p>
+              SaviourCrest Hospital has served our local community with
+              round-the-clock emergency, outpatient and highly specialized care,
+              combining deeply experienced medical staff with modern facilities
+              to keep every patient's journey simple, clear, and immensely
+              reassuring.
+            </p>
+            <p>
+              What started decades ago as a small, humble emergency clinic has
+              expanded into a full-service hospital spanning multiple wings. We
+              now host advanced specialist departments, a vast dedicated blood
+              bank, and digital tools that put patients first — because finding
+              good care should never be complicated or frustrating.
+            </p>
+            <p>
+              Every corridor in our building, every piece of equipment we
+              install, and every team member we bring on board is held to a
+              singular standard: Does this improve the patient's chance of a
+              swift, comfortable recovery? We continually reinvest our time and
+              resources into ensuring the answer is always yes.
+            </p>
+            <a href="/about" class="btn btn-outline" style="margin-top: 15px"
+              >Learn More About Us</a
+            >
+          </div>
+          <img
+            src="static/reception.jpg"
+            alt="SaviourCrest Hospital building and staff"
+          />
+        </div>
+
+        <div class="about-stats reveal">
+          <div class="stat-box">
+            <div class="stat-num" data-count="25">0</div>
+            <div class="stat-label">Years of Dedicated Service</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" data-count="120">0</div>
+            <div class="stat-label">Specialist Doctors on Staff</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" data-count="40000">0</div>
+            <div class="stat-label">Patients Treated Yearly</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" data-static="24/7">24/7</div>
+            <div class="stat-label">Unbroken Emergency Support</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NEW SECTION: COMMUNITY OUTREACH ============ -->
+    <section id="community-outreach" class="bg-white">
+      <div class="container">
+        <div class="about-split reveal" style="margin-bottom: 0">
+          <img
+            src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&q=80"
+            alt="Medical staff engaging with the community"
+          />
+          <div>
+            <span class="eyebrow">Beyond the Hospital Walls</span>
+            <h2>Community Health Initiatives</h2>
+            <p>
+              A truly healthy society requires care that extends far beyond a
+              hospital building. At SaviourCrest, we believe in proactive health
+              education and widespread accessibility. Throughout the year, our
+              medical teams organize local health camps, providing complimentary
+              basic checkups, nutritional advice, and early disease screening
+              for vulnerable populations.
+            </p>
+            <p>
+              Our doctors regularly visit schools to speak about hygiene, mental
+              health, and the importance of active lifestyles. We also partner
+              with local civic organizations to ensure that rapid response
+              first-aid training is freely available to teachers, parents, and
+              community leaders. Healthcare is a collective effort, and we are
+              proud to be firmly rooted in the neighborhoods we serve.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DOCTORS LIST ============ -->
+    <section class="alt-bg" id="doctors">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Our Dedicated Team</span>
+          <h2>Meet Our Doctors</h2>
+          <p>
+            A few of our highly trained specialists, each searchable by name or
+            by symptom on the secure patient dashboard. Find the full directory
+            and their live availability inside the portal.
+          </p>
+        </div>
+
+        <div class="dash-grid">
+          <div class="dash-card reveal">
+            <img class="doc-thumb" src="static/imageF.png" alt="Dr. Noor" />
+            <h4>Dr. Noor</h4>
+            <p>Cardiology Specialist</p>
+            <a href="/doctors/1">View profile →</a>
+          </div>
+          <div class="dash-card reveal" style="animation-delay: 0.1s">
+            <img class="doc-thumb" src="static/imageM.png" alt="Dr. Qasim" />
+            <h4>Dr. Qasim</h4>
+            <p>Pediatric Care</p>
+            <a href="/doctors/2">View profile →</a>
+          </div>
+          <div class="dash-card reveal" style="animation-delay: 0.2s">
+            <img class="doc-thumb" src="/static/imageF.png" alt="Dr. Hina" />
+            <h4>Dr. Hina</h4>
+            <p>Orthopedic Surgery</p>
+            <a href="/doctors/3">View profile →</a>
+          </div>
+          <div class="dash-card reveal" style="animation-delay: 0.3s">
+            <img class="doc-thumb" src="/static/imageM.png" alt="Dr. Javed" />
+            <h4>Dr. Javed</h4>
+            <p>Neurology Dept.</p>
+            <a href="/doctors/4">View profile →</a>
+          </div>
+          <div class="dash-card reveal" style="animation-delay: 0.4s">
+            <h4>View all doctors</h4>
+            <p style="margin-top: 10px">Browse our full roster</p>
+            <a href="/doctors_list">Click to view all →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOSPITAL STAFF CONTACT LIST ============ -->
+    <section id="staff-contact" class="bg-white">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Direct Lines</span>
+          <h2>Hospital Staff Contact List</h2>
+          <p>
+            Reach the exact department you need instantly — front desk
+            coordination, emergency nursing, or general administration — without
+            waiting on hold for an automated general line.
+          </p>
+        </div>
+
+        <div class="blood-table reveal">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Department</th>
+                <th>Direct Phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Anna Cruz</td>
+                <td>Front Desk Lead</td>
+                <td>Reception Operations</td>
+                <td>+1 800 555 0111</td>
+              </tr>
+              <tr>
+                <td>David Osei</td>
+                <td>Head Nurse</td>
+                <td>Emergency & Trauma</td>
+                <td>+1 800 555 0122</td>
+              </tr>
+              <tr>
+                <td>Priya Nair</td>
+                <td>Administrator</td>
+                <td>Hospital Management</td>
+                <td>+1 800 555 0133</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px">
+          <a href="/staff" class="btn btn-outline">View Full Staff Directory</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ DISEASE SPREAD GRAPH ============ -->
+    <section class="alt-bg" id="disease-graph">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Public Health Watch</span>
+          <h2>Regional Health Data Trends</h2>
+          <p>
+            A simple, transparent monthly snapshot of public health trends. We
+            believe in keeping our community informed and prepared. Easy to read
+            at a glance, with no medical background needed.
+          </p>
+        </div>
+
+        <div class="graph-wrap reveal">
+          <div class="graph-meta">
+            <span
+              ><span class="live-dot"></span>Live aggregated data · Refreshes
+              automatically every 30 days</span
+            >
+            <span id="lastUpdated" style="font-weight: 500"
+              >Last updated: Today</span
+            >
+          </div>
+          <canvas id="diseaseChart" height="120"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NEW SECTION: ADVANCED TECHNOLOGY ============ -->
+    <section id="technology" class="bg-white">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Innovation in Care</span>
+          <h2>Advanced Medical Technology</h2>
+          <p>
+            Accuracy and speed in medical treatment save lives. That is why we
+            heavily equip our diagnostic wings and operating theaters with
+            modern, highly reliable machinery.
+          </p>
+        </div>
+        <div class="about-split reveal">
+          <div>
+            <p>
+              From high-resolution MRI scanners that provide unparalleled
+              clarity of internal structures, to minimally invasive surgical
+              tools that drastically reduce patient recovery times, technology
+              is woven into everything we do.
+            </p>
+            <p>
+              Our pathology labs are equipped with automated blood analyzers
+              capable of returning highly accurate results in a fraction of the
+              traditional time. This allows our emergency teams to make critical
+              decisions swiftly, ensuring you receive the correct intervention
+              exactly when you need it. Constant maintenance and regular
+              upgrades ensure our tools are always operating at absolute peak
+              performance.
+            </p>
+          </div>
+          <img
+            src="https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&q=80"
+            alt="Advanced medical diagnostic equipment in a sterile room"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OUR FACILITIES ============ -->
+    <section id="facilities" class="alt-bg">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Inside Saviours</span>
+          <h2>Our Hospital Facilities</h2>
+          <p>
+            Modern, hygienic spaces deliberately built for calm, careful
+            treatment — covering everything from the high-paced emergency ward
+            to the quiet focus of our diagnostic labs.
+          </p>
+        </div>
+
+        <div class="facility-grid">
+          <div class="facility-card reveal">
+            <img src="static/emg.jpg" alt="Emergency Ward" />
+            <div class="facility-cap">24/7 Emergency Ward</div>
+          </div>
+          <div class="facility-card reveal" style="animation-delay: 0.1s">
+            <img src="static/ope.avif" alt="Operation Theatre" />
+            <div class="facility-cap">Sterile Operation Theatre</div>
+          </div>
+          <div class="facility-card reveal" style="animation-delay: 0.2s">
+            <img src="static/diagnostic_lab.png" alt="Diagnostic Lab" />
+            <div class="facility-cap">Advanced Diagnostic Lab</div>
+          </div>
+          <div class="facility-card reveal" style="animation-delay: 0.3s">
+            <img src="static/pat.jpg" alt="Patient Rooms" />
+            <div class="facility-cap">Comfortable Patient Rooms</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BLOOD BANK + DONOR REGISTRATION ============ -->
+    <section id="blood-bank" class="bg-white">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Save a Life Today</span>
+          <h2>Central Blood Bank</h2>
+          <p>
+            Live stock levels across all major blood groups are displayed below.
+            Every single registration adds directly to our live donor graph,
+            helping us maintain critical supplies for surgeries and emergencies.
+            <br />
+            <a
+              href="/blood"
+              style="
+                color: var(--teal-dark);
+                font-weight: 600;
+                display: inline-block;
+                margin-top: 10px;
+              "
+              >View the full Blood Bank &amp; Live Donor Graph →</a
+            >
+          </p>
+        </div>
+
+        <div class="blood-flex reveal">
+          <div class="blood-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Blood Group</th>
+                  <th>Units Available</th>
+                  <th>Current Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>O+</td>
+                  <td>42</td>
+                  <td class="level-good">Sufficient Stock</td>
+                </tr>
+                <tr>
+                  <td>O-</td>
+                  <td>8</td>
+                  <td class="level-low">Low — Donations needed</td>
+                </tr>
+                <tr>
+                  <td>A+</td>
+                  <td>27</td>
+                  <td class="level-good">Sufficient Stock</td>
+                </tr>
+                <tr>
+                  <td>A-</td>
+                  <td>6</td>
+                  <td class="level-low">Low — Donations needed</td>
+                </tr>
+                <tr>
+                  <td>B+</td>
+                  <td>19</td>
+                  <td class="level-good">Sufficient Stock</td>
+                </tr>
+                <tr>
+                  <td>B-</td>
+                  <td>5</td>
+                  <td class="level-low">Low — Donations needed</td>
+                </tr>
+                <tr>
+                  <td>AB+</td>
+                  <td>14</td>
+                  <td class="level-good">Sufficient Stock</td>
+                </tr>
+                <tr>
+                  <td>AB-</td>
+                  <td>4</td>
+                  <td class="level-low">Critical — Donate now</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="donate-box">
+            <h3>Register for Blood Donation</h3>
+            <p>
+              It takes just about 10 to 15 minutes of your day, but a single
+              session can save up to three lives. Sign up securely and our
+              medical team will contact you for the nearest eligible donation
+              slot. Your contribution is profoundly valued by those in desperate
+              need.
+            </p>
+            <a href="blood_donor.html" class="btn btn-primary"
+              >Register as a Donor Now</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PATIENT FEEDBACK ============ -->
+    <section class="alt-bg" id="feedback">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Real Experiences</span>
+          <h2>Patient Feedback & Stories</h2>
+          <p>
+            Read honest, unedited comments from people we've treated recently.
+            We value every piece of feedback to continuously improve our care.
+          </p>
+        </div>
+
+        <div class="feedback-grid reveal">
+          {% if feedbacks %} {% for fb in feedbacks %}
+          <div class="feedback-card">
+            <div class="fb-stars">
+              {% for i in range(fb.rating) %}★{% endfor %}{% for i in range(5 -
+              fb.rating) %}☆{% endfor %}
+            </div>
+            <p class="fb-comment">"{{ fb.comment }}"</p>
+            <div class="fb-name">— {{ fb.patient_name }}</div>
+          </div>
+          {% endfor %} {% else %}
+          <p
+            style="
+              grid-column: 1/-1;
+              text-align: center;
+              color: var(--text-muted);
+              font-size: 16px;
+              padding: 40px;
+              background: #fff;
+              border-radius: var(--radius);
+              border: 1px dashed var(--border);
+            "
+          >
+            Be the first to share your detailed experience with SaviourCrest
+            Hospital! Your voice matters to us.
+          </p>
+          {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 40px">
+          <a href="/feedback_page" class="btn btn-outline"
+            >Share Your Own Feedback</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <h4>SaviourCrest Hospital</h4>
+            <p style="color: #b9c8c6; max-width: 300px; line-height: 1.6">
+              Highly trusted, round-the-clock healthcare. We bring emergency,
+              comprehensive outpatient, and deeply specialized medical services
+              securely under one unified roof.
+            </p>
+          </div>
+          <div>
+            <h4>Quick Links</h4>
+            <a href="/about">About Us</a>
+            <a href="/doctors">Doctors Directory</a>
+            <a href="/staff">Staff Contact List</a>
+            <a href="/blood_bank">Blood Bank Data</a>
+            <a href="/feedback_page">Submit Feedback</a>
+          </div>
+          <div>
+            <h4>Secure Portals</h4>
+            <a href="patient_login.html">Patient Login</a>
+            <a href="doctor_login.html">Doctor Dashboard</a>
+            <a href="reception_login.html">Reception Console</a>
+            <a href="lab_login.html">Lab Technician Portal</a>
+          </div>
+          <div>
+            <h4>Emergency Contact</h4>
+            <a href="tel:+92 (---)-(--)">Main Desk: +92 (---)-(--)</a>
+            <a href="tel:+92 (---)-(---)" class="emergency-line"
+              >Emergency 24/7: +92 (---)-(---)</a
+            >
+            <a href="mailto:care@saviourshospital.com"
+              >care@saviourshospital.com</a
+            >
+            <a href="#">Pakistan, City (---), Area(---)</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          © <span id="year"></span> SaviourCrest Hospital. All rights strictly
+          reserved. Open 24/7, every single day of the year.
+          <div style="margin-top: 8px; font-size: 11px; opacity: 0.7">
+            NOTE: This Website is made as a Project!
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- ============ FLOATING WIDGETS ============ -->
+    <button id="scrollTopBtn" title="Back to top">↑</button>
+
+    <button id="chatToggle" title="Chat with AI Assistant">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 2 Q10 10 2 10 Q10 10 10 18 Q10 10 18 10 Q10 10 10 2 Z" />
+        <path d="M20 3 Q20 6 17 6 Q20 6 20 9 Q20 6 23 6 Q20 6 20 3 Z" />
+        <path
+          d="M17 15 Q17 18 14 18 Q17 18 17 21 Q17 18 20 18 Q17 18 17 15 Z"
+        />
+      </svg>
+    </button>
+
+    <div id="chatPanel">
+      <div class="chat-head">
+        <div class="chat-profile">
+          <div class="chat-avatar">
+            <img src="/static/logo2.jpeg" alt="Logo" />
+          </div>
+          <div>
+            <div class="chat-title">Saviours Assistant</div>
+            <div class="chat-status">
+              <span class="status-dot"></span> Online 24/7
+            </div>
+          </div>
+        </div>
+        <button id="chatClose">✕</button>
+      </div>
+
+      <div class="chat-body" id="chatBody">
+        <div class="chat-msg msg-bot">
+          Hi! I'm the Saviours AI Assistant. Ask me about our 24/7 Emergency,
+          Doctors, or Lab Facilities. How can I help you today?
+        </div>
+      </div>
+
+      <div class="chat-input">
+        <input
+          type="text"
+          id="chatInput"
+          placeholder="Type a message..."
+          autocomplete="off"
+        />
+        <button id="chatSend">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Mobile Hamburger Navigation Toggle Logic
+      const hamburgerBtn = document.getElementById("hamburgerBtn");
+      const navLinks = document.querySelector(".nav-links");
+
+      if (hamburgerBtn && navLinks) {
+        hamburgerBtn.addEventListener("click", () => {
+          hamburgerBtn.classList.toggle("active");
+          navLinks.classList.toggle("active");
+        });
+      }
+
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("show");
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => revealObserver.observe(el));
+
+      function animateCount(el) {
+        const target = Number(el.dataset.count);
+        const duration = 1200;
+        const start = performance.now();
+        function tick(now) {
+          const progress = Math.min((now - start) / duration, 1);
+          el.textContent = Math.floor(progress * target).toLocaleString();
+          if (progress < 1) requestAnimationFrame(tick);
+          else
+            el.textContent =
+              target.toLocaleString() +
+              (target >= 1000 ? "+" : target === 25 ? "+" : "");
+        }
+        requestAnimationFrame(tick);
+      }
+
+      const statObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target
+                .querySelectorAll(".stat-num[data-count]")
+                .forEach(animateCount);
+              statObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.3 },
+      );
+      document
+        .querySelectorAll(".about-stats")
+        .forEach((el) => statObserver.observe(el));
+
+      const scrollBtn = document.getElementById("scrollTopBtn");
+      window.addEventListener("scroll", () => {
+        scrollBtn.style.display = window.scrollY > 400 ? "flex" : "none";
+      });
+      scrollBtn.addEventListener("click", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      // Chatbot Widget Logic
+      const chatToggle = document.getElementById("chatToggle");
+      const chatPanel = document.getElementById("chatPanel");
+      const chatClose = document.getElementById("chatClose");
+      const chatBody = document.getElementById("chatBody");
+      const chatInput = document.getElementById("chatInput");
+      const chatSend = document.getElementById("chatSend");
+
+      chatToggle.addEventListener("click", () =>
+        chatPanel.classList.toggle("open"),
+      );
+      chatClose.addEventListener("click", () =>
+        chatPanel.classList.remove("open"),
+      );
+
+      async function sendChatMessage() {
+        const msg = chatInput.value.trim();
+        if (!msg) return;
+
+        const userBubble = document.createElement("div");
+        userBubble.className = "chat-msg msg-user";
+        userBubble.textContent = msg;
+        chatBody.appendChild(userBubble);
+
+        chatInput.value = "";
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        const typingBubble = document.createElement("div");
+        typingBubble.className = "chat-msg msg-bot";
+        typingBubble.id = "typingIndicator";
+        typingBubble.innerHTML = "<em>Typing...</em>";
+        chatBody.appendChild(typingBubble);
+        chatBody.scrollTop = chatBody.scrollHeight;
+
+        try {
+          const res = await fetch("/api/chatbot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: msg }),
+          });
+          const data = await res.json();
+
+          const indicator = document.getElementById("typingIndicator");
+          if (indicator) indicator.remove();
+
+          const botBubble = document.createElement("div");
+          botBubble.className = "chat-msg msg-bot";
+          botBubble.textContent =
+            data.reply || "Sorry, I couldn't reach the assistant right now.";
+          chatBody.appendChild(botBubble);
+        } catch (err) {
+          const indicator = document.getElementById("typingIndicator");
+          if (indicator) indicator.remove();
+
+          const errorBubble = document.createElement("div");
+          errorBubble.className = "chat-msg msg-bot";
+          errorBubble.textContent =
+            "I am unable to connect right now — please try again shortly.";
+          chatBody.appendChild(errorBubble);
+        }
+
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      chatSend.addEventListener("click", sendChatMessage);
+      chatInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") sendChatMessage();
+      });
+
+      // SECRET TRIPLE-CLICK ADMIN ACCESS LOGIC
+      const hiddenAdminLogo = document.getElementById("hospitalLogo");
+      let clickCount = 0;
+      let clickTimer;
+
+      hiddenAdminLogo.addEventListener("click", (e) => {
+        e.preventDefault();
+        clickCount++;
+
+        if (clickCount === 3) {
+          window.location.href = "admin_login";
+          clickCount = 0;
+        }
+
+        clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => {
+          clickCount = 0;
+        }, 1500);
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        const canvasEl = document.getElementById("diseaseChart");
+        if (!canvasEl || typeof Chart === "undefined") return;
+
+        const fallbackData = {
+          labels: [
+            "Flu",
+            "Dengue",
+            "Diabetes Complications",
+            "Hypertension",
+            "Typhoid",
+            "HIV",
+            "Hepatitis",
+            "Heart Attack",
+            "Major (Road) Accidents",
+            "Polio",
+          ],
+          values: [320, 180, 260, 300, 90, 5, 76, 200, 15, 25],
+        };
+
+        function renderChart(data) {
+          const ctx = canvasEl.getContext("2d");
+
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, "rgba(158, 46, 34, 0.4)");
+          gradient.addColorStop(1, "rgba(158, 46, 34, 0.0)");
+
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: data.labels,
+              datasets: [
+                {
+                  label: "Reported cases (last 30 days)",
+                  data: data.values,
+                  tension: 0.4,
+                  fill: true,
+                  backgroundColor: gradient,
+                  borderColor: "red",
+                  borderWidth: 2.5,
+                  pointRadius: 0,
+                  pointBackgroundColor: "#2d3748",
+                  pointBorderColor: "#ffffff",
+                  pointBorderWidth: 2,
+                  pointHoverRadius: 4,
+                  pointHoverBackgroundColor: "#e4d5d4",
+                  pointHoverBorderColor: "#ffffff",
+                  pointHoverBorderWidth: 2,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              interaction: {
+                mode: "index",
+                intersect: false,
+              },
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  enabled: true,
+                  backgroundColor: "#1a202c",
+                  titleColor: "#ffffff",
+                  bodyColor: "#ffffff",
+                  padding: 10,
+                  cornerRadius: 6,
+                  displayColors: false,
+                },
+              },
+              scales: {
+                x: {
+                  grid: { display: false },
+                  ticks: { color: "#718096" },
+                },
+                y: {
+                  beginAtZero: true,
+                  grid: { color: "#edf2f7" },
+                  ticks: { color: "#718096" },
+                },
+              },
+            },
+          });
+        }
+
+        renderChart(fallbackData);
+      });
+
+      async function loadTopFeedbacks() {
+        const feedbackGrid = document.querySelector(".feedback-grid");
+        if (!feedbackGrid) return;
+
+        try {
+          const res = await fetch("/api/feedback/top");
+          if (!res.ok) return;
+          const list = await res.json();
+
+          if (!list || list.length === 0) return;
+
+          const getStars = (num) => "★".repeat(num) + "☆".repeat(5 - num);
+
+          feedbackGrid.innerHTML = list
+            .map(
+              (item) => `
+                  <div class="feedback-card">
+                    <div class="fb-stars">${getStars(item.rating)}</div>
+                    <p class="fb-comment">"${item.comment}"</p>
+                    <div class="fb-name">— ${item.patient_name}</div>
+                  </div>
+                `,
+            )
+            .join("");
+        } catch (err) {
+          console.error("Feedbacks load karne mein error aaya:", err);
+        }
+      }
+      window.addEventListener("DOMContentLoaded", loadTopFeedbacks);
+    </script>
+  </body>
+</html>

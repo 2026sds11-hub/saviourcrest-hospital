@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Patient Reports | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="Doctor view — look up a patient and see their full report history: blood tests, X-rays and ultrasounds."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f3f6f6;
+        --surface: #ffffff;
+        --ink: #16211f;
+        --ink-soft: #55645f;
+        --line: #dfe6e4;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #b3392b;
+        --green: #1e7a46;
+        --amber: #9a6b12;
+        --radius: 6px;
+      }
+
+      /* Google Translate Overrides */
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      button {
+        font-family: "Inter", sans-serif;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.2px;
+      }
+
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          background 0.12s ease,
+          border-color 0.12s ease,
+          color 0.12s ease;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--teal-dark);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--teal);
+      }
+      .btn-line {
+        background: transparent;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn-line:hover {
+        border-color: var(--teal-dark);
+        color: var(--teal-dark);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* Top Bar */
+      header.topbar-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 15px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+      .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--teal-dark);
+        white-space: nowrap;
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--ink-soft);
+        border-left: 1px solid var(--line);
+        padding-left: 9px;
+        margin-left: 2px;
+        white-space: nowrap;
+      }
+
+      /* Compact Translation Dropdown */
+      .lang-switcher-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid var(--teal-dark);
+        border-radius: 9999px;
+        padding: 2px 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        margin-left: 6px;
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--ink);
+        cursor: pointer;
+        padding-right: 12px;
+        font-family: inherit;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 6px;
+        pointer-events: none;
+        font-size: 7px;
+        color: var(--ink-soft);
+      }
+
+      .id-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12.5px;
+        white-space: nowrap;
+      }
+      .id-actions a.plain {
+        color: var(--ink-soft);
+        transition: color 0.2s;
+        white-space: nowrap;
+      }
+      .id-actions a.plain:hover {
+        color: var(--teal-dark);
+      }
+
+      /* Layout */
+      .shell {
+        display: grid;
+        grid-template-columns: 216px 1fr;
+        min-height: 80vh;
+      }
+
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 20px 14px;
+      }
+      .sidebar .who {
+        padding: 2px 8px 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+      .sidebar .who strong {
+        display: block;
+        font-size: 13.5px;
+      }
+      .sidebar .who .spec {
+        font-size: 11.5px;
+        color: var(--teal);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .sidebar .who .id {
+        font-size: 11px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+
+      .side-nav a {
+        display: block;
+        padding: 7px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-soft);
+        margin-bottom: 1px;
+        border-left: 2px solid transparent;
+      }
+      .side-nav a:hover {
+        color: var(--teal-dark);
+      }
+      .side-nav a.active {
+        color: var(--teal-dark);
+        border-left-color: var(--teal-dark);
+        background: #eff5f4;
+        font-weight: 600;
+      }
+
+      .main {
+        padding: 24px 28px 50px;
+      }
+
+      .page-title {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .page-title h1 {
+        font-size: 19px;
+        margin-bottom: 3px;
+      }
+      .page-title p {
+        color: var(--ink-soft);
+        font-size: 13px;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 22px;
+      }
+      .panel h2 {
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+      .panel .sub {
+        color: var(--ink-soft);
+        font-size: 12.5px;
+        margin-bottom: 16px;
+      }
+
+      .field {
+        margin-bottom: 14px;
+      }
+      .field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--ink-soft);
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .field input {
+        width: 100%;
+        padding: 9px 11px;
+        font-size: 13.5px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #fbfdfd;
+        outline: none;
+        transition: border-color 0.12s ease;
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+      }
+      .field input:focus {
+        border-color: var(--teal-dark);
+      }
+      .field-row {
+        display: flex;
+        gap: 12px;
+      }
+      .field-row .field {
+        flex: 1;
+      }
+
+      .patient-result {
+        display: none;
+        margin-top: 16px;
+      }
+      .patient-result.show {
+        display: block;
+      }
+      .id-line {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+      .id-line h4 {
+        font-size: 15px;
+      }
+      .id-line .meta {
+        font-size: 12px;
+        color: var(--ink-soft);
+      }
+
+      /* Report filter chips */
+      .filter-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .filter-chip {
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        background: #f3f6f6;
+        color: var(--ink-soft);
+        border: 1px solid var(--line);
+        cursor: pointer;
+      }
+      .filter-chip.active {
+        background: var(--teal-dark);
+        color: #fff;
+        border-color: var(--teal-dark);
+      }
+
+      /* Report list */
+      .report-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        background: var(--line);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .report-item {
+        background: var(--surface);
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .report-item .left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .report-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 5px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        background: #eff5f4;
+        color: var(--teal-dark);
+        border: 1px solid var(--line);
+      }
+      .report-icon.xray {
+        background: #fdf3e4;
+        color: var(--amber);
+      }
+      .report-icon.ultrasound {
+        background: #eaf1fb;
+        color: #2a5b9e;
+      }
+      .report-title {
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+      .report-meta {
+        font-size: 11.5px;
+        color: var(--ink-soft);
+        margin-top: 2px;
+      }
+      .report-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .no-reports {
+        color: var(--ink-soft);
+        font-size: 13px;
+        padding: 14px 4px;
+        display: none;
+      }
+
+      footer {
+        background: var(--ink);
+        color: #c9d3d1;
+        padding: 26px 0 16px;
+        font-size: 12.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      footer a {
+        color: #a7b4b0;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .footer-bottom {
+        border-top: 1px solid #2a3634;
+        padding-top: 12px;
+        text-align: center;
+        color: #7c8a86;
+        font-size: 11.5px;
+      }
+
+      /* Mobile Responsive Adjustments (<= 768px) */
+      @media screen and (max-width: 768px) {
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .topbar-inner {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+          gap: 12px !important;
+          padding: 12px 16px !important;
+        }
+
+        .brand {
+          width: 100% !important;
+          justify-content: flex-start !important;
+        }
+
+        .id-actions {
+          width: 100% !important;
+          justify-content: flex-end !important;
+          border-top: 1px solid var(--line);
+          padding-top: 8px;
+          gap: 12px !important;
+        }
+
+        .shell {
+          grid-template-columns: 1fr !important;
+        }
+
+        .sidebar {
+          border-right: none !important;
+          border-bottom: 1px solid var(--line) !important;
+          padding: 14px !important;
+        }
+
+        .main {
+          padding: 16px !important;
+        }
+
+        .field-row {
+          flex-direction: column !important;
+        }
+
+        .report-item {
+          flex-direction: column !important;
+          align-items: flex-start !important;
+        }
+
+        .id-actions .btn {
+          width: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar-strip">
+      <div class="topbar-inner">
+        <div class="brand">
+            <img
+              src="/static/logo.jpeg"
+              alt="SaviourCrest Hospital Logo"
+              width="40"
+              height="40"
+              style="
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid var(--red);
+                padding: 2px;
+              "
+            />
+            <span class="brand-name">Saviour<span>Crest</span></span>
+          </a>
+          <span class="brand-tag">Doctor Portal</span>
+
+          <!-- Google Translate Dropdown -->
+          <div class="lang-switcher-container">
+            <span style="font-size: 11px; margin-right: 2px">🌐</span>
+            <select
+              id="custom_language_selector"
+              onchange="changeLanguage(this.value)"
+            >
+              <option value="" disabled selected>Translate</option>
+              <option value="en">English</option>
+              <option value="ur">Urdu (اردو)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="fa">Persian (فارسی)</option>
+            </select>
+            <span class="custom-arrow">▼</span>
+          </div>
+        </div>
+
+        <div class="id-actions">
+          <a href="/doctor_portal.html" class="plain">Back to Home</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Google Translate Hidden Engine -->
+    <div id="google_translate_element" style="display: none"></div>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <!-- Links back into the main Doctor Dashboard sections -->
+        <nav class="side-nav">
+          <a href="doctor_portal.html">Back to Dashboard</a>
+          <a href="doctor_portal.html" class="active">Patient Reports</a>
+          <a href="doctor_portal#find-patient">Search Patient</a>
+          <a
+            href="/doctor_appointment?doctor_id={{ doctor.id if doctor else 1 }}"
+            >Check Appointments</a
+          >
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="page-title">
+          <h1>Patient Reports</h1>
+          <p>
+            Look up a patient to view every report the lab has sent — blood
+            tests, X-rays and ultrasounds.
+          </p>
+        </div>
+
+        <!-- ============ PATIENT LOOKUP ============ -->
+        <div class="panel">
+          <h2>Patient Lookup</h2>
+          <p class="sub">Name, patient ID and phone number are all required.</p>
+
+          <form id="lookupForm">
+            <div class="field-row">
+              <div class="field">
+                <label for="lookupName">Patient name</label>
+                <input
+                  type="text"
+                  id="lookupName"
+                  name="patient_name"
+                  placeholder="Sarah Malik"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="lookupId">Patient ID</label>
+                <input
+                  type="text"
+                  id="lookupId"
+                  name="patient_id"
+                  placeholder="PT-10492"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label for="lookupPhone">Phone number</label>
+                <input
+                  type="tel"
+                  id="lookupPhone"
+                  name="phone"
+                  placeholder="+1 800 555 0142"
+                  required
+                />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Fetch Reports</button>
+          </form>
+
+          <!-- ============ RESULT ============ -->
+          <div class="patient-result" id="patientResult">
+            <div class="id-line">
+              <div
+                style="
+                  display: flex;
+                  align-items: baseline;
+                  gap: 12px;
+                  flex-wrap: wrap;
+                "
+              >
+                <h4 id="resPatientName">Patient Name</h4>
+                <span class="meta mono"></span>
+                <span class="meta"></span>
+              </div>
+              <button
+                type="button"
+                id="closeResultBtn"
+                class="btn btn-line btn-sm"
+                style="color: var(--red); border-color: #f5c6cb"
+              >
+                ✕ Close Reports
+              </button>
+            </div>
+
+            <div class="filter-row" id="filterRow">
+              <span class="filter-chip active" data-type="all"
+                >All Reports</span
+              >
+              <span class="filter-chip" data-type="Blood Test">Blood Test</span>
+            </div>
+
+            <div class="report-list" id="reportList">
+              <!-- Dynamic lab reports render here -->
+            </div>
+
+            <p class="no-reports" id="noReportsMsg">
+              No reports found for this filter.
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span
+            >© <span id="year"></span> SaviourCrest Hospital — Internal Doctor
+            Portal</span
+          >
+          <span
+            ><a href="tel:+920000000000">Emergency: +92 (---)-(---)</a></span
+          >
+        </div>
+        <div class="footer-bottom">
+          SaviourCrest Hospital · Pakistan, City (---), Area(---)
+        </div>
+      </div>
+    </footer>
+
+    <!-- Google Translate Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      // ====== GOOGLE TRANSLATE ENGINE INIT ======
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          { pageLanguage: "en", autoDisplay: false },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // =================================================================
+      // 1. PATIENT LOOKUP & FETCH REPORTS (UUID & HASHED URL SUPPORT)
+      // =================================================================
+      document
+        .getElementById("lookupForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const name = document.getElementById("lookupName").value.trim();
+          const id = document.getElementById("lookupId").value.trim();
+          const phone = document.getElementById("lookupPhone").value.trim();
+
+          if (!name || !id || !phone) {
+            alert("Please fill in name, patient ID and phone number.");
+            return;
+          }
+
+          const submitBtn = e.target.querySelector('button[type="submit"]');
+          submitBtn.innerText = "Searching...";
+          submitBtn.disabled = true;
+
+          try {
+            // Backend Endpoint Call
+            const response = await fetch(
+              `/api/doctor/patient-reports?patient_id=${encodeURIComponent(id)}&patient_name=${encodeURIComponent(name)}&phone=${encodeURIComponent(phone)}`,
+            );
+            const result = await response.json();
+
+            if (result.status === "success") {
+              // BROWSER URL HASHING
+              const secretPayload = JSON.stringify({
+                id: id,
+                timestamp: Date.now(),
+              });
+              const hashedToken = btoa(secretPayload).replace(/=/g, "");
+              window.history.pushState({}, "", `?ref=${hashedToken}`);
+
+              // A. Set Dynamic Patient Name in Header Line
+              const p = result.patient || {};
+              document.getElementById("resPatientName").innerText =
+                p.full_name || name;
+              document.querySelector("#patientResult .mono").innerText = "";
+              document.querySelector(
+                "#patientResult .meta:last-child",
+              ).innerText = "";
+
+              // B. Render Dynamic Lab Reports
+              renderReportsList(result.reports);
+
+              // C. Show Result Section
+              const resBox = document.getElementById("patientResult");
+              resBox.classList.add("show");
+              resBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            } else {
+              alert(result.detail || "No record found.");
+            }
+          } catch (error) {
+            console.error("Fetch Error:", error);
+            alert("Failed to connect with server.");
+          } finally {
+            submitBtn.innerText = "Fetch Reports";
+            submitBtn.disabled = false;
+          }
+        });
+
+      // =================================================================
+      // 2. CLOSE / HIDE REPORTS BUTTON HANDLER
+      // =================================================================
+      document
+        .getElementById("closeResultBtn")
+        .addEventListener("click", () => {
+          const resBox = document.getElementById("patientResult");
+          resBox.classList.remove("show");
+        });
+
+      // =================================================================
+      // 3. DYNAMIC REPORT LIST GENERATOR WITH SUMMARY & FILES
+      // =================================================================
+      function renderReportsList(reports) {
+        const reportList = document.getElementById("reportList");
+        const noReportsMsg = document.getElementById("noReportsMsg");
+        reportList.innerHTML = "";
+
+        if (!reports || reports.length === 0) {
+          noReportsMsg.style.display = "block";
+          noReportsMsg.innerText =
+            "No lab reports uploaded for this patient yet.";
+          return;
+        }
+
+        noReportsMsg.style.display = "none";
+
+        reports.forEach((r) => {
+          const item = document.createElement("div");
+          item.className = "report-item";
+          item.setAttribute("data-type", r.report_type);
+
+          const rawReportId = String(r.id || r.report_id || "");
+          const shortReportId =
+            rawReportId.length > 8
+              ? rawReportId.substring(0, 8).toUpperCase()
+              : rawReportId;
+
+          const ext = r.file_path
+            ? r.file_path.split(".").pop().toLowerCase()
+            : "";
+          let iconClass = "report-icon";
+          let iconText = "DOC";
+
+          if (ext === "pdf") {
+            iconText = "PDF";
+          } else if (["jpg", "jpeg", "png"].includes(ext)) {
+            iconText = "IMG";
+            if (r.report_type === "X-Ray") iconClass += " xray";
+            if (r.report_type === "Ultrasound") iconClass += " ultrasound";
+          }
+
+          const reportDate = new Date(
+            r.created_at || r.order_date || Date.now(),
+          ).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          });
+
+          item.innerHTML = `
+        <div class="left" style="flex: 1;">
+          <div class="${iconClass}">${iconText}</div>
+          <div>
+            <div class="report-title">
+              ${r.test_name} 
+              <span style="font-weight:normal; font-size:12px; color:var(--teal-dark)">(${r.report_type})</span>
+            </div>
+            <div class="report-meta">
+              Date: ${reportDate} · Lab Report ID #${shortReportId}
+            </div>
+            ${
+              r.result_summary
+                ? `<div style="margin-top:6px; font-size:12.5px; color:var(--ink); background:#f8fbfb; padding:6px 10px; border-radius:4px; border-left:3px solid var(--teal);">
+                    <strong>Lab Tech Remarks / Results:</strong> ${r.result_summary}
+                   </div>`
+                : ""
+            }
+          </div>
+        </div>
+        <div class="report-actions">
+          ${
+            r.file_path
+              ? `<a href="${r.file_path}" target="_blank" class="btn btn-line btn-sm">View File</a>
+                 <a href="${r.file_path}" download class="btn btn-line btn-sm">Download</a>`
+              : `<span style="font-size:11.5px; color:var(--ink-soft);">No File Attached</span>`
+          }
+        </div>
+      `;
+
+          reportList.appendChild(item);
+        });
+
+        bindFilters();
+      }
+
+      // =================================================================
+      // 4. FILTER REPORTS BY TYPE (Chips Handler)
+      // =================================================================
+      function bindFilters() {
+        const chips = document.querySelectorAll(".filter-chip");
+        const items = document.querySelectorAll(".report-item");
+        const noReportsMsg = document.getElementById("noReportsMsg");
+
+        chips.forEach((chip) => {
+          chip.onclick = () => {
+            chips.forEach((c) => c.classList.remove("active"));
+            chip.classList.add("active");
+
+            const selectedType = chip.dataset.type;
+            let visibleCount = 0;
+
+            items.forEach((item) => {
+              const show =
+                selectedType === "all" ||
+                item.getAttribute("data-type") === selectedType;
+              item.style.display = show ? "flex" : "none";
+              if (show) visibleCount++;
+            });
+
+            noReportsMsg.style.display = visibleCount === 0 ? "block" : "none";
+          };
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Patient Records | SaviourCrest Hospital</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Chart.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+      :root {
+        --bg: #f3f6f6;
+        --surface: #ffffff;
+        --ink: #16211f;
+        --ink-soft: #55645f;
+        --line: #dfe6e4;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #b3392b;
+        --radius: 6px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        line-height: 1.5;
+        font-size: 14px;
+        width: 100%;
+        overflow-x: hidden;
+      }
+      h1,
+      h2 {
+        font-family: "Poppins", sans-serif;
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .btn {
+        display: inline-block;
+        font-weight: 600;
+        font-size: 13px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        border: 1px solid transparent;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background: var(--teal-dark);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--teal);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      header.topbar-strip {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+        width: 100%;
+      }
+      .topbar-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1300px;
+        margin: 0 auto;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        text-decoration: none;
+      }
+      .brand-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+      .brand-tag {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        border-left: 1px solid var(--line);
+        padding-left: 9px;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 216px 1fr;
+        max-width: 1300px;
+        margin: 0 auto;
+        width: 100%;
+      }
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 20px 14px;
+      }
+      .sidebar .who {
+        padding: 2px 8px 16px;
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 14px;
+      }
+      .side-nav a {
+        display: block;
+        padding: 7px 8px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: var(--ink-soft);
+        text-decoration: none;
+        margin-bottom: 2px;
+      }
+      .side-nav a.active {
+        color: var(--teal-dark);
+        background: #eff5f4;
+        font-weight: 600;
+        border-left: 2px solid var(--teal-dark);
+      }
+
+      .main {
+        padding: 24px 28px 50px;
+        min-width: 0;
+      }
+      .page-title {
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        margin-bottom: 22px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .controls-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .chip-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 20px;
+        background: #f3f6f6;
+        color: var(--ink-soft);
+        border: 1px solid var(--line);
+        cursor: pointer;
+      }
+      .chip.active {
+        background: var(--teal-dark);
+        color: #fff;
+        border-color: var(--teal-dark);
+      }
+
+      .month-select {
+        padding: 5px 10px;
+        font-size: 12px;
+        border-radius: 5px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink);
+      }
+
+      .pulse-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11px;
+        color: var(--teal-dark);
+        font-weight: 600;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        animation: blink 1.5s infinite;
+      }
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table.web-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin-top: 10px;
+        white-space: nowrap;
+      }
+      table.web-table th {
+        background: #f8fafc;
+        color: var(--ink);
+        font-weight: 600;
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 2px solid var(--line);
+      }
+      table.web-table td {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+        color: var(--ink);
+      }
+      table.web-table tr:hover {
+        background-color: #f9fbfb;
+      }
+
+      .web-day-row td {
+        background-color: #f0f4f3;
+        font-weight: 700;
+        color: var(--teal-dark);
+        padding: 8px 14px;
+        font-size: 12.5px;
+        border-top: 1px solid var(--line);
+      }
+
+      .source-tag {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+      }
+      .source-online {
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+      .source-reception {
+        background: #fef3c7;
+        color: #b45309;
+      }
+
+      /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: relative;
+        z-index: 90;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 3px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 12px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 8px;
+        color: #64748b;
+      }
+
+      /* =========================================================
+   SAVIOURCREST MASTER MOBILE RESPONSIVE SYSTEM (FIXED)
+   ========================================================= */
+
+      @media screen and (max-width: 768px) {
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .shell {
+          grid-template-columns: 1fr !important;
+          width: 100% !important;
+        }
+
+        .sidebar {
+          border-right: none !important;
+          border-bottom: 1px solid var(--line) !important;
+          padding: 12px !important;
+        }
+
+        .side-nav {
+          display: flex !important;
+          gap: 10px !important;
+          overflow-x: auto !important;
+          white-space: nowrap !important;
+        }
+
+        .side-nav a {
+          margin-bottom: 0 !important;
+          white-space: nowrap !important;
+        }
+
+        .main {
+          padding: 16px 12px 30px !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
+
+        .topbar-inner {
+          padding: 10px 12px !important;
+        }
+
+        .brand img {
+          width: 45px !important;
+          height: 45px !important;
+          min-width: 45px !important;
+          min-height: 45px !important;
+        }
+
+        .panel {
+          padding: 14px !important;
+          width: 100% !important;
+        }
+
+        /* Fixed: Cutoff issue by allowing smooth horizontal table scroll */
+        .table-responsive {
+          display: block !important;
+          width: 100% !important;
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch !important;
+        }
+
+        table.web-table {
+          width: 100% !important;
+          min-width: 600px !important;
+        }
+
+        canvas {
+          max-height: 240px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <header class="topbar-strip">
+      <div class="topbar-inner">
+        <!-- <a href="/" class="brand" id="hospitalLogo"> -->
+          <img
+            src="/static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="100"
+            height="100"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+        </a>
+        <div class="header-right">
+          <div class="lang-switcher-container">
+            <span style="margin-right: 6px; font-size: 15px">🌐</span>
+            <select
+              id="custom_language_selector"
+              onchange="changeLanguage(this.value)"
+            >
+              <option value="" disabled selected>Translate Page</option>
+              <option value="en">English</option>
+              <option value="ur">Urdu (اردو)</option>
+              <option value="ar">Arabic (العربية)</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="fa">Persian(فارسی)</option>
+            </select>
+            <span class="custom-arrow">▼</span>
+          </div>
+
+          <div class="pulse-indicator">
+            <span class="dot"></span> Live DB Syncing
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="who">
+          <strong>admin</strong>
+          <div style="font-size: 11px; color: var(--teal); font-weight: 600">
+            ADMINISTRATOR
+          </div>
+        </div>
+        <nav class="side-nav">
+          <a href="/admin_portal">Overview</a>
+          <a href="/patient_records.html?uuid={{admin_uuid}}" class="active">Patient Records</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="page-title">
+          <h1>Dynamic Patient Registry</h1>
+          <p>
+            Real-time updates from Online Bookings & Reception Registrations.
+          </p>
+        </div>
+
+        <!-- ================= PANEL 1: TABLE PANEL ================= -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Patient Records</h2>
+
+            <div class="controls-group">
+              <div class="chip-row" id="timeChips">
+                <span class="chip" data-period="today">Today</span>
+                <span class="chip" data-period="week">This Week</span>
+                <span class="chip active" data-period="month">This Month</span>
+                <span class="chip" data-period="all">All Time</span>
+              </div>
+
+              <select
+                id="monthPicker"
+                class="month-select"
+                onchange="selectCustomMonth(this.value)"
+              >
+                <option value="">-- Select Specific Month --</option>
+                <option value="2026-08">August 2026</option>
+                <option value="2026-07">July 2026</option>
+                <option value="2026-06">June 2026</option>
+              </select>
+
+              <button
+                class="btn btn-primary btn-sm"
+                onclick="downloadReportPDF()"
+              >
+                Download PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="web-table">
+              <thead>
+                <tr>
+                  <th>Patient ID</th>
+                  <th>UUID</th>
+                  <th>Name</th>
+                  <th>Phone Number</th>
+                  <th>CNIC</th>
+                  <th>Age</th>
+                  <th>Source</th>
+                  <th>Reg. Date</th>
+                  <th>Gender</th>
+                </tr>
+              </thead>
+              <tbody id="recordsContainer">
+                <tr>
+                  <td colspan="9" style="text-align: center">
+                    Fetching live database records...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- ================= END TABLE PANEL ================= -->
+
+        <!-- ================= PANEL 2: LIVE GRAPH PANEL ================= -->
+        <div class="panel">
+          <div class="panel-head">
+            <h2 id="chartHeading">Weekly Patient Registration Trend</h2>
+            <div class="pulse-indicator">
+              <span class="dot"></span> Live Data
+            </div>
+          </div>
+          <p
+            style="
+              color: var(--ink-soft);
+              font-size: 12.5px;
+              margin-bottom: 16px;
+            "
+          >
+            Weekly total patient registrations fetched directly from MySQL.
+          </p>
+
+          <div style="position: relative; height: 320px; width: 100%">
+            <canvas id="patientTrendChart"></canvas>
+          </div>
+        </div>
+        <!-- ================= END GRAPH PANEL ================= -->
+      </main>
+    </div>
+
+    <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+      {
+    const adminUrlParams = new URLSearchParams(window.location.search);
+    const currentUuid = adminUrlParams.get("uuid");
+
+    // Sirf tabhi query param attach karein jab UUID valid aur non-empty ho
+    if (currentUuid && currentUuid.trim() !== "") {
+        document.querySelectorAll(".sidenav a").forEach(link => {
+            let href = link.getAttribute("href");
+            if (href) {
+                // Clean URL format: .html remove karein
+                href = href.replace(".html", "");
+                const baseUrl = href.split("?")[0];
+                link.setAttribute("href", `${baseUrl}?uuid=${currentUuid}`);
+            }
+        });
+    }
+}
+
+
+
+      let currentRecords = [];
+      let activePeriod = "month";
+      let patientChartInstance = null;
+
+      // 1. Fetch Table Data from FastAPI
+      async function fetchLivePatientRecords() {
+        try {
+          const response = await fetch(
+            `/api/v1/patients/records?period=${activePeriod}`,
+          );
+          const result = await response.json();
+
+          console.log("Live Patient Data API Response:", result);
+
+          if (result.status === "success" && Array.isArray(result.data)) {
+            currentRecords = result.data;
+            renderTable(currentRecords);
+          } else {
+            document.getElementById("recordsContainer").innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align:center; padding: 20px; color: var(--ink-soft);">
+              No patient records found for this selection.
+            </td>
+          </tr>`;
+          }
+        } catch (error) {
+          console.error("API Fetch Error:", error);
+          document.getElementById("recordsContainer").innerHTML = `
+        <tr>
+          <td colspan="9" style="text-align:center; padding: 20px; color: var(--red);">
+            Error loading records from server.
+          </td>
+        </tr>`;
+        }
+      }
+
+      // Safe Date parsing to prevent JS crash
+      function getDayName(dateString) {
+        if (!dateString || dateString === "Unknown Date") return "Unknown Day";
+
+        const parts = dateString.split("-");
+        if (parts.length === 3) {
+          const date = new Date(parts[0], parts[1] - 1, parts[2]);
+          if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString("en-US", { weekday: "long" });
+          }
+        }
+
+        const date = new Date(dateString);
+        return !isNaN(date.getTime())
+          ? date.toLocaleDateString("en-US", { weekday: "long" })
+          : "Unknown Day";
+      }
+
+      // 2. Render Table with Fallbacks
+      function renderTable(data) {
+        const container = document.getElementById("recordsContainer");
+
+        if (!data || data.length === 0) {
+          container.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 20px; color: var(--ink-soft);">No patient registrations found for this selection.</td></tr>`;
+          return;
+        }
+
+        const groupedByDate = {};
+        data.forEach((item) => {
+          const dateKey = item.date || item.registration_date || "Unknown Date";
+          if (!groupedByDate[dateKey]) groupedByDate[dateKey] = [];
+          groupedByDate[dateKey].push(item);
+        });
+
+        let htmlContent = "";
+        Object.keys(groupedByDate).forEach((dateStr) => {
+          const dayName = getDayName(dateStr);
+          htmlContent += `<tr class="web-day-row"><td colspan="9">${dayName} — <span style="font-weight:400; font-size:11.5px; opacity:0.8">${dateStr}</span></td></tr>`;
+
+          groupedByDate[dateStr].forEach((p) => {
+            const sourceVal = (p.source || "reception").toLowerCase();
+            const sourceBadge =
+              sourceVal === "online"
+                ? `<span class="source-tag source-online">Online</span>`
+                : `<span class="source-tag source-reception">Reception</span>`;
+
+            const patientUuid = p.uuid || p.p_uuid || "-";
+
+            htmlContent += `
+          <tr>
+            <td class="mono">${p.patient_id || p.id || "-"}</td>
+            <td class="mono" style="font-size:11.5px; color: var(--ink-soft);">${patientUuid}</td>
+            <td><strong>${p.name || "-"}</strong></td>
+            <td>${p.phone || "-"}</td>
+            <td class="mono">${p.cnic || "-"}</td>
+            <td>${p.age ?? "-"}</td>
+            <td>${sourceBadge}</td>
+            <td>${p.date || p.registration_date || "-"}</td>
+            <td>${p.gender || "-"}</td>
+          </tr>
+        `;
+          });
+        });
+
+        container.innerHTML = htmlContent;
+      }
+
+      // 3. Chip Selection Event
+      document.querySelectorAll("#timeChips .chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          document
+            .querySelectorAll("#timeChips .chip")
+            .forEach((c) => c.classList.remove("active"));
+          document.getElementById("monthPicker").value = "";
+          chip.classList.add("active");
+          activePeriod = chip.dataset.period;
+          fetchLivePatientRecords();
+        });
+      });
+
+      function selectCustomMonth(monthValue) {
+        if (!monthValue) return;
+        document
+          .querySelectorAll("#timeChips .chip")
+          .forEach((c) => c.classList.remove("active"));
+        activePeriod = monthValue;
+        fetchLivePatientRecords();
+      }
+
+      // 4. Fetch Graph Data from FastAPI & Render Weekly Chart
+      async function loadLiveChartData() {
+        try {
+          const response = await fetch("/api/v1/patients/chart-data");
+          const result = await response.json();
+
+          if (result.status === "success") {
+            const titleEl = document.getElementById("chartHeading");
+            if (titleEl && result.month_year) {
+              titleEl.innerText = `${result.month_year} - Weekly Registration Trend`;
+            }
+
+            renderLineChart(result.labels || [], result.data || []);
+          }
+        } catch (error) {
+          console.error("Error loading live chart data:", error);
+        }
+      }
+
+      function renderLineChart(labels, dataValues) {
+        const canvas = document.getElementById("patientTrendChart");
+        if (!canvas) return;
+
+        if (patientChartInstance) {
+          patientChartInstance.data.labels = labels;
+          patientChartInstance.data.datasets[0].data = dataValues;
+          patientChartInstance.update("none");
+          return;
+        }
+
+        const ctx = canvas.getContext("2d");
+
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, "rgba(14, 107, 101, 0.35)");
+        gradient.addColorStop(1, "rgba(14, 107, 101, 0.0)");
+
+        patientChartInstance = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: "Patients Registered",
+                data: dataValues,
+                borderColor: "#0e6b65",
+                borderWidth: 2.5,
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.35,
+                pointBackgroundColor: "#0a4f4b ",
+                pointBorderColor: "#ffffff",
+                pointBorderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 750,
+            },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: "#16211f ",
+                titleFont: { family: "Inter", size: 12, weight: "bold" },
+                bodyFont: { family: "Inter", size: 13 },
+                padding: 10,
+                displayColors: false,
+                callbacks: {
+                  label: function (context) {
+                    return ` Patients: ${context.parsed.y}`;
+                  },
+                },
+              },
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: {
+                  font: { family: "Inter", size: 11, weight: "600" },
+                  color: "#55645f",
+                },
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1,
+                  font: { family: "Inter", size: 11 },
+                  color: "#55645f",
+                },
+                grid: { color: "#dfe6e4", drawBorder: false },
+              },
+            },
+          },
+        });
+      }
+
+      // 5. PDF Generation - Redesigned Modern & Executive Layout
+      function downloadReportPDF() {
+        if (!currentRecords || currentRecords.length === 0) {
+          alert("No data available to generate PDF.");
+          return;
+        }
+
+        const pdfContainer = document.createElement("div");
+        pdfContainer.style.padding = "24px 28px";
+        pdfContainer.style.backgroundColor = "#ffffff";
+        pdfContainer.style.fontFamily = "'Inter', sans-serif";
+        pdfContainer.style.color = "#16211f";
+
+        const titleText = activePeriod.toUpperCase();
+        const currentDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+        const groupedByDate = {};
+        currentRecords.forEach((item) => {
+          const dateKey = item.date || item.registration_date || "Unknown Date";
+          if (!groupedByDate[dateKey]) groupedByDate[dateKey] = [];
+          groupedByDate[dateKey].push(item);
+        });
+
+        let rowsHtml = "";
+        Object.keys(groupedByDate).forEach((dateStr) => {
+          const dayName = getDayName(dateStr);
+          rowsHtml += `
+            <tr style="background-color: #f0f7f6; color: #0e6b65;">
+              <td colspan="9" style="padding: 8px 10px; border-bottom: 2px solid #0e6b65; font-size: 11px; font-weight: 700;">
+                📅 ${dayName} — <span style="font-weight: 500; color: #55645f;">${dateStr}</span>
+              </td>
+            </tr>
+          `;
+
+          groupedByDate[dateStr].forEach((p, index) => {
+            const bgColor = index % 2 === 0 ? "#ffffff" : "#f8fafc";
+            const sourceVal = (p.source || "reception").toLowerCase();
+            const sourceStyle = sourceVal === "online"
+              ? "background-color: #e0f2fe; color: #0369a1;"
+              : "background-color: #fef3c7; color: #b45309;";
+
+            rowsHtml += `
+              <tr style="background-color: ${bgColor}; border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 8px 9px; font-family: monospace; font-size: 10px; color: #0e6b65; font-weight: 600;">${p.patient_id || p.id || "-"}</td>
+                <td style="padding: 8px 9px; font-family: monospace; font-size: 9.5px; color: #64748b;">${p.uuid || p.p_uuid || "-"}</td>
+                <td style="padding: 8px 9px; font-size: 10.5px; font-weight: 600; color: #16211f;">${p.name || "-"}</td>
+                <td style="padding: 8px 9px; font-size: 10px; color: #334155;">${p.phone || "-"}</td>
+                <td style="padding: 8px 9px; font-family: monospace; font-size: 10px; color: #334155;">${p.cnic || "-"}</td>
+                <td style="padding: 8px 9px; font-size: 10px; color: #334155;">${p.age ?? "-"}</td>
+                <td style="padding: 8px 9px; font-size: 9px;">
+                  <span style="padding: 3px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; ${sourceStyle}">
+                    ${p.source || "reception"}
+                  </span>
+                </td>
+                <td style="padding: 8px 9px; font-size: 10px; color: #334155;">${p.date || p.registration_date || "-"}</td>
+                <td style="padding: 8px 9px; font-size: 10px; color: #334155;">${p.gender || "-"}</td>
+              </tr>
+            `;
+          });
+        });
+
+        pdfContainer.innerHTML = `
+          <!-- Header Banner -->
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #0e6b65; padding-bottom: 14px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <img src="/static/logo.jpeg" alt="SaviourCrest Hospital Logo" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 1.5px solid #0e6b65;" />
+              <div>
+                <h1 style="font-size: 20px; font-weight: 700; color: #0a4f4b; margin: 0; line-height: 1.2;">Saviour<span style="color: #b3392b;">Crest</span> Hospital</h1>
+                <p style="font-size: 11px; color: #55645f; margin: 2px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Official Patient Registry Report &bull; ${titleText}</p>
+              </div>
+            </div>
+            <div style="text-align: right; font-size: 10.5px; color: #55645f;">
+              <div><strong>Period:</strong> ${titleText}</div>
+              <div><strong>Generated:</strong> ${currentDate}</div>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 10px;">
+            <thead>
+              <tr style="background-color: #0e6b65; color: #ffffff; font-weight: 600;">
+                <th style="padding: 9px; border-top-left-radius: 4px;">Patient ID</th>
+                <th style="padding: 9px;">UUID</th>
+                <th style="padding: 9px;">Name</th>
+                <th style="padding: 9px;">Phone Number</th>
+                <th style="padding: 9px;">CNIC</th>
+                <th style="padding: 9px;">Age</th>
+                <th style="padding: 9px;">Source</th>
+                <th style="padding: 9px;">Reg. Date</th>
+                <th style="padding: 9px; border-top-right-radius: 4px;">Gender</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <!-- Footer -->
+          <div style="margin-top: 20px; padding-top: 10px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 9.5px; color: #64748b;">
+            <div>SaviourCrest Hospital Management System &bull; Confidential Data</div>
+            <div>Automated System Report</div>
+          </div>
+        `;
+
+        const opt = {
+          margin: 0.3,
+          filename: `Patient_Records_${activePeriod}.pdf`,
+          image: { type: "jpeg", quality: 1.0 },
+          html2canvas: { scale: 3, useCORS: true },
+          jsPDF: { unit: "in", format: "a4", orientation: "landscape" },
+        };
+
+        html2pdf().set(opt).from(pdfContainer).save();
+      }
+
+      // Initial Calls & Interval Auto-syncing
+      fetchLivePatientRecords();
+      loadLiveChartData();
+
+      setInterval(fetchLivePatientRecords, 20000);
+      setInterval(loadLiveChartData, 60000);
+    </script>
+  </body>
+</html>

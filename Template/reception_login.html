@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Receptionist Login | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="Receptionist login for SaviourCrest Hospital staff."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: #ffffff;
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --red-dark: #9e2e22;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.55;
+      }
+      h1,
+      h2 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      img,
+      svg {
+        display: block;
+        max-width: 100%;
+      }
+
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      /* -----------------Toast --------------------- */
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .toast-msg {
+        min-width: 260px;
+        padding: 14px 18px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateX(100%);
+        animation:
+          slideIn 0.3s forwards,
+          fadeOut 0.3s 3.5s forwards;
+      }
+      .toast-success {
+        background-color: #28a745;
+        border-left: 6px solid #1e7e34;
+      }
+      .toast-error {
+        background-color: #dc3545;
+        border-left: 6px solid #bd2130;
+      }
+      @keyframes slideIn {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+      }
+
+      header.navbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+        gap: 20px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 22px;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+
+      /* Header Nav Links Styles */
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      .nav-links a {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: color 0.15s ease;
+      }
+      .nav-links a:hover {
+        color: var(--teal);
+      }
+
+      /* Hamburger Menu Styles */
+      .menu-toggle {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 5px;
+      }
+      .menu-toggle .bar {
+        width: 25px;
+        height: 3px;
+        background-color: var(--teal-dark);
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+      .menu-toggle.active .bar:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+      }
+      .menu-toggle.active .bar:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-toggle.active .bar:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+      }
+
+      .btn {
+        display: inline-block;
+        font-family: "Inter", sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.12s ease,
+          box-shadow 0.12s ease,
+          background 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+      }
+      .btn-primary {
+        background: var(--red);
+        color: #fff;
+        width: 100%;
+        text-align: center;
+      }
+      .btn-primary:hover {
+        background: var(--red-dark);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--teal-dark);
+        border: 1px solid var(--teal);
+      }
+      .btn-outline:hover {
+        background: var(--teal);
+        color: #fff;
+      }
+
+      /* Back to Home Button Wrapper (Shifted Right) */
+      .back-home-wrapper {
+        display: flex;
+        justify-content: flex-end;
+      }
+      .back-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--teal-dark);
+        margin: 22px 0 0;
+      }
+      .back-home:hover {
+        text-decoration: underline;
+      }
+
+      .auth-wrap {
+        display: flex;
+        justify-content: center;
+        padding: 30px 0 60px;
+      }
+      .auth-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        width: 100%;
+        max-width: 420px;
+        padding: 30px 30px 26px;
+      }
+      .auth-head {
+        text-align: center;
+        margin-bottom: 22px;
+      }
+      .eyebrow {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--teal);
+        background: #eaf4f3;
+        padding: 4px 10px;
+        border-radius: 20px;
+        margin-bottom: 10px;
+      }
+      .auth-head h1 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+      .auth-head p {
+        color: var(--text-muted);
+        font-size: 13.5px;
+      }
+
+      .field {
+        margin-bottom: 16px;
+      }
+      .field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--text);
+      }
+      .field input {
+        width: 100%;
+        padding: 11px 12px;
+        font-size: 14px;
+        font-family: "Inter", sans-serif;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fbfefe;
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+      .field input:focus {
+        border-color: var(--teal);
+      }
+      .field .hint {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        margin-top: 5px;
+      }
+
+      .error-msg {
+        background: #fceae7;
+        color: var(--red-dark);
+        border: 1px solid #f3c9c2;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+
+      .info-note {
+        background: #eff6f5;
+        color: var(--teal-dark);
+        font-size: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 34px 0 18px;
+        font-size: 13.5px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      footer a {
+        color: #b9c8c6;
+        transition: color 0.15s ease;
+      }
+      footer a:hover {
+        color: #fff;
+      }
+      .emergency-line {
+        color: #ffd9d4;
+        font-weight: 600;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 14px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 12.5px;
+      }
+
+      /* =========================================================
+   SAVIOURCREST MASTER MOBILE RESPONSIVE SYSTEM (<= 768px)
+   ========================================================= */
+
+      @media screen and (max-width: 768px) {
+        /* 1. Universal Layout & Screen Reset */
+        html,
+        body {
+          width: 100% !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+
+        .container,
+        .wrapper,
+        main,
+        .main-content {
+          width: 100% !important;
+          max-width: 100% !important;
+          padding-left: 15px !important;
+          padding-right: 15px !important;
+        }
+
+        /* 2. Header & Navigation Responsive Alignment */
+        header,
+        nav,
+        .navbar {
+          height: auto !important;
+        }
+
+        .nav-inner {
+          flex-wrap: wrap !important;
+          padding: 12px 15px !important;
+          align-items: center !important;
+          justify-content: space-between !important;
+        }
+
+        .brand {
+          justify-content: flex-start !important;
+          width: auto !important;
+        }
+
+        .menu-toggle {
+          display: flex !important;
+        }
+
+        .nav-links {
+          display: none !important;
+          flex-direction: column !important;
+          width: 100% !important;
+          text-align: center !important;
+          gap: 10px !important;
+          padding: 12px 0 0 0 !important;
+          order: 3 !important;
+        }
+
+        .nav-links.active {
+          display: flex !important;
+        }
+
+        .nav-links a {
+          display: block !important;
+          padding: 8px 0 !important;
+          font-size: 14px !important;
+          border-bottom: 1px solid var(--border, #e1eae9);
+        }
+
+        /* 3. Floating Translate Dropdown */
+        .lang-switcher-container {
+          position: relative !important;
+          top: auto !important;
+          left: auto !important;
+          margin: 8px auto !important;
+          display: inline-flex !important;
+        }
+
+        /* 4. Grids & Multi-Column Layouts -> Single Column Stack */
+        .login-grid,
+        .services-grid,
+        .about-stats,
+        .facility-grid,
+        .feedback-grid,
+        .dash-grid,
+        .footer-grid,
+        .row,
+        .grid {
+          grid-template-columns: 1fr !important;
+          flex-direction: column !important;
+          gap: 16px !important;
+        }
+
+        .about-split {
+          grid-template-columns: 1fr !important;
+          gap: 20px !important;
+        }
+
+        /* 5. Cards, Forms, Inputs & Buttons Width Reset */
+        .login-card,
+        .service-card,
+        .stat-box,
+        .facility-card,
+        .feedback-card,
+        .dash-card,
+        .donate-box,
+        .card,
+        form {
+          width: 100% !important;
+          max-width: 100% !important;
+        }
+
+        input,
+        select,
+        textarea,
+        button,
+        .btn {
+          width: 100% !important;
+          max-width: 100% !important;
+          box-sizing: border-box !important;
+        }
+
+        /* 6. Universal Table Safe Horizontal Scroll */
+        table {
+          display: block !important;
+          width: 100% !important;
+          overflow-x: auto !important;
+          white-space: nowrap !important;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* 7. Canvas / Charts Auto-Fit */
+        canvas {
+          width: 100% !important;
+          height: auto !important;
+          max-height: 280px !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast-container"></div>
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (---)-(---)</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>, every day of the year.
+    </div>
+
+    <header class="navbar">
+      <div class="nav-inner">
+        <!-- <a href="/" class="brand"> -->
+          <img
+            src="static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="90"
+            height="90"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+        </a>
+
+        <!-- Mobile Hamburger / Close Icon (Rakha gaya nav-links se pehle taaki header line mein rahe) -->
+        <div class="menu-toggle" id="mobile-menu">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+
+        <!-- Header Navigation Links -->
+        <nav class="nav-links" id="nav-links">
+          <a href="/about">About Us</a>
+          <a href="/doctors_list">Doctors List</a>
+          <a href="/staff_cont">Staff Contact</a>
+          <a href="/blood_bank">Blood Bank</a>
+          <a href="/feedback_page">Feedback</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="container back-home-wrapper">
+      <a href="main_page.html" class="back-home">← Back to Home</a>
+    </div>
+
+    <div class="auth-wrap">
+      <div class="auth-card">
+        <div class="auth-head">
+          <span class="eyebrow">Staff Access</span>
+          <h1>Receptionist Login</h1>
+          <p>Enter the ID and name given to you by hospital administration.</p>
+        </div>
+
+        <div class="info-note">
+          No signup here — receptionist accounts are created by hospital admin
+          when you're onboarded. If you don't have your ID, contact the hospital
+          office.
+        </div>
+
+        <div class="error-msg" id="errorMsg" style="display: none"></div>
+
+        <form id="loginForm" method="POST" action="/reception_login">
+          <div class="field">
+            <label for="staffId">Receptionist ID</label>
+            <input
+              type="password"
+              id="staffId"
+              name="staff_id"
+              placeholder="e.g. REC_000"
+              required
+            />
+            <div class="hint">The ID issued to you by the hospital.</div>
+          </div>
+          <div class="field">
+            <label for="fullName">Full name</label>
+            <input
+              type="text"
+              id="fullName"
+              name="full_name"
+              placeholder="e.g. abc"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Log In</button>
+        </form>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span
+            >© <span id="year"></span> SaviourCrest Hospital. Open
+            <strong style="color: #fff">24/7</strong>, every day.</span
+          >
+          <span>
+            <a href="tel:+92 (---)-(--)">Main: +92 (---)-(--)</a>
+            &nbsp;·&nbsp;
+            <a href="tel:+92 (---)-(---)" class="emergency-line"
+              >Emergency: +92 (---)-(---)</a
+            >
+          </span>
+        </div>
+        <div class="footer-bottom">
+          SaviourCrest Hospital · Pakistan, City (---), Area(---) ·
+          <a href="/">Back to Home</a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Hamburger Menu Toggle Logic
+      const mobileMenu = document.getElementById("mobile-menu");
+      const navLinks = document.getElementById("nav-links");
+
+      if (mobileMenu && navLinks) {
+        mobileMenu.addEventListener("click", () => {
+          mobileMenu.classList.toggle("active");
+          navLinks.classList.toggle("active");
+        });
+      }
+
+      function showNotification(message, type) {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        toast.className =
+          "toast-msg " + (type === "success" ? "toast-success" : "toast-error");
+        toast.innerText = message;
+
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get("msg");
+
+        if (msg === "login_success") {
+          showNotification("Login successfully!", "success");
+        } else if (msg === "logout_success") {
+          showNotification("Logout successfully!", "success");
+        } else if (msg === "invalid") {
+          showNotification("Invalid ID or Name!", "error");
+        }
+
+        if (msg) {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      });
+    </script>
+  </body>
+</html>

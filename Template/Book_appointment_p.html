@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/jpeg" href="/static/logo2.jpeg" />
+    <title>Book Appointment | SaviourCrest Hospital</title>
+    <meta
+      name="description"
+      content="Book an online consultation with expert doctors at SaviourCrest Hospital."
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #f6fafa;
+        --surface: rgba(255, 255, 255, 0.88);
+        --glass-border: rgba(14, 107, 101, 0.15);
+        --glass-shadow: 0 10px 30px rgba(14, 107, 101, 0.05);
+        --teal: #0e6b65;
+        --teal-dark: #0a4f4b;
+        --red: #c0392b;
+        --red-dark: #9e2e22;
+        --green: #1e824c;
+        --text: #1c2b2a;
+        --text-muted: #5c6f6d;
+        --border: #e1eae9;
+        --radius: 12px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        background: linear-gradient(135deg, #f6fafa 0%, #eaf4f3 100%);
+        min-height: 100vh;
+        line-height: 1.55;
+      }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Poppins", sans-serif;
+        color: var(--text);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      /* Glossy Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 12px 22px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        backdrop-filter: blur(4px);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--red) 0%,
+          var(--red-dark) 100%
+        );
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(192, 57, 43, 0.25);
+      }
+      .btn-jazzcash {
+        background: linear-gradient(135deg, #da1f26 0%, #b8181e 100%);
+        color: #fff;
+        width: 100%;
+        box-shadow: 0 4px 12px rgba(218, 31, 38, 0.25);
+      }
+
+      /* Top strip & Navbar */
+      .top-strip {
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        text-align: center;
+        padding: 6px 12px;
+      }
+      .top-strip strong {
+        color: #ffd9d4;
+      }
+
+      header.navbar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 24px;
+        max-width: 1180px;
+        margin: 0 auto;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-name {
+        font-family: "Poppins", sans-serif;
+        font-weight: 700;
+        font-size: 21px;
+        color: var(--teal-dark);
+      }
+      .brand-name span {
+        color: var(--red);
+      }
+
+      .back-link {
+        display: flex;
+        justify-content: flex-end;
+        margin-left: auto;
+        margin-right: 20px;
+        align-items: center;
+        gap: 6px;
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--teal-dark);
+        margin: 22px  20 16px auto;
+        transition: transform 0.2s;
+      }
+      .back-link:hover {
+        transform: translateX(-3px);
+      }
+
+      /* Doctor Profile Card (Glossy) */
+      .doctor-strip {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        background: var(--surface);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        padding: 18px 22px;
+        margin-bottom: 24px;
+        box-shadow: var(--glass-shadow);
+      }
+      .doctor-strip img {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid var(--teal);
+      }
+      .doctor-strip h2 {
+        font-size: 17px;
+        margin-bottom: 2px;
+      }
+      .doctor-strip .spec {
+        font-size: 13px;
+        color: var(--teal);
+        font-weight: 600;
+      }
+      .doctor-strip .hours {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .status-inline {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-left: auto;
+        background: #eaf6f4;
+        padding: 6px 12px;
+        border-radius: 20px;
+        color: var(--teal-dark);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      /* Glass Steps Styling */
+      .step {
+        background: var(--surface);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--glass-shadow);
+        transition: opacity 0.3s ease;
+      }
+      .step.disabled {
+        opacity: 0.45;
+        pointer-events: none;
+      }
+      .step-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 4px;
+      }
+      .step-num {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--teal-dark);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .step h3 {
+        font-size: 16px;
+      }
+      .step .sub {
+        color: var(--text-muted);
+        font-size: 13px;
+        margin: 4px 0 18px 40px;
+      }
+
+      /* Modern Calendar & Slots UI */
+      .date-row {
+        display: flex;
+        gap: 10px;
+        margin: 0 0 20px 40px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+      }
+      .date-pill {
+        flex: 0 0 auto;
+        text-align: center;
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: #fff;
+        cursor: pointer;
+        min-width: 64px;
+        transition: all 0.2s ease;
+      }
+      .date-pill:hover {
+        border-color: var(--teal);
+        transform: translateY(-2px);
+      }
+      .date-pill.selected {
+        background: linear-gradient(
+          135deg,
+          var(--teal) 0%,
+          var(--teal-dark) 100%
+        );
+        border-color: var(--teal-dark);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(14, 107, 101, 0.25);
+      }
+      .date-pill .dow {
+        font-size: 11px;
+        text-transform: uppercase;
+        opacity: 0.8;
+      }
+      .date-pill .dnum {
+        font-size: 16px;
+        font-weight: 700;
+        font-family: "Poppins", sans-serif;
+      }
+
+      .slot-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        margin-left: 40px;
+      }
+      .slot-btn {
+        padding: 10px 8px;
+        text-align: center;
+        font-size: 12.5px;
+        font-weight: 600;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .slot-btn:hover {
+        border-color: var(--teal);
+        color: var(--teal);
+      }
+      .slot-btn.selected {
+        background: var(--teal-dark);
+        border-color: var(--teal-dark);
+        color: #fff;
+      }
+      .slot-btn.booked {
+        background: #f1f5f5;
+        color: #b4bbb9;
+        border-color: #e2e8e7;
+        cursor: not-allowed;
+        text-decoration: line-through;
+      }
+
+        /*-------------Google Translation----------------*/
+      body {
+        top: 0 !important;
+        position: static !important;
+      }
+      .skiptranslate iframe,
+      #goog-gt-tt {
+        display: none !important;
+      }
+
+      .lang-switcher-container {
+        position: absolute;
+        z-index: 10;
+        top: 50px;
+        right: 30px;
+        left: auto;
+        display: inline-flex;
+        align-items: center;
+        background-color: #ffffff;
+        border: 1px solid #115564;
+        border-radius: 9999px;
+        padding: 3px 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .lang-switcher-container:hover {
+        border-color: #115564;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+      }
+      .lang-switcher-container select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background: transparent;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        font-weight: 900;
+        color: #1e293b;
+        cursor: pointer;
+        padding-right: 14px;
+        font-family: inherit;
+      }
+      .lang-switcher-container span {
+        font-size: 12px !important;
+      }
+      .lang-switcher-container .custom-arrow {
+        position: absolute;
+        right: 8px;
+        pointer-events: none;
+        font-size: 8px;
+        color: #64748b;
+      }
+
+
+      /* Payment Box */
+      .pay-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #eff6f5 0%, #e2f0ee 100%);
+        border-radius: 10px;
+        padding: 16px 20px;
+        margin: 0 0 18px 40px;
+        border: 1px solid var(--glass-border);
+      }
+      .pay-summary .label {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        font-weight: 500;
+      }
+      .pay-summary .amount {
+        font-family: "Poppins", sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--teal-dark);
+      }
+
+      .field {
+        margin: 0 0 16px 40px;
+      }
+      .field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .field input {
+        width: 100%;
+        padding: 12px 14px;
+        font-size: 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+      .field input:focus {
+        border-color: var(--teal);
+      }
+
+      .jazzcash-box {
+        margin-left: 40px;
+        margin-bottom: 18px;
+      }
+      .paid-confirm {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: #e9f6ef;
+        color: var(--green);
+        border: 1px solid #bee6ce;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 13px;
+        margin: 0 0 18px 40px;
+        font-weight: 500;
+      }
+      .paid-confirm.show {
+        display: flex;
+      }
+
+      .upload-box {
+        margin-left: 40px;
+      }
+      .upload-box input[type="file"] {
+        width: 100%;
+        padding: 12px;
+        font-size: 13px;
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+      }
+      .upload-hint {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        margin-top: 6px;
+      }
+
+      .confirm-row {
+        margin-left: 40px;
+        margin-top: 18px;
+      }
+
+      /* Modal Popup Styling */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(10, 30, 30, 0.6);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      .modal-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 440px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+      .modal-overlay.active .modal-card {
+        transform: translateY(0);
+      }
+      .modal-icon {
+        width: 60px;
+        height: 60px;
+        background: #e9f6ef;
+        color: var(--green);
+        border-radius: 80%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        margin: 0 auto 16px;
+      }
+      .modal-card h3 {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .modal-card p {
+        font-size: 13.5px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      footer {
+        background: var(--text);
+        color: #d9e3e2;
+        padding: 34px 0 18px;
+        font-size: 13.5px;
+        margin-top: 40px;
+      }
+      .footer-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        max-width: 1180px;
+        margin: 0 auto 16px;
+        padding: 0 24px;
+      }
+      footer a {
+        color: #b9c8c6;
+      }
+      .footer-bottom {
+        border-top: 1px solid #33403f;
+        padding-top: 14px;
+        text-align: center;
+        color: #8fa19f;
+        font-size: 12.5px;
+      }
+
+      @media (max-width: 640px) {
+        .date-row,
+        .slot-grid,
+        .field,
+        .pay-summary,
+        .jazzcash-box,
+        .paid-confirm,
+        .upload-box,
+        .confirm-row {
+          margin-left: 0;
+        }
+        .step .sub {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-strip">
+      Emergency Helpline <strong>+92 (---)-(---)</strong> — SaviourCrest
+      Hospital is open <strong>24/7</strong>.
+    </div>
+
+    <header class="navbar">
+      <div class="nav-inner">
+        <!-- <a href="patient_portal.html" class="brand"> -->
+          <img
+             src="/static/logo.jpeg"
+            alt="SaviourCrest Hospital Logo"
+            width="100"
+            height="100"
+            style="
+              border-radius: 50%;
+              object-fit: cover;
+              border: 1px solid red;
+              padding: 2px;
+            "
+          />
+          <span class="brand-name">Saviour<span>Crest</span></span>
+            <!-- Google Translations hidden element -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      "
+    ></div>
+
+    <!-- ============ FULL WIDTH HERO BANNER ============ -->
+    <section class="hero-banner">
+      <div class="lang-switcher-container">
+        <span style="margin-right: 6px; font-size: 15px">🌐</span>
+        <select
+          id="custom_language_selector"
+          onchange="changeLanguage(this.value)"
+        >
+          <option value="" disabled selected>Translate Page</option>
+          <option value="en">English</option>
+          <option value="ur">Urdu (اردو)</option>
+          <option value="ar">Arabic (العربية)</option>
+          <option value="es">Spanish (Español)</option>
+          <option value="fr">French (Français)</option>
+          <option value="fa">Persian(فارسی)</option>
+        </select>
+        <span class="custom-arrow">▼</span>
+      </div>
+
+        </a>
+        <!-- <a href="/dashboard/patient/{patient_uuid}" class="back-link">← Back to Dashboard</a> -->
+        
+      </div>
+    </header>
+     <a href="/dashboard/patient/{patient_uuid}" class="back-link">← Back to Dashboard</a>
+    <div class="container">
+      <!-- ============ DYNAMIC DOCTOR SUMMARY ============ -->
+      <div class="doctor-strip" id="doctorStrip">
+        <img
+          src="{{ doctor.photo_url if doctor and doctor.photo_url else 'static/imageM.png' }}"
+          alt="Doctor photo"
+          id="docPhoto"
+        />
+        <div>
+          <h2 id="docName">
+            {{ doctor.full_name if doctor else 'Dr. Doctor Name' }}
+          </h2>
+          <div class="spec" id="docSpec">
+            {{ doctor.specialization if doctor else 'Specialist' }}
+          </div>
+          <div class="hours" id="docHours">
+            {{ doctor.available_from if doctor else '09:00 AM' }} – {{
+            doctor.available_to if doctor else '05:00 PM' }}
+          </div>
+        </div>
+        <div class="status-inline">
+          <span class="status-dot"></span>
+          <span>Available for Online Booking</span>
+        </div>
+      </div>
+
+      <!-- ============ STEP 1: DATE & TIME SCHEDULE ============ -->
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">1</span>
+          <h3>Select Date & Available Slot</h3>
+        </div>
+        <p class="sub">
+          Pick a suitable date and available time slot for your video
+          consultation.
+        </p>
+
+        <div class="date-row" id="dateRow">
+          <!-- Filled dynamically by JavaScript -->
+        </div>
+        <div class="slot-grid" id="slotGrid">
+          <!-- Slots rendered dynamically based on selected date -->
+        </div>
+      </div>
+
+      <!-- ============ STEP 2: PAYMENT DETAILS ============ -->
+      <div class="step">
+        <div class="step-head">
+          <span class="step-num">2</span>
+          <h3>Pay Online Fee via JazzCash</h3>
+        </div>
+        <p class="sub">
+          Full consultation fee is required to confirm online video
+          appointments.
+        </p>
+
+        <div class="pay-summary">
+          <span class="label">Consultation Fee</span>
+          <span class="amount">Rs. 2,000</span>
+        </div>
+
+        <div class="field">
+          <label for="jazzNumber">JazzCash Mobile Number</label>
+          <input
+            type="tel"
+            id="jazzNumber"
+            placeholder="03XX-XXXXXXX"
+            maxlength="11"
+            required
+          />
+        </div>
+
+        <div class="jazzcash-box">
+          <button type="button" class="btn btn-jazzcash" id="jazzPayBtn">
+            Pay with JazzCash
+          </button>
+        </div>
+
+        <div class="paid-confirm" id="paidConfirm">
+          ✅ Payment initiated! Please attach payment proof receipt below.
+        </div>
+      </div>
+
+      <!-- ============ STEP 3: UPLOAD PROOF & CONFIRM ============ -->
+      <div class="step disabled" id="proofStep">
+        <div class="step-head">
+          <span class="step-num">3</span>
+          <h3>Upload Payment Proof</h3>
+        </div>
+        <p class="sub">
+          Upload the screenshot/PDF of your successful JazzCash transaction for
+          verification.
+        </p>
+
+        <form id="bookingForm" enctype="multipart/form-data">
+          <!-- ✅ YAHAN MAINE PATIENT ID KA HIDDEN INPUT ADD KIYA HAI -->
+          <input
+            type="hidden"
+            name="patient_id"
+            value="{{ request.session.get('patient_id') }}"
+          />
+
+          <!-- Baqi puranay dynamic hidden inputs -->
+          <input
+            type="hidden"
+            id="doctorIdField"
+            name="doctor_id"
+            value="{{ doctor.id if doctor else '1' }}"
+          />
+          <input type="hidden" id="apptDateField" name="appt_date" />
+          <input type="hidden" id="apptTimeField" name="appt_time" />
+          <input
+            type="hidden"
+            id="apptAmountField"
+            name="amount_paid"
+            value="2000"
+          />
+
+          <div class="upload-box">
+            <input
+              type="file"
+              id="proofFile"
+              name="payment_proof"
+              accept="image/png, image/jpeg, application/pdf"
+              required
+            />
+            <div class="upload-hint">
+              Accepted formats: JPG, PNG, or PDF (Max 5MB). Encrypted & securely
+              stored.
+            </div>
+          </div>
+
+          <div class="confirm-row">
+            <button type="submit" class="btn btn-primary" id="confirmBtn">
+              Confirm & Book Appointment
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ POPUP SUCCESS MODAL ============ -->
+    <div class="modal-overlay" id="successModal">
+      <div class="modal-card">
+        <div class="modal-icon">✓</div>
+        <h3>Appointment Request Sent!</h3>
+        <p>
+          Your appointment request and payment proof (Rs. 2,000) have been sent
+          to the
+          <strong>Reception & Verification Portal</strong>. Once verified, you
+          will receive a <strong>confirm message</strong> on your dashboard and
+          if <strong>rejected</strong> it will show message also.
+        </p>
+        <button
+          class="btn btn-primary"
+          style="width: 100%"
+          onclick="window.location.href = '/dashboard/patient'"
+        >
+          Go to Patient Dashboard
+        </button>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span
+          >© <span id="year"></span> SaviourCrest Hospital. All Rights
+          Reserved.</span
+        >
+        <span>Emergency: +92 (---)-(---)</span>
+      </div>
+      <div class="footer-bottom">SaviourCrest Hospital · Healthcare Portal</div>
+    </footer>
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const docIdParam = urlParams.get("doctor_id");
+  const docNameParam = urlParams.get("doctor_name");
+
+  if (docIdParam) {
+    document.getElementById("doctorIdField").value = docIdParam;
+  }
+  if (docNameParam) {
+    document.getElementById("docName").textContent = decodeURIComponent(docNameParam);
+  }
+
+  // 1. DATE & TIME SLOT GENERATION
+  const dateRow = document.getElementById("dateRow");
+  const slotGrid = document.getElementById("slotGrid");
+  const apptDateField = document.getElementById("apptDateField");
+  const apptTimeField = document.getElementById("apptTimeField");
+
+  const allSlots = [
+    "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", 
+    "11:00 AM", "11:30 AM", "02:00 PM", "02:30 PM", 
+    "03:00 PM", "03:30 PM", "04:00 PM"
+  ];
+
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const today = new Date();
+  let selectedDateStr = null;
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const iso = d.toISOString().split("T")[0];
+
+    const pill = document.createElement("div");
+    pill.className = "date-pill" + (i === 0 ? " selected" : "");
+    pill.dataset.date = iso;
+    pill.innerHTML = `<div class="dow">${dayNames[d.getDay()]}</div><div class="dnum">${d.getDate()}</div>`;
+    pill.addEventListener("click", () => selectDate(iso, pill));
+    dateRow.appendChild(pill);
+
+    if (i === 0) selectedDateStr = iso;
+  }
+
+  function selectDate(iso, pillEl) {
+    document.querySelectorAll(".date-pill").forEach((p) => p.classList.remove("selected"));
+    pillEl.classList.add("selected");
+    selectedDateStr = iso;
+    apptDateField.value = iso;
+    renderSlots();
+  }
+
+  function renderSlots() {
+    slotGrid.innerHTML = "";
+    apptTimeField.value = "";
+    const booked = []; // Dynamic booked slots array from API can be mapped here
+
+    allSlots.forEach((time) => {
+      const isBooked = booked.includes(time);
+      const btn = document.createElement("div");
+      btn.className = "slot-btn" + (isBooked ? " booked" : "");
+      btn.textContent = time;
+
+      if (!isBooked) {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".slot-btn").forEach((s) => s.classList.remove("selected"));
+          btn.classList.add("selected");
+          apptTimeField.value = time;
+        });
+      }
+      slotGrid.appendChild(btn);
+    });
+  }
+
+  apptDateField.value = selectedDateStr;
+  renderSlots();
+
+  // 2. PAYMENT UNLOCK
+  const jazzPayBtn = document.getElementById("jazzPayBtn");
+  const paidConfirm = document.getElementById("paidConfirm");
+  const proofStep = document.getElementById("proofStep");
+
+  jazzPayBtn.addEventListener("click", () => {
+    const number = document.getElementById("jazzNumber").value.trim();
+    if (!number) {
+      alert("Please enter your JazzCash mobile number to proceed.");
+      return;
+    }
+    paidConfirm.classList.add("show");
+    proofStep.classList.remove("disabled");
+    proofStep.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
+
+  // 3. SECURE FORM SUBMISSION
+  document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!apptDateField.value || !apptTimeField.value) {
+      alert("Please select a date and time slot.");
+      return;
+    }
+
+    const fileInput = document.getElementById("proofFile");
+    if (!fileInput || fileInput.files.length === 0) {
+      alert("Please upload payment proof screenshot.");
+      return;
+    }
+
+    const formData = new FormData(e.target);
+
+    try {
+      const response = await fetch("/api/appointments/book", {
+        method: "POST",
+        body: formData,
+      });
+
+      const resData = await response.json();
+      if (response.ok && resData.status !== "error") {
+        document.getElementById("successModal").classList.add("active");
+      } else {
+        alert("Booking Error: " + (resData.message || resData.detail || "Failed to submit request"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server connection failed. Ensure Uvicorn server is running.");
+    }
+  });
+</script>
+   <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
+    </script>
+  </body>
+</html>
