@@ -67,14 +67,14 @@ def create_tables():
 
 
  # 1. PEHLE SAB PURANI TABLES DROP KAREIN
-    cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
-    cursor.execute("DROP TABLE IF EXISTS medical_history;")
-    cursor.execute("DROP TABLE IF EXISTS lab_orders;")
-    cursor.execute("DROP TABLE IF EXISTS patients;")
-    cursor.execute("DROP TABLE IF EXISTS doctors;")
-    cursor.execute("DROP TABLE IF EXISTS admins;")
-    cursor.execute("DROP TABLE IF EXISTS disease_stats;")
-    cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
+    # cursor.execute("SET FOREIGN_KEY_CHECKS = 0;")
+    # cursor.execute("DROP TABLE IF EXISTS medical_history;")
+    # cursor.execute("DROP TABLE IF EXISTS lab_orders;")
+    # cursor.execute("DROP TABLE IF EXISTS patients;")
+    # cursor.execute("DROP TABLE IF EXISTS doctors;")
+    # cursor.execute("DROP TABLE IF EXISTS admins;")
+    # cursor.execute("DROP TABLE IF EXISTS disease_stats;")
+    # cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
     # 2. PHIR NAYI TABLES CREATE KAREIN
     cursor.execute(PATIENTS_TABLE_SQL)
