@@ -1452,10 +1452,9 @@
             return;
           }
 
-          const doctorPmdcId =
-            document.querySelector(".sidebar .who .id")?.textContent.trim() ||
-            "DOC-123";
-          const rxNotes = document.getElementById("rxNotes").value;
+         const doctorPmdcId = (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' && LOGGED_IN_DOCTOR_PMDC.trim() !== "") 
+                     ? LOGGED_IN_DOCTOR_PMDC 
+                     : document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim();
 
           const medNames = document.getElementsByName("medicine_name[]");
           const dosages = document.getElementsByName("dosage[]");
@@ -1526,9 +1525,10 @@
             return;
           }
 
-          const doctorPmdcId =
-            document.querySelector(".sidebar .who .id")?.textContent.trim() ||
-            "DOC-123";
+          const doctorPmdcId = (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' && LOGGED_IN_DOCTOR_PMDC.trim() !== "") 
+                     ? LOGGED_IN_DOCTOR_PMDC 
+                     : document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim();
+
           const testName = document.getElementById("btTestName").value;
           const urgency = document.getElementById("btUrgency").value;
           const instructions = document.getElementById("btNotes").value;
