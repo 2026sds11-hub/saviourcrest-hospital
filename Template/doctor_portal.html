@@ -1165,8 +1165,7 @@
     </script>
 
 <script>
-  // Jinja fallback check for both 'pmdc_id' and 'pmdc' keys
-  const LOGGED_IN_DOCTOR_PMDC = "{{ doctor.pmdc_id or doctor.pmdc or '' }}";
+ const LOGGED_IN_DOCTOR_PMDC = "{% if doctor %}{{ doctor.get('pmdc_id') or doctor.get('pmdc') or '' }}{% endif %}";
 
   document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
