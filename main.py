@@ -1707,22 +1707,21 @@ async def book_appointment(
     amount_paid: str = Form("2000"),
     payment_proof: UploadFile = File(...)
 ):
+    conn = None
+    cursor = None
     try:
         upload_folder = "static/uploads"
         os.makedirs(upload_folder, exist_ok=True)
         
-        # --- YAHAN UUID WALA CODE LAGA DIYA ---
         unique_filename = f"{uuid.uuid4().hex}_{payment_proof.filename}"
         file_path = f"{upload_folder}/{unique_filename}"
         
-        # File save karte waqt unique_filename use kiya
-        with open(f"static/uploads/{unique_filename}", "wb") as buffer:
+        with open(file_path, "wb") as buffer:
             shutil.copyfileobj(payment_proof.file, buffer)
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Baki query aur execute ka code same rahega
         query = """
             INSERT INTO appointments 
             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
@@ -1731,14 +1730,18 @@ async def book_appointment(
         cursor.execute(query, (patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
         conn.commit()
         
-        cursor.close()
-        conn.close()
         return {"status": "success", "message": "Appointment booked successfully!"}
 
     except Exception as e:
+        if conn:
+            conn.rollback() # Lock release karne ke liye
         print(f"BOOKING ERROR: {e}")
-        raise HTTPException(status_code=500, detail=str(e))    
-
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # 2. RECEPTION STATS ENDPOINT (Calculates Online Collection)
 # @app.get("/api/reception/stats")
