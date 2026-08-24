@@ -1201,15 +1201,34 @@
   }
 
   // PMDC ID Helper Function
+  // function getDoctorPmdcId() {
+  //   if (typeof LOGGED_IN_DOCTOR_PMDC !== "undefined" && LOGGED_IN_DOCTOR_PMDC.trim() !== "" && LOGGED_IN_DOCTOR_PMDC !== "{{ doctor.pmdc_id }}") {
+  //     return LOGGED_IN_DOCTOR_PMDC;
+  //   }
+  //   const inputVal = document.getElementById("loggedDoctorPmdc")?.value;
+  //   if (inputVal) return inputVal;
+    
+  //   const sidebarText = document.querySelector(".sidebar .who .id")?.textContent;
+  //   if (sidebarText) return sidebarText.replace(/PMDC:\s*/i, "").trim();
+    
+  //   return "";
+  // }
+
   function getDoctorPmdcId() {
-    if (typeof LOGGED_IN_DOCTOR_PMDC !== "undefined" && LOGGED_IN_DOCTOR_PMDC.trim() !== "" && LOGGED_IN_DOCTOR_PMDC !== "{{ doctor.pmdc_id }}") {
+    // 1. Pehle Jinja variable check karein agar render hua ho
+    if (typeof LOGGED_IN_DOCTOR_PMDC !== "undefined" && LOGGED_IN_DOCTOR_PMDC.trim() !== "" && !LOGGED_IN_DOCTOR_PMDC.includes("{{")) {
       return LOGGED_IN_DOCTOR_PMDC;
     }
-    const inputVal = document.getElementById("loggedDoctorPmdc")?.value;
-    if (inputVal) return inputVal;
     
+    // 2. Phir hidden input element se uthayein
+    const inputVal = document.getElementById("loggedDoctorPmdc")?.value;
+    if (inputVal && inputVal.trim() !== "") return inputVal.trim();
+    
+    // 3. Last option sidebar se read karein
     const sidebarText = document.querySelector(".sidebar .who .id")?.textContent;
-    if (sidebarText) return sidebarText.replace(/PMDC:\s*/i, "").trim();
+    if (sidebarText) {
+      return sidebarText.replace(/PMDC:\s*/i, "").trim();
+    }
     
     return "";
   }
