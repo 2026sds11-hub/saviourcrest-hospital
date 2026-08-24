@@ -137,6 +137,13 @@ def create_tables():
     except Exception:
         pass
 
+    # Make email column NULLable for walk-in reception patients
+    try:
+        cursor.execute("ALTER TABLE patients MODIFY email VARCHAR(150) DEFAULT NULL;")
+    except Exception as e:
+        print("Alter email log:", e)
+
+
     try:
         cursor.execute("ALTER TABLE doctors ADD COLUMN specialization VARCHAR(100);")
     except Exception:
