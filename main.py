@@ -1159,19 +1159,19 @@ async def render_doctor_appointments(request: Request, doctor_id: int = None):
 # 2. PROTECTED PORTALS (Unified Logic & Session Checks)
 # =====================================================================
 
+
 @app.get("/doctor_portal", response_class=HTMLResponse)
 @app.get("/doctor_portal.html", response_class=HTMLResponse)
 def doctor_portal_page(request: Request):
     doctor_id = request.session.get("doctor_id")
-    
+
     # 1. Session check
     if not doctor_id:
         return RedirectResponse(url="/doctor_login")
 
-    # 🔒 2. HASHED URL CHECK: Agar URL me ?ref= parameter nahi hai to hashed token generate karke redirect karein
+    # 🔒 2. HASHED URL CHECK: Agar URL me ?ref= parameter nahi hai to hashed token generate karein
     ref_token = request.query_params.get("ref")
     if not ref_token:
-        # Base64 encoded token from doctor_id & random UUID
         raw_payload = f"doc_{doctor_id}_{uuid.uuid4().hex[:10]}"
         hashed_ref = base64.b64encode(raw_payload.encode()).decode().rstrip("=")
         return RedirectResponse(url=f"/doctor_portal?ref={hashed_ref}")
@@ -1184,12 +1184,47 @@ def doctor_portal_page(request: Request):
     cursor.close()
     conn.close()
 
-    # Line 1191 fix:
-    if doctor:
-     if "pmdc_id" not in doctor and "pmdc" in doctor:
+    # 4. Agar DB me doctor na mile to login page par bhejain (Uncommented & Fixed)
+    if not doctor:
+        request.session.clear()
+        return RedirectResponse(url="/doctor_login")
+
+    if "pmdc_id" not in doctor and "pmdc" in doctor:
         doctor["pmdc_id"] = doctor["pmdc"]
 
-        return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
+    return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
+
+# @app.get("/doctor_portal", response_class=HTMLResponse)
+# @app.get("/doctor_portal.html", response_class=HTMLResponse)
+# def doctor_portal_page(request: Request):
+#     doctor_id = request.session.get("doctor_id")
+    
+#     # 1. Session check
+#     if not doctor_id:
+#         return RedirectResponse(url="/doctor_login")
+
+#     # 🔒 2. HASHED URL CHECK: Agar URL me ?ref= parameter nahi hai to hashed token generate karke redirect karein
+#     ref_token = request.query_params.get("ref")
+#     if not ref_token:
+#         # Base64 encoded token from doctor_id & random UUID
+#         raw_payload = f"doc_{doctor_id}_{uuid.uuid4().hex[:10]}"
+#         hashed_ref = base64.b64encode(raw_payload.encode()).decode().rstrip("=")
+#         return RedirectResponse(url=f"/doctor_portal?ref={hashed_ref}")
+
+#     # 3. Database lookup for logged in doctor
+#     conn = get_db_connection()
+#     cursor = conn.cursor(dictionary=True)
+#     cursor.execute("SELECT * FROM doctors WHERE id = %s", (doctor_id,))
+#     doctor = cursor.fetchone()
+#     cursor.close()
+#     conn.close()
+
+#     # Line 1191 fix:
+#     if doctor:
+#      if "pmdc_id" not in doctor and "pmdc" in doctor:
+#         doctor["pmdc_id"] = doctor["pmdc"]
+
+#         return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
 
     # if not doctor:
     #     request.session.pop("doctor_id", None)
