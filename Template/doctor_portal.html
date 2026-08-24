@@ -1164,8 +1164,9 @@
       }
     </script>
 
- <script>
-  const LOGGED_IN_DOCTOR_PMDC = "{{ doctor.pmdc_id }}";
+<script>
+  // Jinja fallback check for both 'pmdc_id' and 'pmdc' keys
+  const LOGGED_IN_DOCTOR_PMDC = "{{ doctor.pmdc_id or doctor.pmdc or '' }}";
 
   document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -1200,21 +1201,34 @@
     }, 3000);
   }
 
-  // PMDC ID Helper Function
+  // Ultra-robust PMDC ID Retrieval Function
   function getDoctorPmdcId() {
-    if (typeof LOGGED_IN_DOCTOR_PMDC !== "undefined" && LOGGED_IN_DOCTOR_PMDC.trim() !== "" && LOGGED_IN_DOCTOR_PMDC !== "{{ doctor.pmdc_id }}") {
-      return LOGGED_IN_DOCTOR_PMDC;
+    // 1. Jinja Variable Check
+    if (
+      typeof LOGGED_IN_DOCTOR_PMDC !== "undefined" &&
+      LOGGED_IN_DOCTOR_PMDC.trim() !== "" &&
+      LOGGED_IN_DOCTOR_PMDC !== "None" &&
+      !LOGGED_IN_DOCTOR_PMDC.includes("{{")
+    ) {
+      return LOGGED_IN_DOCTOR_PMDC.trim();
     }
+
+    // 2. Hidden Input Check
     const inputVal = document.getElementById("loggedDoctorPmdc")?.value;
-    if (inputVal) return inputVal;
-    
-    const sidebarText = document.querySelector(".sidebar .who .id")?.textContent;
-    if (sidebarText) return sidebarText.replace(/PMDC:\s*/i, "").trim();
-    
+    if (inputVal && inputVal.trim() !== "" && inputVal !== "None") {
+      return inputVal.trim();
+    }
+
+    // 3. Regex Search on Sidebar Text
+    const sidebarEl = document.querySelector(".sidebar") || document.body;
+    const text = sidebarEl.textContent || "";
+    const match = text.match(/PMDC[\s:-]*([A-Z0-9-]+)/i);
+    if (match && match[1] && match[1].toLowerCase() !== "id") {
+      return match[1].trim();
+    }
+
     return "";
   }
-
- 
 
   const radioButtons = document.querySelectorAll('input[name="searchType"]');
   const searchBoxId = document.getElementById("searchBoxId");
@@ -1569,5 +1583,6 @@
     }
   });
 </script>
-  </body>
+
+</body>
 </html>

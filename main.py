@@ -1184,11 +1184,18 @@ def doctor_portal_page(request: Request):
     cursor.close()
     conn.close()
 
-    if not doctor:
-        request.session.pop("doctor_id", None)
-        return RedirectResponse(url="/doctor_login")
+    # Line 1191 fix:
+    if doctor:
+     if "pmdc_id" not in doctor and "pmdc" in doctor:
+        doctor["pmdc_id"] = doctor["pmdc"]
 
-    return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
+        return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
+
+    # if not doctor:
+    #     request.session.pop("doctor_id", None)
+    #     return RedirectResponse(url="/doctor_login")
+
+    # return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
 
 # ---------------------------------------------------------
 # B. Booking API
