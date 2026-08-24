@@ -1153,20 +1153,40 @@
     </script>
 
     <script>
+      // function getDoctorPmdcId() {
+      //   const hiddenVal = document.getElementById("loggedDoctorPmdc")?.value;
+      //   if (hiddenVal && hiddenVal.trim() !== "" && hiddenVal !== "None") {
+      //     return hiddenVal.trim();
+      //   }
+      //   const sidebarIdEl = document.querySelector(".sidebar .who .id");
+      //   if (
+      //     sidebarIdEl &&
+      //     sidebarIdEl.textContent.trim() !== "" &&
+      //     sidebarIdEl.textContent.trim() !== "PMC-00000"
+      //   ) {
+      //     return sidebarIdEl.textContent.trim();
+      //   }
+      //   return "DOC-123";
+      // }
+
       function getDoctorPmdcId() {
-        const hiddenVal = document.getElementById("loggedDoctorPmdc")?.value;
-        if (hiddenVal && hiddenVal.trim() !== "" && hiddenVal !== "None") {
-          return hiddenVal.trim();
-        }
-        const sidebarIdEl = document.querySelector(".sidebar .who .id");
+        const sidebarIdEl =
+          document.querySelector(".id.mono") ||
+          document.querySelector(".sidebar-info .id");
+        const extractedId = sidebarIdEl ? sidebarIdEl.textContent.trim() : "";
+
+        // Agar valid ID mili hai aur wo fallback value nahi hai
         if (
-          sidebarIdEl &&
-          sidebarIdEl.textContent.trim() !== "" &&
-          sidebarIdEl.textContent.trim() !== "PMC-00000"
+          extractedId &&
+          extractedId !== "" &&
+          extractedId !== "PMC-00000" &&
+          extractedId !== "DOC-123"
         ) {
-          return sidebarIdEl.textContent.trim();
+          return extractedId;
         }
-        return "DOC-123";
+
+        // Direct backend Jinja variable injection as backup
+        return "{{ doctor.pmdc_id or doctor.pmdc or '' }}";
       }
 
       document.addEventListener("DOMContentLoaded", () => {
