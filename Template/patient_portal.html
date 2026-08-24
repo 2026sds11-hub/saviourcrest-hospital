@@ -1207,41 +1207,112 @@
         Urology: "Urologist",
         Oncology: "Oncologist",
       };
-      // 1. Backend database se live doctors fetch karein
-      const rawDoctors = "{{ doctors | tojson }}";
-
-      // 2. Dynamic object banayein jo automatic specialties mein group karega
-      const doctorsBySpecialty = {};
-
-      rawDoctors.forEach((doc) => {
-        // Agar DB mein specialization nahi hai to default "General Physician" assign ho jayegi
-        const spec = doc.specialization || "General Physician";
-        if (!doctorsBySpecialty[spec]) {
-          doctorsBySpecialty[spec] = [];
-        }
-
-        // Doctor ke naam ke hisab se Male/Female photo set karne ki smart logic
-        let avatarPhoto = "/static/imageM.png"; // Default male
-        const nameLower = (doc.full_name || doc.name || "").toLowerCase();
-
-        if (
-          (doc.gender && doc.gender.toLowerCase() === "female") ||
-          nameLower.includes("noor") ||
-          nameLower.includes("saba") ||
-          nameLower.includes("hina") ||
-          nameLower.includes("ayesha") ||
-          nameLower.includes("maryam")
-        ) {
-          avatarPhoto = "/static/imageF.png";
-        }
-
-        doctorsBySpecialty[spec].push({
-          id: doc.id, // TiDB ki REAL ID (e.g. 30001, 30002)
-          name: doc.full_name || doc.name, // Real Doctor Name
-          photo: doc.photo || avatarPhoto, // Dynamic Image
-          online: true,
-        });
-      });
+      const doctorsBySpecialty = {
+        Cardiology: [
+          {
+            id: 3,
+            name: "Dr. Noor",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Dermatology: [
+          {
+            id: 16,
+            name: "Dr. Saba Asif",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Pediatrics: [
+          {
+            id: 17,
+            name: "Dr. Qasim",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Orthopedics: [
+          {
+            id: 18,
+            name: "Dr. Hina",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Neurology: [
+          {
+            id: 19,
+            name: "Dr. Javed",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        "General Physician": [
+          {
+            id: 21,
+            name: "Dr. Uthman",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Gynecology: [
+          {
+            id: 22,
+            name: "Dr. Ayesha",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        Nephrology: [
+          {
+            id: 23,
+            name: "Dr. Hassan Imran",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Gastrology: [
+          {
+            id: 24,
+            name: "Dr. Ahmad Afzal",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        ENT: [
+          {
+            id: 25,
+            name: "Dr. Maryam",
+            photo: "/static/imageF.png",
+            online: true,
+          },
+        ],
+        "General Surgery": [
+          {
+            id: 26,
+            name: "Dr. Nawaz Kamran",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Urology: [
+          {
+            id: 27,
+            name: "Dr. Umar ",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+        Oncology: [
+          {
+            id: 28,
+            name: "Dr. Ibrahim",
+            photo: "/static/imageM.png",
+            online: true,
+          },
+        ],
+      };
 
       const suggestionBox = document.getElementById("suggestionBox");
       const suggSpecName = document.getElementById("suggSpecName");

@@ -912,74 +912,39 @@
     proofStep.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
 // Booking
-  window.addEventListener("DOMContentLoaded", function () {
-    const bookingForm = document.getElementById("bookingForm");
+    document.getElementById("bookingForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    if (!bookingForm) {
-        alert("CRITICAL: 'bookingForm' ID HTML mein nahi mili!");
-        return;
+    if (!apptDateField.value || !apptTimeField.value) {
+      alert("Please select a date and time slot.");
+      return;
     }
 
-
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const doctorIdFromUrl = urlParams.get('doctor_id');
-    if (doctorIdFromUrl) {
-        const doctorInput = document.getElementById("doctorIdField");
-        if (doctorInput) {
-            doctorInput.value = doctorIdFromUrl;
-        }
+    const fileInput = document.getElementById("proofFile");
+    if (!fileInput || fileInput.files.length === 0) {
+      alert("Please upload payment proof screenshot.");
+      return;
     }
 
-    
+    const formData = new FormData(e.target);
 
-    bookingForm.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    try {
+      const response = await fetch("/api/appointments/book", {
+        method: "POST",
+        body: formData,
+      });
 
-        const dateVal = document.getElementById("apptDateField")?.value;
-        const timeVal = document.getElementById("apptTimeField")?.value;
-        const fileInput = document.getElementById("proofFile");
-
-        // 1. Date & Time Check
-        if (!dateVal || !timeVal) {
-            alert("Khabardar: Pehle Calendar se Date aur Time Slot select karein!");
-           return;
-        }
-
-        // 2. File Upload Check
-        if (!fileInput || fileInput.files.length === 0) {
-            alert("Khabardar: Payment proof ki Image/PDF upload karein!");
-            return;
-        }
-
-        alert("Validation Passed! Server ko request bhej rahe hain...");
-
-        const formData = new FormData(bookingForm);
-
-        try {
-            const response = await fetch("/api/appointments/book", {
-                method: "POST",
-                body: formData
-            });
-
-            const resData = await response.json();
-
-            if (response.ok && resData.status === "success") {
-                const modal = document.getElementById("successModal");
-                if (modal) {
-                    modal.style.display = "flex";
-                    modal.classList.add("active");
-                } else {
-                    alert("Appointment Booked Successfully!");
-                }
-            } else {
-                alert("Backend Error: " + (resData.detail || resData.message || JSON.stringify(resData)));
-            }
-        } catch (err) {
-            alert("Network Fetch Error: " + err.message);
-        }
-    });
-});
+      const resData = await response.json();
+      if (response.ok && resData.status !== "error") {
+        document.getElementById("successModal").classList.add("active");
+      } else {
+        alert("Booking Error: " + (resData.message || resData.detail || "Failed to submit request"));
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Server connection failed. Ensure Uvicorn server is running.");
+    }
+  });
 </script>
    <!-- Google Translate API Script -->
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

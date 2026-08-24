@@ -1676,84 +1676,26 @@ def doctor_portal_page(request: Request):
 
 #================================== add amount to reception ============================
 # 1. BOOKING ENDPOINT (Saves 2000 PKR & Proof Image)
-# @app.post("/api/appointments/book")
-# async def book_appointment(
-#     patient_id: int = Form(...), 
-#     doctor_id: int = Form(...),
-#     appt_date: str = Form(...),
-#     appt_time: str = Form(...),
-#     amount_paid: str = Form("2000"),
-#     payment_proof: UploadFile = File(...)
-# ):
-#     try:
-#         upload_folder = "static/uploads"
-#         os.makedirs(upload_folder, exist_ok=True)
-#         file_path = f"/{upload_folder}/{payment_proof.filename}"
-        
-#         with open(f"static/uploads/{payment_proof.filename}", "wb") as buffer:
-#             shutil.copyfileobj(payment_proof.file, buffer)
-
-#         conn = get_db_connection()
-#         cursor = conn.cursor()
-        
-#         query = """
-#             INSERT INTO appointments 
-#             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
-#             VALUES (%s, %s, %s, %s, %s, %s, 'Pending')
-#         """
-#         cursor.execute(query, (patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
-#         conn.commit()
-        
-#         cursor.close()
-#         conn.close()
-#         return {"status": "success", "message": "Appointment booked successfully!"}
-        
-#     except Exception as e:
-#         print(f"❌ BOOKING ERROR: {e}")
-#         raise HTTPException(status_code=500, detail=str(e))
-
-
-# main.py mein book_appointment function ke andar
-
-
 @app.post("/api/appointments/book")
 async def book_appointment(
-    patient_id: int = Form(...),
+    patient_id: int = Form(...), 
     doctor_id: int = Form(...),
     appt_date: str = Form(...),
     appt_time: str = Form(...),
     amount_paid: str = Form("2000"),
     payment_proof: UploadFile = File(...)
 ):
-    conn = None
-    cursor = None
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # 1. Verify karein ke doctor_id database mein exist karta hai ya nahi
-        cursor.execute("SELECT id FROM doctors WHERE id = %s", (doctor_id,))
-        valid_doctor = cursor.fetchone()
-
-        if not valid_doctor:
-            # Agar ID 3 exist nahi karti, toh pehle available doctor ki ID utha lein
-            cursor.execute("SELECT id FROM doctors LIMIT 1")
-            first_doctor = cursor.fetchone()
-            if first_doctor:
-                doctor_id = first_doctor['id']
-            else:
-                raise HTTPException(status_code=400, detail="Database mein koi doctor registered nahi hai.")
-
-        # 2. File Save Logic
         upload_folder = "static/uploads"
         os.makedirs(upload_folder, exist_ok=True)
-        unique_filename = f"{uuid.uuid4().hex}_{payment_proof.filename}"
-        file_path = f"{upload_folder}/{unique_filename}"
-
-        with open(file_path, "wb") as buffer:
+        file_path = f"/{upload_folder}/{payment_proof.filename}"
+        
+        with open(f"static/uploads/{payment_proof.filename}", "wb") as buffer:
             shutil.copyfileobj(payment_proof.file, buffer)
 
-        # 3. Insert Appointment
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
         query = """
             INSERT INTO appointments 
             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
@@ -1761,19 +1703,77 @@ async def book_appointment(
         """
         cursor.execute(query, (patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
         conn.commit()
-
+        
+        cursor.close()
+        conn.close()
         return {"status": "success", "message": "Appointment booked successfully!"}
-
+        
     except Exception as e:
-        if conn:
-            conn.rollback()
-        print(f"BOOKING ERROR: {e}")
+        print(f"❌ BOOKING ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+
+
+# main.py mein book_appointment function ke andar
+
+
+# @app.post("/api/appointments/book")
+# async def book_appointment(
+#     patient_id: int = Form(...),
+#     doctor_id: int = Form(...),
+#     appt_date: str = Form(...),
+#     appt_time: str = Form(...),
+#     amount_paid: str = Form("2000"),
+#     payment_proof: UploadFile = File(...)
+# ):
+#     conn = None
+#     cursor = None
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor(dictionary=True)
+
+#         # 1. Verify karein ke doctor_id database mein exist karta hai ya nahi
+#         cursor.execute("SELECT id FROM doctors WHERE id = %s", (doctor_id,))
+#         valid_doctor = cursor.fetchone()
+
+#         if not valid_doctor:
+#             # Agar ID 3 exist nahi karti, toh pehle available doctor ki ID utha lein
+#             cursor.execute("SELECT id FROM doctors LIMIT 1")
+#             first_doctor = cursor.fetchone()
+#             if first_doctor:
+#                 doctor_id = first_doctor['id']
+#             else:
+#                 raise HTTPException(status_code=400, detail="Database mein koi doctor registered nahi hai.")
+
+#         # 2. File Save Logic
+#         upload_folder = "static/uploads"
+#         os.makedirs(upload_folder, exist_ok=True)
+#         unique_filename = f"{uuid.uuid4().hex}_{payment_proof.filename}"
+#         file_path = f"{upload_folder}/{unique_filename}"
+
+#         with open(file_path, "wb") as buffer:
+#             shutil.copyfileobj(payment_proof.file, buffer)
+
+#         # 3. Insert Appointment
+#         query = """
+#             INSERT INTO appointments 
+#             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
+#             VALUES (%s, %s, %s, %s, %s, %s, 'Pending')
+#         """
+#         cursor.execute(query, (patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
+#         conn.commit()
+
+#         return {"status": "success", "message": "Appointment booked successfully!"}
+
+#     except Exception as e:
+#         if conn:
+#             conn.rollback()
+#         print(f"BOOKING ERROR: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
+#     finally:
+#         if cursor:
+#             cursor.close()
+#         if conn:
+#             conn.close()
 
 # 2. RECEPTION STATS ENDPOINT (Calculates Online Collection)
 # @app.get("/api/reception/stats")
