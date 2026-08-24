@@ -771,8 +771,7 @@
             else 'Specialist' }}
           </div>
           <div class="id mono">
-            {{ doctor.pmdc_id if doctor and 'pmdc_id' in doctor else
-            (doctor.pmdc if doctor and 'pmdc' in doctor else 'PMC-00000') }}
+            {{ doctor.pmdc_id or doctor.pmdc or 'PMC-00000' }}
           </div>
         </div>
 
