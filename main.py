@@ -736,10 +736,10 @@ def delete_doctor(doctor_id: int, request: Request):
 # ----------------------------------------------------------------
 # LOGOUT — GET
 # ----------------------------------------------------------------
-@app.get("/logout")
-def logout(request: Request):
-    request.session.clear()
-    return JSONResponse(content={"success": True, "message": "Logged out successfully!"})
+# @app.get("/logout")
+# def logout(request: Request):
+#     request.session.clear()
+#     return JSONResponse(content={"success": True, "message": "Logged out successfully!"})
 
 # ----------------------------------------------------------------
 # SIGNUP — POST /signup/patient
@@ -866,6 +866,11 @@ def login_patient(request: Request, email: str = Form(...), password: str = Form
             cursor.close()
         if conn and conn.is_connected():
             conn.close()
+
+@app.get("/logout")
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/patient_login.html", status_code=status.HTTP_303_SEE_OTHER)            
 
 
 # Pydantic Schemas
