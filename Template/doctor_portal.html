@@ -1454,10 +1454,7 @@
           }
 
           // Dynamic lookup from hidden input -> global variable -> sidebar
-const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value.trim() ||
-                     (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' ? LOGGED_IN_DOCTOR_PMDC.trim() : "") ||
-                     document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim() ||
-                     "";
+const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value || "";
 
 
 // Verification - Agar ID na mile to seedha stop kar de
@@ -1536,16 +1533,10 @@ if (!doctorPmdcId) {
           }
 
           // Dynamic lookup from hidden input -> global variable -> sidebar
-const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value.trim() ||
-                     (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' ? LOGGED_IN_DOCTOR_PMDC.trim() : "") ||
-                     document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim() ||
-                     "";
 
-// Verification - Agar ID na mile to seedha stop kar de
-if (!doctorPmdcId) {
-    showToast("Error: Doctor PMDC ID missing. Please log in again.", "error");
-    return;
-}
+const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value || "";
+
+
 
           const testName = document.getElementById("btTestName").value;
           const urgency = document.getElementById("btUrgency").value;
