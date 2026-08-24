@@ -20,12 +20,14 @@ CREATE TABLE IF NOT EXISTS patients (
     id INT AUTO_INCREMENT PRIMARY KEY,
     patient_id VARCHAR(20) UNIQUE,
     full_name VARCHAR(120) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
-    gender VARCHAR(20),
-    age INT,
+    email VARCHAR(150) UNIQUE,
     phone VARCHAR(20),
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    password_hash VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    age INT,
+    gender VARCHAR(20),
+    cnic VARCHAR(20)
 );
 """
 #-------------- Doctor Signup -------------------------
@@ -112,6 +114,22 @@ def create_tables():
     cursor.execute(DISEASE_STATS_TABLE_SQL)
     cursor.execute(RECEPTIONISTS_TABLE_SQL)
     cursor.execute(LAB_TABLE_SQL)
+
+    # Ensure all columns exist in live DB patients table
+    patient_cols = [
+        ("patient_id", "VARCHAR(20)"),
+        ("phone", "VARCHAR(20)"),
+        ("password_hash", "VARCHAR(255)"),
+        ("registration_date", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+        ("age", "INT"),
+        ("gender", "VARCHAR(20)"),
+        ("cnic", "VARCHAR(20)")
+    ]
+    for col_name, col_type in patient_cols:
+        try:
+            cursor.execute(f"ALTER TABLE patients ADD COLUMN {col_name} {col_type};")
+        except Exception:
+            pass
 
     # 2. Missing Columns Fixes for Live Database Schema Alteration
     try:
