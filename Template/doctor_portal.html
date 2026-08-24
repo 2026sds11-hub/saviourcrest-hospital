@@ -1170,10 +1170,8 @@
       // }
 
       function getDoctorPmdcId() {
-        const sidebarIdEl =
-          document.querySelector(".id.mono") ||
-          document.querySelector(".sidebar-info .id");
-        const extractedId = sidebarIdEl ? sidebarIdEl.textContent.trim() : "";
+        const sidebarEl = document.querySelector(".id_mono");
+        const extractedId = sidebarEl ? sidebarEl.textContent.trim() : "";
 
         // Agar valid ID mili hai aur wo fallback value nahi hai
         if (
