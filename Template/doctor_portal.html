@@ -1164,486 +1164,408 @@
       }
     </script>
 
-    <script>
-      const LOGGED_IN_DOCTOR_PMDC = "{{ doctor.pmdc_id }}";
-      document.addEventListener("DOMContentLoaded", () => {
-        const urlParams = new URLSearchParams(window.location.search);
+ <script>
+  const LOGGED_IN_DOCTOR_PMDC = "{{ doctor.pmdc_id }}";
 
-        // Agar URL me 'ref' token nahi hai to browser address bar ko silently mask karein
-        if (!urlParams.has("ref")) {
-          const rawToken =
-            "doc_auth_" + btoa(Date.now().toString()).substring(0, 12);
-          window.history.replaceState({}, "", `/doctor_portal?ref=${rawToken}`);
-        }
-      });
-      document.getElementById("year").textContent = new Date().getFullYear();
+  document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.has("ref")) {
+      const rawToken = "doc_auth_" + btoa(Date.now().toString()).substring(0, 12);
+      window.history.replaceState({}, "", `/doctor_portal?ref=${rawToken}`);
+    }
+  });
 
-      const today = new Date();
-      const options = { year: "numeric", month: "short", day: "numeric" };
-      const formattedDate = today.toLocaleDateString("en-US", options);
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-      document.getElementById("liveDateDisplay").textContent = formattedDate;
-      document.getElementById("prescriptionDateBadge").textContent =
-        "Date: " + formattedDate;
+  const today = new Date();
+  const options = { year: "numeric", month: "short", day: "numeric" };
+  const formattedDate = today.toLocaleDateString("en-US", options);
 
-      function showToast(message, type = "success") {
-        const container = document.getElementById("toastContainer");
-        const toast = document.createElement("div");
-        toast.className = `toast ${type}`;
-        let icon = type === "success" ? "✅" : "⚠️";
+  document.getElementById("liveDateDisplay").textContent = formattedDate;
+  document.getElementById("prescriptionDateBadge").textContent = "Date: " + formattedDate;
 
-        toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
-        container.appendChild(toast);
+  function showToast(message, type = "success") {
+    const container = document.getElementById("toastContainer");
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    let icon = type === "success" ? "✅" : "⚠️";
 
-        setTimeout(() => toast.classList.add("show"), 10);
-        setTimeout(() => {
-          toast.classList.remove("show");
-          setTimeout(() => toast.remove(), 300);
-        }, 3000);
+    toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // PMDC ID Helper Function
+  function getDoctorPmdcId() {
+    if (typeof LOGGED_IN_DOCTOR_PMDC !== "undefined" && LOGGED_IN_DOCTOR_PMDC.trim() !== "" && LOGGED_IN_DOCTOR_PMDC !== "{{ doctor.pmdc_id }}") {
+      return LOGGED_IN_DOCTOR_PMDC;
+    }
+    const inputVal = document.getElementById("loggedDoctorPmdc")?.value;
+    if (inputVal) return inputVal;
+    
+    const sidebarText = document.querySelector(".sidebar .who .id")?.textContent;
+    if (sidebarText) return sidebarText.replace(/PMDC:\s*/i, "").trim();
+    
+    return "";
+  }
+
+  const radioButtons = document.querySelectorAll('input[name="searchType"]');
+  const searchBoxId = document.getElementById("searchBoxId");
+  const searchBoxNamePhone = document.getElementById("searchBoxNamePhone");
+
+  radioButtons.forEach((radio) => {
+    radio.addEventListener("change", (e) => {
+      if (e.target.value === "id") {
+        searchBoxId.style.display = "block";
+        searchBoxNamePhone.style.display = "none";
+      } else {
+        searchBoxId.style.display = "none";
+        searchBoxNamePhone.style.display = "block";
+      }
+    });
+  });
+
+  const fetchPatientForm = document.getElementById("fetchPatientForm");
+  const doctorWorkspace = document.getElementById("doctorWorkspace");
+  const lockedNote = document.getElementById("lockedNote");
+  const selectedBanner = document.getElementById("selectedPatientBanner");
+  let currentPatientId = null;
+
+  async function loadPatientHistory(patientId) {
+    const container = document.getElementById("historyContainer");
+    const panel = document.getElementById("historyPanel");
+
+    if (!container || !panel) return;
+
+    panel.style.display = "block";
+    container.innerHTML = "<p style='text-align:center; padding:10px;'>Loading history...</p>";
+
+    try {
+      const response = await fetch(`/api/doctor/patient-history/${patientId}`);
+      const result = await response.json();
+
+      container.innerHTML = "";
+
+      if (response.ok && result.history && result.history.length > 0) {
+        result.history.forEach((item) => {
+          const card = document.createElement("div");
+          card.className = "history-card";
+          card.innerHTML = `
+            <div class="history-header">
+                <span style="font-weight:600;">Visit on ${item.date}</span>
+                <span class="history-meta">Prescribed by ${item.dr}</span>
+            </div>
+            <div class="history-details">
+                <div><strong>Diagnosis:</strong> ${item.diagnosis}</div>
+                <div><strong>Medicines:</strong> ${item.meds}</div>
+                <div><strong>Tests Recommended:</strong> ${item.tests}</div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      } else {
+        container.innerHTML = `
+          <div style="padding:20px; text-align:center; color:var(--ink-soft); font-style:italic; background:#f9fafb; border:1px dashed var(--line); border-radius:var(--radius);">
+            No previous prescription available. Patient is new.
+          </div>`;
+      }
+    } catch (error) {
+      console.error(error);
+      container.innerHTML = `
+        <div style="padding:20px; text-align:center; color:var(--ink-soft); font-style:italic; background:#f9fafb; border:1px dashed var(--line); border-radius:var(--radius);">
+          No previous prescription available. Patient is new.
+        </div>`;
+    }
+  }
+
+  fetchPatientForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const searchType = document.querySelector('input[name="searchType"]:checked').value;
+    let pId = document.getElementById("fetchId").value.trim();
+    let pName = document.getElementById("fetchName").value.trim();
+    let pPhone = document.getElementById("fetchPhone").value.trim();
+
+    if (searchType === "id" && !pId) {
+      showToast("Error: Please enter a Patient ID.", "error");
+      return;
+    }
+    if (searchType === "name_phone" && (!pName || !pPhone)) {
+      showToast("Error: Please enter both Name and Phone number.", "error");
+      return;
+    }
+
+    try {
+      let url = "/api/doctor/search-patient?";
+      if (searchType === "id") {
+        url += `patient_id=${pId}`;
+      } else {
+        url += `name=${encodeURIComponent(pName)}&phone=${encodeURIComponent(pPhone)}`;
       }
 
-      const radioButtons = document.querySelectorAll(
-        'input[name="searchType"]',
-      );
-      const searchBoxId = document.getElementById("searchBoxId");
-      const searchBoxNamePhone = document.getElementById("searchBoxNamePhone");
+      const response = await fetch(url);
+      const result = await response.json();
 
-      radioButtons.forEach((radio) => {
-        radio.addEventListener("change", (e) => {
-          if (e.target.value === "id") {
-            searchBoxId.style.display = "block";
-            searchBoxNamePhone.style.display = "none";
-          } else {
-            searchBoxId.style.display = "none";
-            searchBoxNamePhone.style.display = "block";
-          }
-        });
-      });
+      if (response.ok && result.status === "success") {
+        const patientData = result.patient;
+        if (document.getElementById("spId")) document.getElementById("spId").textContent = patientData.patient_id;
+        if (document.getElementById("spName")) document.getElementById("spName").textContent = patientData.full_name;
+        if (document.getElementById("spPhone")) document.getElementById("spPhone").textContent = patientData.phone;
+        if (document.getElementById("spAge")) document.getElementById("spAge").textContent = patientData.age || "N/A";
+        if (document.getElementById("spGender")) document.getElementById("spGender").textContent = patientData.gender || "N/A";
 
-      const fetchPatientForm = document.getElementById("fetchPatientForm");
-      const doctorWorkspace = document.getElementById("doctorWorkspace");
-      const lockedNote = document.getElementById("lockedNote");
-      const selectedBanner = document.getElementById("selectedPatientBanner");
-      let currentPatientId = null;
+        if (lockedNote) lockedNote.style.display = "none";
+        if (selectedBanner) selectedBanner.classList.add("show");
+        if (doctorWorkspace) doctorWorkspace.classList.replace("locked-section", "unlocked-section");
 
-      function loadPatientHistory(patientId) {
-        const container = document.getElementById("historyContainer");
-        const panel = document.getElementById("historyPanel");
+        currentPatientId = patientData.patient_id || patientData.id || (patientData.patient && patientData.patient.id);
 
-        let mockHistory = [];
+        loadPatientHistory(currentPatientId.toString());
+        showToast("Success! Patient data fetched.", "success");
 
-        if (!container || !panel) {
-          console.warn(
-            "historyContainer or historyPanel not found. History load skipped.",
-          );
-          return;
-        }
-
-        if (patientId.toString() === "7") {
-          mockHistory = [
-            {
-              date: "Aug 02, 2026",
-              dr: "Dr. A. Karim",
-              diagnosis: "Viral Flu",
-              meds: "Paracetamol 500mg, Syrup Tixylix",
-              tests: "CBC (Complete Blood Count)",
-            },
-            {
-              date: "Jul 15, 2026",
-              dr: "Dr. Z. Khan",
-              diagnosis: "Migraine",
-              meds: "Ibuprofen 400mg",
-              tests: "None",
-            },
-          ];
-        }
-
-        container.innerHTML = "";
-
-        if (mockHistory.length === 0) {
-          const noHistoryMsg = document.createElement("div");
-          noHistoryMsg.style.padding = "20px";
-          noHistoryMsg.style.textAlign = "center";
-          noHistoryMsg.style.color = "var(--ink-soft)";
-          noHistoryMsg.style.fontStyle = "italic";
-          noHistoryMsg.style.background = "#f9fafb";
-          noHistoryMsg.style.border = "1px dashed var(--line)";
-          noHistoryMsg.style.borderRadius = "var(--radius)";
-          noHistoryMsg.innerHTML =
-            "No previous prescription available. Patient is new.";
-
-          container.appendChild(noHistoryMsg);
-        } else {
-          mockHistory.forEach((item) => {
-            const card = document.createElement("div");
-            card.className = "history-card";
-            card.innerHTML = `
-                      <div class="history-header">
-                          <span style="font-weight:600;">Visit on ${item.date}</span>
-                          <span class="history-meta">Prescribed by ${item.dr}</span>
-                      </div>
-                      <div class="history-details">
-                          <div><strong>Diagnosis:</strong> ${item.diagnosis}</div>
-                          <div><strong>Medicines:</strong> ${item.meds}</div>
-                          <div><strong>Tests Recommended:</strong> ${item.tests}</div>
-                      </div>
-                  `;
-            container.appendChild(card);
-          });
-        }
-
-        panel.style.display = "block";
+        if (document.getElementById("fetchId")) document.getElementById("fetchId").value = "";
+        if (document.getElementById("fetchName")) document.getElementById("fetchName").value = "";
+        if (document.getElementById("fetchPhone")) document.getElementById("fetchPhone").value = "";
+      } else {
+        showToast("Error: " + (result.detail || "Patient not found!"), "error");
       }
+    } catch (error) {
+      showToast("Network Error: Check if FastAPI server is running!", "error");
+      console.error(error);
+    }
+  });
 
-      fetchPatientForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  document.getElementById("clearPatientBtn").addEventListener("click", () => {
+    lockedNote.style.display = "block";
+    selectedBanner.classList.remove("show");
+    doctorWorkspace.classList.replace("unlocked-section", "locked-section");
+    currentPatientId = null;
+    document.getElementById("historyPanel").style.display = "none";
+    document.getElementById("historyContainer").innerHTML = "";
+    showToast("Session cleared.", "success");
+  });
 
-        const searchType = document.querySelector(
-          'input[name="searchType"]:checked',
-        ).value;
-        let pId = document.getElementById("fetchId").value.trim();
-        let pName = document.getElementById("fetchName").value.trim();
-        let pPhone = document.getElementById("fetchPhone").value.trim();
+  const addMedBtn = document.getElementById("addMedBtn");
+  const medicineRows = document.getElementById("medicineRows");
 
-        if (searchType === "id" && !pId) {
-          showToast("Error: Please enter a Patient ID.", "error");
-          return;
-        }
-        if (searchType === "name_phone" && (!pName || !pPhone)) {
-          showToast("Error: Please enter both Name and Phone number.", "error");
-          return;
-        }
+  addMedBtn.addEventListener("click", () => {
+    const row = document.createElement("div");
+    row.className = "med-row";
+    row.innerHTML = `
+      <input type="text" name="medicine_name[]" placeholder="Medicine name" required />
+      <input type="text" name="dosage[]" placeholder="Dosage (e.g. 500mg)" required />
+      <input type="text" name="frequency[]" placeholder="Frequency (e.g. 1x a day)" required />
+      <input type="text" name="duration[]" placeholder="Duration (e.g. 5 days)" required />
+      <button type="button" class="remove-row">Remove</button>
+    `;
+    medicineRows.appendChild(row);
+  });
 
-        try {
-          let url = "/api/doctor/search-patient?";
-          if (searchType === "id") {
-            url += `patient_id=${pId}`;
-          } else {
-            url += `name=${encodeURIComponent(pName)}&phone=${encodeURIComponent(pPhone)}`;
-          }
+  medicineRows.addEventListener("click", (e) => {
+    if (e.target.classList.contains("remove-row")) {
+      const rows = medicineRows.querySelectorAll(".med-row");
+      if (rows.length > 1) {
+        e.target.parentElement.remove();
+      } else {
+        showToast("At least one medicine row is required.", "error");
+      }
+    }
+  });
 
-          const response = await fetch(url);
-          const result = await response.json();
+  document.getElementById("printParchiBtn").addEventListener("click", () => {
+    const meds = document.querySelectorAll('input[name="medicine_name[]"]');
+    let hasMed = false;
+    meds.forEach((med) => {
+      if (med.value.trim() !== "") hasMed = true;
+    });
+    if (!hasMed) {
+      showToast("Error: Add at least one medicine before printing.", "error");
+      return;
+    }
+    window.print();
+  });
 
-          if (response.ok && result.status === "success") {
-            const patientData = result.patient;
-            if (document.getElementById("spId"))
-              document.getElementById("spId").textContent =
-                patientData.patient_id;
-            if (document.getElementById("spName"))
-              document.getElementById("spName").textContent =
-                patientData.full_name;
-            if (document.getElementById("spPhone"))
-              document.getElementById("spPhone").textContent =
-                patientData.phone;
-            if (document.getElementById("spAge"))
-              document.getElementById("spAge").textContent =
-                patientData.age || "N/A";
-            if (document.getElementById("spGender"))
-              document.getElementById("spGender").textContent =
-                patientData.gender || "N/A";
+  // 1. PRESCRIPTION FORM SUBMIT
+  document.getElementById("prescriptionForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-            if (lockedNote) lockedNote.style.display = "none";
-            if (selectedBanner) selectedBanner.classList.add("show");
-            if (doctorWorkspace)
-              doctorWorkspace.classList.replace(
-                "locked-section",
-                "unlocked-section",
-              );
+    if (!currentPatientId) {
+      showToast("Error: Please fetch a patient first!", "error");
+      return;
+    }
 
-            currentPatientId =
-              patientData.patient_id ||
-              patientData.id ||
-              (patientData.patient && patientData.patient.id);
+    const doctorPmdcId = getDoctorPmdcId();
+    if (!doctorPmdcId) {
+      showToast("Error: Doctor PMDC ID missing. Please log in again.", "error");
+      return;
+    }
 
-            loadPatientHistory(currentPatientId.toString());
-            showToast("Success! Patient data fetched.", "success");
+    const rxNotes = document.getElementById("rxNotes")?.value || "";
 
-            if (document.getElementById("fetchId"))
-              document.getElementById("fetchId").value = "";
-            if (document.getElementById("fetchName"))
-              document.getElementById("fetchName").value = "";
-            if (document.getElementById("fetchPhone"))
-              document.getElementById("fetchPhone").value = "";
-          } else {
-            showToast(
-              "Error: " + (result.detail || "Patient not found!"),
-              "error",
-            );
-          }
-        } catch (error) {
-          showToast(
-            "Network Error: Check if FastAPI server is running!",
-            "error",
-          );
-          console.error(error);
-        }
+    const medNames = document.getElementsByName("medicine_name[]");
+    const dosages = document.getElementsByName("dosage[]");
+    const frequencies = document.getElementsByName("frequency[]");
+    const durations = document.getElementsByName("duration[]");
+
+    let medicinesList = [];
+    for (let i = 0; i < medNames.length; i++) {
+      if (medNames[i].value.trim() !== "") {
+        medicinesList.push({
+          medicine_name: medNames[i].value.trim(),
+          dosage: dosages[i].value.trim(),
+          frequency: frequencies[i].value.trim(),
+          duration: durations[i].value.trim(),
+        });
+      }
+    }
+
+    if (medicinesList.length === 0) {
+      showToast("Please add at least one medicine.", "error");
+      return;
+    }
+
+    const payload = {
+      patient_id: currentPatientId,
+      doctor_pmdc_id: doctorPmdcId,
+      temperature: null,
+      blood_pressure: null,
+      diagnosis_notes: rxNotes || "Prescription Added",
+      medicines: medicinesList,
+      lab_tests: [],
+    };
+
+    try {
+      const response = await fetch("/api/doctor/save-visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      document
-        .getElementById("clearPatientBtn")
-        .addEventListener("click", () => {
-          lockedNote.style.display = "block";
-          selectedBanner.classList.remove("show");
-          doctorWorkspace.classList.replace(
-            "unlocked-section",
-            "locked-section",
-          );
-          currentPatientId = null;
-          document.getElementById("historyPanel").style.display = "none";
-          document.getElementById("historyContainer").innerHTML = "";
-          showToast("Session cleared.", "success");
-        });
+      const result = await response.json();
 
-      const addMedBtn = document.getElementById("addMedBtn");
-      const medicineRows = document.getElementById("medicineRows");
+      if (response.ok && result.status === "success") {
+        showToast("Success! Prescription saved to patient's digital record.", "success");
+      } else {
+        showToast("Error: " + (result.detail || "Failed to save prescription"), "error");
+      }
+    } catch (error) {
+      console.error(error);
+      showToast("Network Error: Could not reach FastAPI server", "error");
+    }
+  });
 
-      addMedBtn.addEventListener("click", () => {
-        const row = document.createElement("div");
-        row.className = "med-row";
-        row.innerHTML = `
-                  <input type="text" name="medicine_name[]" placeholder="Medicine name" required />
-                  <input type="text" name="dosage[]" placeholder="Dosage (e.g. 500mg)" required />
-                  <input type="text" name="frequency[]" placeholder="Frequency (e.g. 1x a day)" required />
-                  <input type="text" name="duration[]" placeholder="Duration (e.g. 5 days)" required />
-                  <button type="button" class="remove-row">Remove</button>
-              `;
-        medicineRows.appendChild(row);
+  // 2. BLOOD TEST FORM SUBMIT
+  document.getElementById("bloodTestForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentPatientId) {
+      showToast("Error: Please fetch a patient first!", "error");
+      return;
+    }
+
+    const doctorPmdcId = getDoctorPmdcId();
+    if (!doctorPmdcId) {
+      showToast("Error: Doctor PMDC ID missing. Please log in again.", "error");
+      return;
+    }
+
+    const testName = document.getElementById("btTestName").value;
+    const urgency = document.getElementById("btUrgency").value;
+    const instructions = document.getElementById("btNotes").value;
+
+    const payload = {
+      patient_id: currentPatientId,
+      doctor_pmdc_id: doctorPmdcId,
+      temperature: null,
+      blood_pressure: null,
+      diagnosis_notes: "Lab Order Request",
+      medicines: [],
+      lab_tests: [
+        {
+          test_name: testName,
+          urgency: urgency,
+          instructions: instructions,
+        },
+      ],
+    };
+
+    try {
+      const response = await fetch("/api/doctor/save-visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      medicineRows.addEventListener("click", (e) => {
-        if (e.target.classList.contains("remove-row")) {
-          const rows = medicineRows.querySelectorAll(".med-row");
-          if (rows.length > 1) {
-            e.target.parentElement.remove();
-          } else {
-            showToast("At least one medicine row is required.", "error");
-          }
-        }
+      const result = await response.json();
+
+      if (response.ok && result.status === "success") {
+        showToast(`Success! ${testName} order sent to Laboratory Dept.`, "success");
+        document.getElementById("btNotes").value = "";
+      } else {
+        showToast("Error: " + (result.detail || "Failed to send lab test"), "error");
+      }
+    } catch (error) {
+      console.error(error);
+      showToast("Network Error: Could not reach FastAPI server", "error");
+    }
+  });
+
+  // 3. HISTORY FORM SUBMIT
+  document.getElementById("historyForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!currentPatientId) {
+      showToast("Error: Please fetch a patient first!", "error");
+      return;
+    }
+
+    const doctorPmdcId = getDoctorPmdcId();
+    if (!doctorPmdcId) {
+      showToast("Error: Doctor PMDC ID missing. Please log in again.", "error");
+      return;
+    }
+
+    const temp = document.getElementById("histTemp").value;
+    const bp = document.getElementById("histBP").value;
+    const notes = document.getElementById("histNotes").value;
+
+    const payload = {
+      patient_id: currentPatientId,
+      doctor_pmdc_id: doctorPmdcId,
+      temperature: temp,
+      blood_pressure: bp,
+      diagnosis_notes: notes,
+      medicines: [],
+      lab_tests: [],
+    };
+
+    try {
+      const response = await fetch("/api/doctor/save-visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      document
-        .getElementById("printParchiBtn")
-        .addEventListener("click", () => {
-          const meds = document.querySelectorAll(
-            'input[name="medicine_name[]"]',
-          );
-          let hasMed = false;
-          meds.forEach((med) => {
-            if (med.value.trim() !== "") hasMed = true;
-          });
-          if (!hasMed) {
-            showToast(
-              "Error: Add at least one medicine before printing.",
-              "error",
-            );
-            return;
-          }
-          window.print();
-        });
+      const result = await response.json();
 
-      // 1. PRESCRIPTION FORM SUBMIT
-      document
-        .getElementById("prescriptionForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          if (!currentPatientId) {
-            showToast("Error: Please fetch a patient first!", "error");
-            return;
-          }
-
-          // Dynamic lookup from hidden input -> global variable -> sidebar
-const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value || "";
-
-
-// Verification - Agar ID na mile to seedha stop kar de
-if (!doctorPmdcId) {
-    showToast("Error: Doctor PMDC ID missing. Please log in again.", "error");
-    return;
-}
-
-          const medNames = document.getElementsByName("medicine_name[]");
-          const dosages = document.getElementsByName("dosage[]");
-          const frequencies = document.getElementsByName("frequency[]");
-          const durations = document.getElementsByName("duration[]");
-
-          let medicinesList = [];
-          for (let i = 0; i < medNames.length; i++) {
-            if (medNames[i].value.trim() !== "") {
-              medicinesList.push({
-                medicine_name: medNames[i].value.trim(),
-                dosage: dosages[i].value.trim(),
-                frequency: frequencies[i].value.trim(),
-                duration: durations[i].value.trim(),
-              });
-            }
-          }
-
-          if (medicinesList.length === 0) {
-            showToast("Please add at least one medicine.", "error");
-            return;
-          }
-
-          const payload = {
-            patient_id: currentPatientId,
-            doctor_pmdc_id: doctorPmdcId,
-            temperature: null,
-            blood_pressure: null,
-            diagnosis_notes: rxNotes || "Prescription Added",
-            medicines: medicinesList,
-            lab_tests: [],
-          };
-
-          try {
-            const response = await fetch("/api/doctor/save-visit", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.status === "success") {
-              showToast(
-                "Success! Prescription saved to patient's digital record.",
-                "success",
-              );
-            } else {
-              showToast(
-                "Error: " + (result.detail || "Failed to save prescription"),
-                "error",
-              );
-            }
-          } catch (error) {
-            console.error(error);
-            showToast("Network Error: Could not reach FastAPI server", "error");
-          }
-        });
-
-      // 2. BLOOD TEST FORM SUBMIT
-      document
-        .getElementById("bloodTestForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          if (!currentPatientId) {
-            showToast("Error: Please fetch a patient first!", "error");
-            return;
-          }
-
-          // Dynamic lookup from hidden input -> global variable -> sidebar
-
-const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value || "";
-
-
-
-          const testName = document.getElementById("btTestName").value;
-          const urgency = document.getElementById("btUrgency").value;
-          const instructions = document.getElementById("btNotes").value;
-
-          const payload = {
-            patient_id: currentPatientId,
-            doctor_pmdc_id: doctorPmdcId,
-            temperature: null,
-            blood_pressure: null,
-            diagnosis_notes: "Lab Order Request",
-            medicines: [],
-            lab_tests: [
-              {
-                test_name: testName,
-                urgency: urgency,
-                instructions: instructions,
-              },
-            ],
-          };
-
-          try {
-            const response = await fetch("/api/doctor/save-visit", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.status === "success") {
-              showToast(
-                `Success! ${testName} order sent to Laboratory Dept.`,
-                "success",
-              );
-              document.getElementById("btNotes").value = "";
-            } else {
-              showToast(
-                "Error: " + (result.detail || "Failed to send lab test"),
-                "error",
-              );
-            }
-          } catch (error) {
-            console.error(error);
-            showToast("Network Error: Could not reach FastAPI server", "error");
-          }
-        });
-
-      // 3. HISTORY FORM SUBMIT
-      document
-        .getElementById("historyForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          if (!currentPatientId) {
-            showToast("Error: Please fetch a patient first!", "error");
-            return;
-          }
-
-          // Sidebar ya Jinja variable se dynamic ID lein, bina kisi dummy string ke
-           const doctorPmdcId = (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' && LOGGED_IN_DOCTOR_PMDC.trim() !== "") 
-           ? LOGGED_IN_DOCTOR_PMDC 
-           : document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim();
-
-
-          const temp = document.getElementById("histTemp").value;
-          const bp = document.getElementById("histBP").value;
-          const notes = document.getElementById("histNotes").value;
-
-          const payload = {
-            patient_id: currentPatientId,
-            doctor_pmdc_id: doctorPmdcId,
-            temperature: temp,
-            blood_pressure: bp,
-            diagnosis_notes: notes,
-            medicines: [],
-            lab_tests: [],
-          };
-
-          try {
-            const response = await fetch("/api/doctor/save-visit", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.status === "success") {
-              showToast(
-                "Success! Notes appended to patient history.",
-                "success",
-              );
-              document.getElementById("histTemp").value = "";
-              document.getElementById("histBP").value = "";
-              document.getElementById("histNotes").value = "";
-            } else {
-              showToast(
-                "Error: " + (result.detail || "Failed to save history"),
-                "error",
-              );
-            }
-          } catch (error) {
-            console.error(error);
-            showToast("Network Error: Could not reach FastAPI server", "error");
-          }
-        });
-    </script>
+      if (response.ok && result.status === "success") {
+        showToast("Success! Notes appended to patient history.", "success");
+        document.getElementById("histTemp").value = "";
+        document.getElementById("histBP").value = "";
+        document.getElementById("histNotes").value = "";
+      } else {
+        showToast("Error: " + (result.detail || "Failed to save history"), "error");
+      }
+    } catch (error) {
+      console.error(error);
+      showToast("Network Error: Could not reach FastAPI server", "error");
+    }
+  });
+</script>
   </body>
 </html>
