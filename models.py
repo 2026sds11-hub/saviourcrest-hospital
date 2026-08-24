@@ -56,12 +56,11 @@ CREATE TABLE IF NOT EXISTS admins (
 );
 """    
 
-RECEPTIONIST_TABLE_SQL = """
-CREATE TABLE IF NOT EXISTS receptionist (
+RECEPTIONISTS_TABLE_SQL = """
+CREATE TABLE IF NOT EXISTS receptionists (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    name VARCHAR(100) NOT NULL,
-    hashed_password VARCHAR(255) NOT NULL,
+    hospital_id VARCHAR(50) UNIQUE NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 """
@@ -111,7 +110,7 @@ def create_tables():
     cursor.execute(DOCTOR_TABLE_SQL)
     cursor.execute(ADMINS_TABLE_SQL)
     cursor.execute(DISEASE_STATS_TABLE_SQL)
-    cursor.execute(RECEPTIONIST_TABLE_SQL)
+    cursor.execute(RECEPTIONISTS_TABLE_SQL)
     cursor.execute(LAB_TABLE_SQL)
 
     # 2. Missing Columns Fixes for Live Database Schema Alteration
