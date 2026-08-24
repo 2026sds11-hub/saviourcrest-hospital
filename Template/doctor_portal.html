@@ -1587,8 +1587,11 @@
             return;
           }
 
-          const doctorPmdcId = LOGGED_IN_DOCTOR_PMDC || 
-          document.querySelector(".sidebar .who .id")?.textContent.trim();
+          // Sidebar ya Jinja variable se dynamic ID lein, bina kisi dummy string ke
+           const doctorPmdcId = (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' && LOGGED_IN_DOCTOR_PMDC.trim() !== "") 
+           ? LOGGED_IN_DOCTOR_PMDC 
+           : document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim();
+
 
           const temp = document.getElementById("histTemp").value;
           const bp = document.getElementById("histBP").value;
