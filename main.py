@@ -1658,9 +1658,49 @@ def doctor_portal_page(request: Request):
 
 #================================== add amount to reception ============================
 # 1. BOOKING ENDPOINT (Saves 2000 PKR & Proof Image)
+# @app.post("/api/appointments/book")
+# async def book_appointment(
+#     patient_id: int = Form(...), 
+#     doctor_id: int = Form(...),
+#     appt_date: str = Form(...),
+#     appt_time: str = Form(...),
+#     amount_paid: str = Form("2000"),
+#     payment_proof: UploadFile = File(...)
+# ):
+#     try:
+#         upload_folder = "static/uploads"
+#         os.makedirs(upload_folder, exist_ok=True)
+#         file_path = f"/{upload_folder}/{payment_proof.filename}"
+        
+#         with open(f"static/uploads/{payment_proof.filename}", "wb") as buffer:
+#             shutil.copyfileobj(payment_proof.file, buffer)
+
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+        
+#         query = """
+#             INSERT INTO appointments 
+#             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
+#             VALUES (%s, %s, %s, %s, %s, %s, 'Pending')
+#         """
+#         cursor.execute(query, (patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
+#         conn.commit()
+        
+#         cursor.close()
+#         conn.close()
+#         return {"status": "success", "message": "Appointment booked successfully!"}
+        
+#     except Exception as e:
+#         print(f"❌ BOOKING ERROR: {e}")
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
+# main.py mein book_appointment function ke andar
+
+
 @app.post("/api/appointments/book")
 async def book_appointment(
-    patient_id: int = Form(...), 
+    patient_id: int = Form(...),
     doctor_id: int = Form(...),
     appt_date: str = Form(...),
     appt_time: str = Form(...),
@@ -1670,14 +1710,19 @@ async def book_appointment(
     try:
         upload_folder = "static/uploads"
         os.makedirs(upload_folder, exist_ok=True)
-        file_path = f"/{upload_folder}/{payment_proof.filename}"
         
-        with open(f"static/uploads/{payment_proof.filename}", "wb") as buffer:
+        # --- YAHAN UUID WALA CODE LAGA DIYA ---
+        unique_filename = f"{uuid.uuid4().hex}_{payment_proof.filename}"
+        file_path = f"{upload_folder}/{unique_filename}"
+        
+        # File save karte waqt unique_filename use kiya
+        with open(f"static/uploads/{unique_filename}", "wb") as buffer:
             shutil.copyfileobj(payment_proof.file, buffer)
-
+        
         conn = get_db_connection()
         cursor = conn.cursor()
         
+        # Baki query aur execute ka code same rahega
         query = """
             INSERT INTO appointments 
             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
@@ -1689,10 +1734,10 @@ async def book_appointment(
         cursor.close()
         conn.close()
         return {"status": "success", "message": "Appointment booked successfully!"}
-        
+
     except Exception as e:
-        print(f"❌ BOOKING ERROR: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"BOOKING ERROR: {e}")
+        raise HTTPException(status_code=500, detail=str(e))    
 
 
 # 2. RECEPTION STATS ENDPOINT (Calculates Online Collection)
@@ -1772,7 +1817,8 @@ async def register_patient(
     phone: str = Form(...),
     age: int = Form(...),
     gender: str = Form(...),
-    cnic: str = Form(None)
+    cnic: str = Form(None),
+    email:str=Form(None)
 ):
     try:
         conn = get_db_connection()
@@ -1782,7 +1828,7 @@ async def register_patient(
 
         cursor.execute(
             "INSERT INTO patients (patient_id, full_name, phone, age, gender, cnic, registration_date) VALUES (%s, %s, %s, %s, %s, %s, NOW())",
-            (new_patient_id, full_name, phone, age, gender, cnic)
+            (new_patient_id, full_name, phone, age, gender, cnic,email)
         )
         conn.commit()
 

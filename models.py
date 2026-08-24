@@ -115,6 +115,29 @@ def create_tables():
     cursor.execute(RECEPTIONISTS_TABLE_SQL)
     cursor.execute(LAB_TABLE_SQL)
 
+
+# Fix appointments table schema for booking endpoint
+    appointment_alters = [
+        "ALTER TABLE appointments ADD COLUMN IF NOT EXISTS appt_date VARCHAR(50);",
+        "ALTER TABLE appointments ADD COLUMN IF NOT EXISTS appt_time VARCHAR(50);",
+        "ALTER TABLE appointments ADD COLUMN IF NOT EXISTS amount_paid VARCHAR(50) DEFAULT '2000';",
+        "ALTER TABLE appointments ADD COLUMN IF NOT EXISTS payment_proof_path VARCHAR(255);",
+        "ALTER TABLE appointments MODIFY status VARCHAR(50) DEFAULT 'Pending';"
+    ]
+    for alter in appointment_alters:
+        try:
+            cursor.execute(alter)
+        except Exception:
+            pass
+
+    # Make old/extra columns NULLable to avoid Error 1364
+    old_cols = ["appointment_date", "appointment_time", "payment_proof", "notes", "symptoms"]
+    for col in old_cols:
+        try:
+            cursor.execute(f"ALTER TABLE appointments MODIFY {col} VARCHAR(255) DEFAULT NULL;")
+        except Exception:
+            pass
+
     # Ensure all columns exist in live DB patients table
     patient_cols = [
         ("patient_id", "VARCHAR(20)"),
