@@ -1189,8 +1189,20 @@ def doctor_portal_page(request: Request):
         request.session.clear()
         return RedirectResponse(url="/doctor_login")
 
-    if "pmdc_id" not in doctor and "pmdc" in doctor:
+    # --- Line 1191 ke baad yeh block add/replace karein ---
+# Safe check: Agar database se bare lafzon me PMDC_ID aaye ya pmdc aaye, usay chote pmdc_id me convert karein
+    if "pmdc_id" not in doctor:
+      if "PMDC_ID" in doctor:
+        doctor["pmdc_id"] = doctor["PMDC_ID"]
+    elif "pmdc" in doctor:
         doctor["pmdc_id"] = doctor["pmdc"]
+    elif "PMDC" in doctor:
+        doctor["pmdc_id"] = doctor["PMDC"]
+
+    return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
+
+    # if "pmdc_id" not in doctor and "pmdc" in doctor:
+    #     doctor["pmdc_id"] = doctor["pmdc"]
 
     return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
 
