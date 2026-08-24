@@ -143,6 +143,12 @@ def create_tables():
     except Exception as e:
         print("Alter email log:", e)
 
+        # Make password_hash NULLable for reception registered patients
+    try:
+        cursor.execute("ALTER TABLE patients MODIFY password_hash VARCHAR(255) DEFAULT NULL;")
+    except Exception as e:
+        print("Alter password_hash log:", e)
+
 
     try:
         cursor.execute("ALTER TABLE doctors ADD COLUMN specialization VARCHAR(100);")
