@@ -911,13 +911,22 @@
     proofStep.classList.remove("disabled");
     proofStep.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
-
+// Booking
   window.addEventListener("DOMContentLoaded", function () {
     const bookingForm = document.getElementById("bookingForm");
 
     if (!bookingForm) {
         alert("CRITICAL: 'bookingForm' ID HTML mein nahi mili!");
         return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const doctorIdFromUrl = urlParams.get('doctor_id');
+    if (doctorIdFromUrl) {
+        const doctorInput = document.getElementById("doctorIdField");
+        if (doctorInput) {
+            doctorInput.value = doctorIdFromUrl;
+        }
     }
 
     bookingForm.addEventListener("submit", async function (e) {
@@ -930,7 +939,7 @@
         // 1. Date & Time Check
         if (!dateVal || !timeVal) {
             alert("Khabardar: Pehle Calendar se Date aur Time Slot select karein!");
-            return;
+           return;
         }
 
         // 2. File Upload Check

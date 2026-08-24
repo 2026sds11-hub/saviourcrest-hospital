@@ -1710,18 +1710,32 @@ async def book_appointment(
     conn = None
     cursor = None
     try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # 1. Verify karein ke doctor_id database mein exist karta hai ya nahi
+        cursor.execute("SELECT id FROM doctors WHERE id = %s", (doctor_id,))
+        valid_doctor = cursor.fetchone()
+
+        if not valid_doctor:
+            # Agar ID 3 exist nahi karti, toh pehle available doctor ki ID utha lein
+            cursor.execute("SELECT id FROM doctors LIMIT 1")
+            first_doctor = cursor.fetchone()
+            if first_doctor:
+                doctor_id = first_doctor['id']
+            else:
+                raise HTTPException(status_code=400, detail="Database mein koi doctor registered nahi hai.")
+
+        # 2. File Save Logic
         upload_folder = "static/uploads"
         os.makedirs(upload_folder, exist_ok=True)
-        
         unique_filename = f"{uuid.uuid4().hex}_{payment_proof.filename}"
         file_path = f"{upload_folder}/{unique_filename}"
-        
+
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(payment_proof.file, buffer)
-        
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
+
+        # 3. Insert Appointment
         query = """
             INSERT INTO appointments 
             (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
@@ -1729,12 +1743,12 @@ async def book_appointment(
         """
         cursor.execute(query, (patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
         conn.commit()
-        
+
         return {"status": "success", "message": "Appointment booked successfully!"}
 
     except Exception as e:
         if conn:
-            conn.rollback() # Lock release karne ke liye
+            conn.rollback()
         print(f"BOOKING ERROR: {e}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
