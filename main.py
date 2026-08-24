@@ -2452,7 +2452,7 @@ def save_doctor_visit(data: DoctorVisitRequest):
         """
         cursor.execute(history_query, (
             data.patient_id, 
-            data.doctor_pmdc, 
+            data.doctor_pmdc_id, 
             data.temperature, 
             data.blood_pressure, 
             data.diagnosis_notes
@@ -2470,7 +2470,7 @@ def save_doctor_visit(data: DoctorVisitRequest):
                 cursor.execute(rx_query, (
                     history_id,
                     data.patient_id,
-                    data.doctor_pmdc,
+                    data.doctor_pmdc_id,
                     med.medicine_name,
                     med.dosage,
                     med.frequency,
@@ -2486,7 +2486,7 @@ def save_doctor_visit(data: DoctorVisitRequest):
             for lab in data.lab_tests:
                 cursor.execute(lab_query, (
                     data.patient_id,
-                    data.doctor_pmdc,
+                    data.doctor_pmdc_id,
                     lab.test_name,
                     lab.urgency,
                     lab.instructions
