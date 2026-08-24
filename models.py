@@ -129,12 +129,15 @@ def create_tables():
     except Exception:
         pass
 
-    # 3. Force Reset Super Admin
-    cursor.execute("DELETE FROM admins WHERE username = 'adminSaviourAli'")
-    hashed_admin_pw = hash_password("admin12!!")
+   # 3. Force Reset Super Admin (Using Environment Variables)
+    admin_username = os.getenv("ADMIN_USERNAME", "admin_default")
+    admin_password = os.getenv("ADMIN_PASSWORD", "admin_pass_default")
+
+    cursor.execute("DELETE FROM admins WHERE username = %s", (admin_username,))
+    hashed_admin_pw = hash_password(admin_password)
     cursor.execute(
         "INSERT INTO admins (username, hashed_password) VALUES (%s, %s)",
-        ("adminSaviourAli", hashed_admin_pw)
+        (admin_username, hashed_admin_pw)
     )
 
   # 4. Auto Seed Receptionist (Abdullah - REC_2000)
