@@ -2440,7 +2440,14 @@ def search_patient_for_doctor(
 
 # 2. Save Medical History, Prescriptions, and Lab Orders Endpoint
 @app.post("/api/doctor/save-visit")
-def save_doctor_visit(data: DoctorVisitRequest):
+def save_doctor_visit(request: Request, data: DoctorVisitRequest):
+    active_doctor_pmdc = request.session.get("doctor_pmdc_id") or request.session.get("pmdc_id") or data.doctor_pmdc_id
+
+    if not active_doctor_pmdc or active_doctor_pmdc.strip() == "":
+        raise HTTPException(status_code=400, detail="Doctor session invalid. Please log in again.")
+
+    data.doctor_pmdc_id = active_doctor_pmdc.strip()
+# def save_doctor_visit(data: DoctorVisitRequest):
     conn = get_db_connection()
     cursor = conn.cursor()
     
