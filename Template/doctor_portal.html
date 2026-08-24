@@ -1164,6 +1164,7 @@
     </script>
 
     <script>
+      const LOGGED_IN_DOCTOR_PMDC = "{{ doctor.pmdc_id }}";
       document.addEventListener("DOMContentLoaded", () => {
         const urlParams = new URLSearchParams(window.location.search);
 
@@ -1586,9 +1587,9 @@
             return;
           }
 
-          const doctorPmdcId =
-            document.querySelector(".sidebar .who .id")?.textContent.trim() ||
-            "DOC-123";
+          const doctorPmdcId = LOGGED_IN_DOCTOR_PMDC || 
+          document.querySelector(".sidebar .who .id")?.textContent.trim();
+
           const temp = document.getElementById("histTemp").value;
           const bp = document.getElementById("histBP").value;
           const notes = document.getElementById("histNotes").value;
