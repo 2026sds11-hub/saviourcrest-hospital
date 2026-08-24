@@ -920,6 +920,8 @@
         return;
     }
 
+
+
     const urlParams = new URLSearchParams(window.location.search);
     const doctorIdFromUrl = urlParams.get('doctor_id');
     if (doctorIdFromUrl) {
@@ -928,6 +930,8 @@
             doctorInput.value = doctorIdFromUrl;
         }
     }
+
+    
 
     bookingForm.addEventListener("submit", async function (e) {
         e.preventDefault();

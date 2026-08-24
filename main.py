@@ -1054,8 +1054,19 @@ async def render_patient_dashboard(
         )
         patient = cursor.fetchone()
 
+        # 2. Database se patient details fetch karein
+        cursor.execute(
+            "SELECT * FROM patients WHERE id = %s OR patient_id = %s",
+            (patient_id, patient_id)
+        )
+        patient = cursor.fetchone()
         if not patient:
             return RedirectResponse(url="/patient_login.html", status_code=status.HTTP_303_SEE_OTHER)
+
+        cursor.execute("SELECT id, full_name, specialization FROM doctors")
+        doctors_list = cursor.fetchall()
+
+        
 
         real_patient_id = patient.get("patient_id") or patient.get("id")
         patient_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(real_patient_id)))
@@ -1079,7 +1090,8 @@ async def render_patient_dashboard(
                 context={
                     "patient": safe_patient,
                     "patient_id": real_patient_id,
-                    "patient_uuid": patient_uuid
+                    "patient_uuid": patient_uuid,
+                    "doctors":doctors_list
                 }
             )
         except TypeError:
@@ -1089,7 +1101,8 @@ async def render_patient_dashboard(
                     "request": request,
                     "patient": safe_patient,
                     "patient_id": real_patient_id,
-                    "patient_uuid": patient_uuid
+                    "patient_uuid": patient_uuid,
+                    "doctors":doctors_list
                 }
             )
 
