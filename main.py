@@ -1483,8 +1483,12 @@ def login_doctor(
                 content={"success": False, "message": "Your account is currently inactive. Contact Admin."}
             )
 
-        request.session["doctor_id"] = doctor["id"]
-        request.session["doctor_pmdc_id"] = doctor["pmdc_id"]
+            # Safe dictionary & object attribute fetching
+        doc_pmdc = doctor.get("pmdc_id") if isinstance(doctor, dict) else getattr(doctor, "pmdc_id", pmdc_id)
+        doc_id = doctor.get("id") if isinstance(doctor, dict) else getattr(doctor, "id", None)
+
+        request.session["doctor_id"] = doc_id
+        request.session["doctor_pmdc_id"] = doc_pmdc or pmdc_id  # Fallback to login form's input PMDC ID
 
         return JSONResponse(
             content={"success": True, "message": "Login successful!", "redirect": "/doctor_portal.html"}
