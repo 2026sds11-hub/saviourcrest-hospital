@@ -871,6 +871,7 @@
 
         <!-- ============ FETCH PATIENT RECORD ============ -->
         <div class="panel" id="find-patient">
+          <input type="hidden" id="loggedDoctorPmdc" value="{{ doctor.pmdc_id if doctor and doctor.pmdc_id else '' }}">
           <h2>Fetch Patient Record</h2>
           <p class="sub">
             Find patients registered by reception or via online booking.
@@ -1452,10 +1453,12 @@
             return;
           }
 
-         // Pure Dynamic Extraction
-const doctorPmdcId = (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' && LOGGED_IN_DOCTOR_PMDC.trim() !== "") 
-                     ? LOGGED_IN_DOCTOR_PMDC.trim() 
-                     : document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim();
+          // Dynamic lookup from hidden input -> global variable -> sidebar
+const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value.trim() ||
+                     (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' ? LOGGED_IN_DOCTOR_PMDC.trim() : "") ||
+                     document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim() ||
+                     "";
+
 
 // Verification - Agar ID na mile to seedha stop kar de
 if (!doctorPmdcId) {
@@ -1532,10 +1535,11 @@ if (!doctorPmdcId) {
             return;
           }
 
-          // Pure Dynamic Extraction
-const doctorPmdcId = (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' && LOGGED_IN_DOCTOR_PMDC.trim() !== "") 
-                     ? LOGGED_IN_DOCTOR_PMDC.trim() 
-                     : document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim();
+          // Dynamic lookup from hidden input -> global variable -> sidebar
+const doctorPmdcId = document.getElementById("loggedDoctorPmdc")?.value.trim() ||
+                     (typeof LOGGED_IN_DOCTOR_PMDC !== 'undefined' ? LOGGED_IN_DOCTOR_PMDC.trim() : "") ||
+                     document.querySelector(".sidebar .who .id")?.textContent.replace(/PMDC:\s*/i, "").trim() ||
+                     "";
 
 // Verification - Agar ID na mile to seedha stop kar de
 if (!doctorPmdcId) {

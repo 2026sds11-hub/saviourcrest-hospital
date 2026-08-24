@@ -1159,28 +1159,6 @@ async def render_doctor_appointments(request: Request, doctor_id: int = None):
 # 2. PROTECTED PORTALS (Unified Logic & Session Checks)
 # =====================================================================
 
-# --- DOCTOR PORTAL (CONSOLIDATED - SINGLE ROUTE) ---
-# @app.get("/doctor_portal", response_class=HTMLResponse)
-# @app.get("/doctor_portal.html", response_class=HTMLResponse)
-# def doctor_portal_page(request: Request):
-#     doctor_id = request.session.get("doctor_id")
-    
-#     if not doctor_id:
-#         return RedirectResponse(url="/doctor_login")
-
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM doctors WHERE id = %s", (doctor_id,))
-#     doctor = cursor.fetchone()
-#     cursor.close()
-#     conn.close()
-
-#     if not doctor:
-#         request.session.pop("doctor_id", None)
-#         return RedirectResponse(url="/doctor_login")
-
-#     return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
-
 @app.get("/doctor_portal", response_class=HTMLResponse)
 @app.get("/doctor_portal.html", response_class=HTMLResponse)
 def doctor_portal_page(request: Request):
@@ -1506,6 +1484,7 @@ def login_doctor(
             )
 
         request.session["doctor_id"] = doctor["id"]
+        request.session["doctor_pmdc_id"] = doctor["pmdc_id"]
 
         return JSONResponse(
             content={"success": True, "message": "Login successful!", "redirect": "/doctor_portal.html"}
@@ -1518,30 +1497,7 @@ def login_doctor(
             content={"success": False, "message": "Server error. Please try again later."}
         )
 
-# ==================================================================
-# DOCTOR PORTAL ROUTE
-# ==================================================================
-@app.get("/doctor_portal.html", response_class=HTMLResponse)
-def doctor_portal_page(request: Request):
-    doctor_id = request.session.get("doctor_id")
-    
-    if not doctor_id:
-        return RedirectResponse(url="/doctor_login")
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    
-    cursor.execute("SELECT * FROM doctors WHERE id = %s", (doctor_id,))
-    doctor = cursor.fetchone()
-    
-    cursor.close()
-    conn.close()
-
-    if not doctor:
-        request.session.pop("doctor_id", None)
-        return RedirectResponse(url="/doctor_login")
-
-    return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
 
 # ==================================================================
 # DOCTOR LOGOUT ROUTE
@@ -1617,60 +1573,6 @@ def reception_portal_page(request: Request):
 def logout_receptionist(request: Request):
     request.session.pop("reception_id", None)
     return RedirectResponse(url="/reception_login.html?msg=logout_success", status_code=303)
-
-# --- DOCTOR PORTAL (CONSOLIDATED - SINGLE ROUTE) ---
-# @app.get("/doctor_portal", response_class=HTMLResponse)
-# @app.get("/doctor_portal.html", response_class=HTMLResponse)
-# def doctor_portal_page(request: Request):
-#     doctor_id = request.session.get("doctor_id")
-    
-#     if not doctor_id:
-#         return RedirectResponse(url="/doctor_login")
-
-#     conn = get_db_connection()
-#     cursor = conn.cursor(dictionary=True)
-#     cursor.execute("SELECT * FROM doctors WHERE id = %s", (doctor_id,))
-#     doctor = cursor.fetchone()
-#     cursor.close()
-#     conn.close()
-
-#     if not doctor:
-#         request.session.pop("doctor_id", None)
-#         return RedirectResponse(url="/doctor_login")
-
-#     return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})    
-
-@app.get("/doctor_portal", response_class=HTMLResponse)
-@app.get("/doctor_portal.html", response_class=HTMLResponse)
-def doctor_portal_page(request: Request):
-    doctor_id = request.session.get("doctor_id")
-    
-    # 1. Session check
-    if not doctor_id:
-        return RedirectResponse(url="/doctor_login")
-
-    # 🔒 2. HASHED URL CHECK: Agar URL me ?ref= parameter nahi hai to hashed token generate karke redirect karein
-    ref_token = request.query_params.get("ref")
-    if not ref_token:
-        # Base64 encoded token from doctor_id & random UUID
-        raw_payload = f"doc_{doctor_id}_{uuid.uuid4().hex[:10]}"
-        hashed_ref = base64.b64encode(raw_payload.encode()).decode().rstrip("=")
-        return RedirectResponse(url=f"/doctor_portal?ref={hashed_ref}")
-
-    # 3. Database lookup for logged in doctor
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM doctors WHERE id = %s", (doctor_id,))
-    doctor = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    if not doctor:
-        request.session.pop("doctor_id", None)
-        return RedirectResponse(url="/doctor_login")
-
-    return templates.TemplateResponse("doctor_portal.html", {"request": request, "doctor": doctor})
-
 
 
 
@@ -2350,9 +2252,18 @@ class LabOrderItem(BaseModel):
     urgency: Optional[str] = "Normal"
     instructions: Optional[str] = ""
 
+# class DoctorVisitRequest(BaseModel):
+#     patient_id: str
+#     doctor_pmdc_id: str
+#     temperature: Optional[str] = None
+#     blood_pressure: Optional[str] = None
+#     diagnosis_notes: Optional[str] = None
+#     medicines: List[MedicineItem] = []
+#     lab_tests: List[LabOrderItem] = []
+
 class DoctorVisitRequest(BaseModel):
     patient_id: str
-    doctor_pmdc_id: str
+    doctor_pmdc_id: Optional[str] = ""  # Fixed: Ab missing field par 422 error nahi aayega
     temperature: Optional[str] = None
     blood_pressure: Optional[str] = None
     diagnosis_notes: Optional[str] = None
@@ -2441,7 +2352,12 @@ def search_patient_for_doctor(
 # 2. Save Medical History, Prescriptions, and Lab Orders Endpoint
 @app.post("/api/doctor/save-visit")
 def save_doctor_visit(request: Request, data: DoctorVisitRequest):
-    active_doctor_pmdc = request.session.get("doctor_pmdc_id") or request.session.get("pmdc_id") or data.doctor_pmdc_id
+    active_doctor_pmdc = (
+        request.session.get("doctor_pmdc_id") or 
+        request.session.get("pmdc_id") or 
+        request.session.get("user_id") or 
+        data.doctor_pmdc_id
+    )
 
     if not active_doctor_pmdc or active_doctor_pmdc.strip() == "":
         raise HTTPException(status_code=400, detail="Doctor session invalid. Please log in again.")
