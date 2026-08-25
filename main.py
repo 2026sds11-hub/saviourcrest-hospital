@@ -3238,10 +3238,51 @@ def blood_reports_page(request: Request, uuid_param: Optional[str] = Query(None,
 
 
 # --- PATIENT HISTORY (WITH UUID IN URL) ---
+# 1. API Route (Doctor Portal JS Fetch ke liye - JSON Response)
+@app.get("/api/doctor/patient-history/{patient_id}")
+async def get_doctor_patient_history_api(patient_id: str):
+    clean_p_id = patient_id.split(":")[0].replace("PT-", "").strip()
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT id FROM patients WHERE id = %s OR patient_id = %s", (clean_p_id, clean_p_id))
+        p_row = cursor.fetchone()
+        if not p_row:
+            return {"status": "success", "history": []}
+
+        real_p_id = p_row["id"]
+
+        query = """
+            SELECT mh.*, d.full_name AS doctor_name
+            FROM medical_history mh
+            LEFT JOIN doctors d ON mh.doctor_pmdc_id = d.pmdc_id
+            WHERE mh.patient_id = %s
+            ORDER BY mh.visit_date DESC
+        """
+        cursor.execute(query, (real_p_id,))
+        history_records = cursor.fetchall()
+
+        for visit in history_records:
+            cursor.execute("SELECT * FROM prescriptions WHERE history_id = %s", (visit["id"],))
+            visit["medicines"] = cursor.fetchall()
+
+        safe_history = serialize_db_data(history_records)
+        return {"status": "success", "history": safe_history}
+
+    except Exception as e:
+        print(f"❌ API HISTORY ERROR: {e}")
+        return {"status": "error", "message": str(e), "history": []}
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# 2. HTML Page Routes (.html aur without .html dono ke liye)
 @app.get("/patient_history", response_class=HTMLResponse)
 @app.get("/patient_history.html", response_class=HTMLResponse)
 def patient_history_page(request: Request, uuid_param: Optional[str] = Query(None, alias="uuid")):
-    # 1. Session check
     session_patient_id = request.session.get("patient_id")
     if not session_patient_id:
         return RedirectResponse(url="/patient_login.html", status_code=status.HTTP_303_SEE_OTHER)
@@ -3250,30 +3291,18 @@ def patient_history_page(request: Request, uuid_param: Optional[str] = Query(Non
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # 2. Session ID se Patient Details Fetch Karein
-        cursor.execute(
-            "SELECT * FROM patients WHERE patient_id = %s OR id = %s", 
-            (session_patient_id, session_patient_id)
-        )
+        cursor.execute("SELECT * FROM patients WHERE patient_id = %s OR id = %s", (session_patient_id, session_patient_id))
         patient = cursor.fetchone()
 
         if not patient:
             return RedirectResponse(url="/patient_login.html", status_code=status.HTTP_303_SEE_OTHER)
 
-        # Patient ki real ID
         real_patient_id = patient.get("patient_id") or patient.get("id")
-
-        # 3. Hashed UUID Generate Karein (Real ID se Deterministic UUID Hash)
         patient_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(real_patient_id)))
 
-        # 4. Agar URL me 'uuid' parameter nahi hai, toh URL par Hashed UUID ke sath REDIRECT karein
         if not uuid_param:
-            return RedirectResponse(
-                url=f"/patient_history?uuid={patient_uuid}", 
-                status_code=status.HTTP_302_FOUND
-            )
+            return RedirectResponse(url=f"/patient_history?uuid={patient_uuid}", status_code=status.HTTP_302_FOUND)
 
-        # 5. Medical History Fetch Karein
         query = """
             SELECT mh.*, d.full_name AS doctor_name
             FROM medical_history mh
@@ -3281,41 +3310,110 @@ def patient_history_page(request: Request, uuid_param: Optional[str] = Query(Non
             WHERE mh.patient_id = %s
             ORDER BY mh.visit_date DESC
         """
-
         cursor.execute(query, (real_patient_id,))
         history_records = cursor.fetchall()
 
-        # 6. Prescriptions / Medicines Map Karein
         for visit in history_records:
             cursor.execute("SELECT * FROM prescriptions WHERE history_id = %s", (visit["id"],))
             visit["medicines"] = cursor.fetchall()
 
-        # Data serialization
         safe_patient = serialize_db_data(patient)
         safe_history = serialize_db_data(history_records)
 
-        return templates.TemplateResponse(
-            "patient_history.html",
-            {
-                "request": request,
-                "patient": safe_patient,
-                "patient_id": real_patient_id,
-                "patient_uuid": patient_uuid,
-                "history_records": safe_history
-            }
-        )
+        return templates.TemplateResponse("patient_history.html", {
+            "request": request,
+            "patient": safe_patient,
+            "patient_id": real_patient_id,
+            "patient_uuid": patient_uuid,
+            "history_records": safe_history
+        })
 
     except Exception as e:
-        print("❌ Error fetching history:", str(e))
-        return templates.TemplateResponse(
-            "patient_history.html",
-            {"request": request, "history_records": [], "error": str(e), "patient": None}
-        )
+        print(f"❌ Error fetching history page: {e}")
+        return templates.TemplateResponse("patient_history.html", {
+            "request": request, "history_records": [], "error": str(e), "patient": None
+        })
     finally:
-        if cursor:
-            cursor.close()
-        if conn and conn.is_connected():
-            conn.close()
+        cursor.close()
+        conn.close()
+# @app.get("/patient_history", response_class=HTMLResponse)
+# @app.get("/patient_history.html", response_class=HTMLResponse)
+# def patient_history_page(request: Request, uuid_param: Optional[str] = Query(None, alias="uuid")):
+#     # 1. Session check
+#     session_patient_id = request.session.get("patient_id")
+#     if not session_patient_id:
+#         return RedirectResponse(url="/patient_login.html", status_code=status.HTTP_303_SEE_OTHER)
+
+#     conn = get_db_connection()
+#     cursor = conn.cursor(dictionary=True)
+
+#     try:
+#         # 2. Session ID se Patient Details Fetch Karein
+#         cursor.execute(
+#             "SELECT * FROM patients WHERE patient_id = %s OR id = %s", 
+#             (session_patient_id, session_patient_id)
+#         )
+#         patient = cursor.fetchone()
+
+#         if not patient:
+#             return RedirectResponse(url="/patient_login.html", status_code=status.HTTP_303_SEE_OTHER)
+
+#         # Patient ki real ID
+#         real_patient_id = patient.get("patient_id") or patient.get("id")
+
+#         # 3. Hashed UUID Generate Karein (Real ID se Deterministic UUID Hash)
+#         patient_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(real_patient_id)))
+
+#         # 4. Agar URL me 'uuid' parameter nahi hai, toh URL par Hashed UUID ke sath REDIRECT karein
+#         if not uuid_param:
+#             return RedirectResponse(
+#                 url=f"/patient_history?uuid={patient_uuid}", 
+#                 status_code=status.HTTP_302_FOUND
+#             )
+
+#         # 5. Medical History Fetch Karein
+#         query = """
+#             SELECT mh.*, d.full_name AS doctor_name
+#             FROM medical_history mh
+#             LEFT JOIN doctors d ON mh.doctor_pmdc_id = d.pmdc_id
+#             WHERE mh.patient_id = %s
+#             ORDER BY mh.visit_date DESC
+#         """
+
+#         cursor.execute(query, (real_patient_id,))
+#         history_records = cursor.fetchall()
+
+#         # 6. Prescriptions / Medicines Map Karein
+#         for visit in history_records:
+#             cursor.execute("SELECT * FROM prescriptions WHERE history_id = %s", (visit["id"],))
+#             visit["medicines"] = cursor.fetchall()
+
+#         # Data serialization
+#         safe_patient = serialize_db_data(patient)
+#         safe_history = serialize_db_data(history_records)
+
+#         return templates.TemplateResponse(
+#             "patient_history.html",
+#             {
+#                 "request": request,
+#                 "patient": safe_patient,
+#                 "patient_id": real_patient_id,
+#                 "patient_uuid": patient_uuid,
+#                 "history_records": safe_history
+#             }
+#         )
+
+#     except Exception as e:
+#         print("❌ Error fetching history:", str(e))
+#         return templates.TemplateResponse(
+#             "patient_history.html",
+#             {"request": request, "history_records": [], "error": str(e), "patient": None}
+#         )
+#     finally:
+#         if cursor:
+#             cursor.close()
+#         if conn and conn.is_connected():
+#             conn.close()
 #=====================================================
 # Feedback
 #=====================================================
