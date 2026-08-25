@@ -2029,7 +2029,7 @@ async def register_patient(
     age: int = Form(...),
     gender: str = Form(...),
     cnic: str = Form(None),
-    email:str=Form(None)
+    email: str = Form(None)
 ):
     try:
         conn = get_db_connection()
@@ -2037,14 +2037,18 @@ async def register_patient(
 
         new_patient_id = f"PT-{random.randint(10000, 99999)}"
 
+        # Fixed: Added 'email' to columns list (Total 8 columns matching 8 values)
         cursor.execute(
-            "INSERT INTO patients (patient_id, full_name, phone, age, gender, cnic, registration_date) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())",
-            (new_patient_id, full_name, phone, age, gender, cnic,email)
+            """
+            INSERT INTO patients (patient_id, full_name, phone, age, gender, cnic, email, registration_date) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+            """,
+            (new_patient_id, full_name, phone, age, gender, cnic, email)
         )
         conn.commit()
 
         return JSONResponse(content={
-            "status": "success", 
+            "status": "success",
             "patient_id": new_patient_id
         })
     except Exception as e:
@@ -2054,6 +2058,39 @@ async def register_patient(
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+# @app.post("/register_patient")
+# async def register_patient(
+#     request: Request,
+#     full_name: str = Form(...),
+#     phone: str = Form(...),
+#     age: int = Form(...),
+#     gender: str = Form(...),
+#     cnic: str = Form(None),
+#     email:str=Form(None)
+# ):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+
+#         new_patient_id = f"PT-{random.randint(10000, 99999)}"
+
+#         cursor.execute(
+#             "INSERT INTO patients (patient_id, full_name, phone, age, gender, cnic, registration_date) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())",
+#             (new_patient_id, full_name, phone, age, gender, cnic,email)
+#         )
+#         conn.commit()
+
+#         return JSONResponse(content={
+#             "status": "success", 
+#             "patient_id": new_patient_id
+#         })
+#     except Exception as e:
+#         print(f"Error registering patient: {e}")
+#         return JSONResponse(content={"status": "error", "message": str(e)})
+#     finally:
+#         if 'conn' in locals() and conn.is_connected():
+#             cursor.close()
+#             conn.close()
 
 
 # 3. SEARCH PATIENT
