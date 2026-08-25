@@ -740,7 +740,7 @@
 
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
-   <script>
+  <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
   // =================================================================
@@ -758,13 +758,11 @@
 
     container.appendChild(toast);
 
-    // Animate in
     setTimeout(() => toast.classList.add("show"), 10);
 
-    // Remove automatically after 3.5 seconds
     setTimeout(() => {
       toast.classList.remove("show");
-      setTimeout(() => toast.remove(), 300); // Wait for transition
+      setTimeout(() => toast.remove(), 300);
     }, 3500);
   }
 
@@ -801,7 +799,6 @@
         appointments.forEach((appt) => {
           const card = document.createElement("div");
           card.className = "request-card";
-
           card.dataset.requestId = appt.appointment_id;
 
           const isPaid = (appt.payment_status || "Paid").toLowerCase() === "paid";
@@ -813,25 +810,34 @@
             ? `<a href="${appt.payment_proof}" target="_blank">View Proof</a>`
             : `<a href="#" onclick="showToast('No proof image uploaded.', 'error'); return false;">View Proof</a>`;
 
-          const rawPatientId = String(
+          // ==========================================
+          // CLEAN PATIENT ID FORMATTING LOGIC
+          // ==========================================
+          let rawPatientId = String(
             appt.patient_id ||
-              appt.patient_uuid ||
               appt.patient_code ||
+              appt.patient_uuid ||
               appt.user_id ||
-              appt.appointment_id ||
-              "",
-          );
+              ""
+          ).trim();
 
-          const realPatientId =
-            rawPatientId.length > 8
-              ? rawPatientId.substring(0, 8).toUpperCase()
-              : rawPatientId;
+          let displayPatientId = "";
+          if (rawPatientId) {
+            if (rawPatientId.toUpperCase().startsWith("PT-")) {
+              displayPatientId = rawPatientId.toUpperCase();
+            } else {
+              displayPatientId = `PT-${rawPatientId.toUpperCase()}`;
+            }
+          } else {
+            displayPatientId = "PT-N/A";
+          }
+          // ==========================================
 
           card.innerHTML = `
         <div class="request-top">
           <div>
             <div class="req-patient">${appt.full_name}</div>
-            <div class="req-id mono">PT-${realPatientId}</div>
+            <div class="req-id mono">${displayPatientId}</div>
             <div class="req-meta">Requested Date: ${appt.appointment_date || "Today"}</div>
           </div>
         </div>
