@@ -2406,30 +2406,6 @@
         </button>
       </div>
     </div>
-    <!-- Google Translate API Script -->
-    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-    <script>
-      function googleTranslateElementInit() {
-        new google.translate.TranslateElement(
-          {
-            pageLanguage: "en",
-            autoDisplay: false,
-          },
-          "google_translate_element",
-        );
-      }
-
-      function changeLanguage(langCode) {
-        const googleSelect = document.querySelector(".goog-te-combo");
-        if (googleSelect) {
-          googleSelect.value = langCode;
-          googleSelect.dispatchEvent(new Event("change"));
-        } else {
-          console.error("Google Translate script not loaded yet.");
-        }
-      }
-    </script>
 
     <script>
       document.getElementById("year").textContent = new Date().getFullYear();
@@ -2708,6 +2684,31 @@
         }
       }
       window.addEventListener("DOMContentLoaded", loadTopFeedbacks);
+    </script>
+
+    <!-- Google Translate API Script -->
+    <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+      function googleTranslateElementInit() {
+        new google.translate.TranslateElement(
+          {
+            pageLanguage: "en",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
+      }
+
+      function changeLanguage(langCode) {
+        const googleSelect = document.querySelector(".goog-te-combo");
+        if (googleSelect) {
+          googleSelect.value = langCode;
+          googleSelect.dispatchEvent(new Event("change"));
+        } else {
+          console.error("Google Translate script not loaded yet.");
+        }
+      }
     </script>
   </body>
 </html>
