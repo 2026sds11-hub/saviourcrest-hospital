@@ -1,35 +1,15 @@
 import mysql.connector
-from mysql.connector import pooling  # Pooling package import kiya
 import os
-from auth import hash_password
-
-# Ek dafa connection pool banayein jo background me connections open rakhega
-db_pool = mysql.connector.pooling.MySQLConnectionPool(
-    pool_name="saviours_pool",
-    pool_size=15,  # 15 connections har waqt Oregon aur Tokyo ke darmiyan khule rahenge
-    host=os.getenv("DB_HOST", "localhost"),
-    port=int(os.getenv("DB_PORT", 3307)),
-    user=os.getenv("DB_USER", "root"),
-    password=os.getenv("DB_PASSWORD"),
-    database=os.getenv("DB_NAME", "saviours_hospital")
-)
+from auth import hash_password 
 
 def get_db_connection():
-    # Ab naye connection ki bajaye pehle se tayar pool se connection return karega
-    return db_pool.get_connection()
-
-# import mysql.connector
-# import os
-# from auth import hash_password 
-
-# def get_db_connection():
-#     return mysql.connector.connect(
-#         host=os.getenv("DB_HOST", "localhost"),
-#         port=int(os.getenv("DB_PORT", 3307)),
-#         user=os.getenv("DB_USER", "root"),
-#         password=os.getenv("DB_PASSWORD"),
-#         database=os.getenv("DB_NAME", "saviours_hospital")
-#     )
+    return mysql.connector.connect(
+        host=os.getenv("DB_HOST", "localhost"),
+        port=int(os.getenv("DB_PORT", 3307)),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME", "saviours_hospital")
+    )
 def create_tables():
     conn=get_db_connection()
     cursor= conn.cursor()
