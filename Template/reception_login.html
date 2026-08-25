@@ -537,17 +537,18 @@
         }
       });
 
-      // AJAX Form Submit with Toast Pop-Up
+      // AJAX Form Submit with Toast Pop-Up (Fixed)
       document
         .getElementById("loginForm")
         .addEventListener("submit", async function (e) {
           e.preventDefault();
 
+          const form = this; // Form context save kar liya
           const loginBtn = document.getElementById("loginBtn");
           loginBtn.disabled = true;
           loginBtn.innerText = "Verifying...";
 
-          const formData = new FormData(this);
+          const formData = new FormData(form);
 
           try {
             const response = await fetch("/reception_login", {
@@ -555,27 +556,33 @@
               body: formData,
             });
 
+            // 1. Agar backend ne Direct RedirectResponse bheja hai
+            if (response.redirected) {
+              showNotification("Login successfully! Redirecting...", "success");
+              setTimeout(() => {
+                window.location.href = response.url;
+              }, 1000);
+              return;
+            }
+
+            // 2. Agar JSON response aya hai
             const data = await response.json();
 
-            if (
-              data.status === "success" ||
-              response.redirected ||
-              data.redirect
-            ) {
+            if (data.status === "success" || data.redirect) {
               showNotification("Login successfully! Redirecting...", "success");
               setTimeout(() => {
                 window.location.href = data.redirect || "/reception_portal";
-              }, 1200);
+              }, 1000);
             } else {
               showNotification(data.message || "Invalid ID or Name!", "error");
               loginBtn.disabled = false;
               loginBtn.innerText = "Log In";
             }
           } catch (err) {
-            // Fallback if backend returns direct Form redirect instead of JSON
-            showNotification("Processing login...", "success");
+            // 3. Fallback standard HTML form submit
+            showNotification("Logging in...", "success");
             setTimeout(() => {
-              this.submit();
+              form.submit();
             }, 800);
           }
         });
