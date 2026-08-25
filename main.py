@@ -2038,7 +2038,7 @@ async def register_patient(
         new_patient_id = f"PT-{random.randint(10000, 99999)}"
 
         cursor.execute(
-            "INSERT INTO patients (patient_id, full_name, phone, age, gender, cnic, registration_date) VALUES (%s, %s, %s, %s, %s, %s, NOW())",
+            "INSERT INTO patients (patient_id, full_name, phone, age, gender, cnic, registration_date) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())",
             (new_patient_id, full_name, phone, age, gender, cnic,email)
         )
         conn.commit()
