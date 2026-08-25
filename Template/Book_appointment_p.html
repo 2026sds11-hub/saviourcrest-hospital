@@ -826,13 +826,17 @@
   const docNameParam = urlParams.get("doctor_name");
 
   if (docIdParam) {
-    document.getElementById("doctorIdField").value = docIdParam;
+    const docIdInput = document.getElementById("doctorIdField");
+    if (docIdInput) docIdInput.value = docIdParam;
   }
   if (docNameParam) {
-    document.getElementById("docName").textContent = decodeURIComponent(docNameParam);
+    const docNameEl = document.getElementById("docName");
+    if (docNameEl) docNameEl.textContent = decodeURIComponent(docNameParam);
   }
 
-  // 1. DATE & TIME SLOT GENERATION
+  // =================================================================
+  // 1. DATE & TIME SLOT GENERATION (Local Timezone Safe)
+  // =================================================================
   const dateRow = document.getElementById("dateRow");
   const slotGrid = document.getElementById("slotGrid");
   const apptDateField = document.getElementById("apptDateField");
@@ -851,7 +855,12 @@
   for (let i = 0; i < 7; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const iso = d.toISOString().split("T")[0];
+    
+    // YYYY-MM-DD Local format to prevent timezone offset bugs
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    const iso = `${year}-${month}-${day}`;
 
     const pill = document.createElement("div");
     pill.className = "date-pill" + (i === 0 ? " selected" : "");
@@ -867,14 +876,15 @@
     document.querySelectorAll(".date-pill").forEach((p) => p.classList.remove("selected"));
     pillEl.classList.add("selected");
     selectedDateStr = iso;
-    apptDateField.value = iso;
+    if (apptDateField) apptDateField.value = iso;
     renderSlots();
   }
 
   function renderSlots() {
+    if (!slotGrid) return;
     slotGrid.innerHTML = "";
-    apptTimeField.value = "";
-    const booked = []; // Dynamic booked slots array from API can be mapped here
+    if (apptTimeField) apptTimeField.value = "";
+    const booked = []; 
 
     allSlots.forEach((time) => {
       const isBooked = booked.includes(time);
@@ -886,65 +896,89 @@
         btn.addEventListener("click", () => {
           document.querySelectorAll(".slot-btn").forEach((s) => s.classList.remove("selected"));
           btn.classList.add("selected");
-          apptTimeField.value = time;
+          if (apptTimeField) apptTimeField.value = time;
         });
       }
       slotGrid.appendChild(btn);
     });
   }
 
-  apptDateField.value = selectedDateStr;
+  if (apptDateField) apptDateField.value = selectedDateStr;
   renderSlots();
 
+  // =================================================================
   // 2. PAYMENT UNLOCK
+  // =================================================================
   const jazzPayBtn = document.getElementById("jazzPayBtn");
   const paidConfirm = document.getElementById("paidConfirm");
   const proofStep = document.getElementById("proofStep");
 
-  jazzPayBtn.addEventListener("click", () => {
-    const number = document.getElementById("jazzNumber").value.trim();
-    if (!number) {
-      alert("Please enter your JazzCash mobile number to proceed.");
-      return;
-    }
-    paidConfirm.classList.add("show");
-    proofStep.classList.remove("disabled");
-    proofStep.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
-// Booking
-    document.getElementById("bookingForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    if (!apptDateField.value || !apptTimeField.value) {
-      alert("Please select a date and time slot.");
-      return;
-    }
-
-    const fileInput = document.getElementById("proofFile");
-    if (!fileInput || fileInput.files.length === 0) {
-      alert("Please upload payment proof screenshot.");
-      return;
-    }
-
-    const formData = new FormData(e.target);
-
-    try {
-      const response = await fetch("/api/appointments/book", {
-        method: "POST",
-        body: formData,
-      });
-
-      const resData = await response.json();
-      if (response.ok && resData.status !== "error") {
-        document.getElementById("successModal").classList.add("active");
-      } else {
-        alert("Booking Error: " + (resData.message || resData.detail || "Failed to submit request"));
+  if (jazzPayBtn) {
+    jazzPayBtn.addEventListener("click", () => {
+      const number = document.getElementById("jazzNumber")?.value.trim();
+      if (!number) {
+        alert("Please enter your JazzCash mobile number to proceed.");
+        return;
       }
-    } catch (err) {
-      console.error(err);
-      alert("Server connection failed. Ensure Uvicorn server is running.");
-    }
-  });
+      if (paidConfirm) paidConfirm.classList.add("show");
+      if (proofStep) {
+        proofStep.classList.remove("disabled");
+        proofStep.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    });
+  }
+
+  // =================================================================
+  // 3. BOOKING SUBMIT (FASTAPI API CONNECTED)
+  // =================================================================
+  const bookingForm = document.getElementById("bookingForm");
+  if (bookingForm) {
+    bookingForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const dateVal = apptDateField ? apptDateField.value : selectedDateStr;
+      const timeVal = apptTimeField ? apptTimeField.value : "";
+
+      if (!dateVal || !timeVal) {
+        alert("Please select a date and time slot.");
+        return;
+      }
+
+      const fileInput = document.getElementById("proofFile");
+      if (!fileInput || fileInput.files.length === 0) {
+        alert("Please upload payment proof screenshot.");
+        return;
+      }
+
+      const formData = new FormData(bookingForm);
+      // Ensure exact field names matching FastAPI expectations
+      formData.set("appt_date", dateVal);
+      formData.set("appt_time", timeVal);
+
+      try {
+        const response = await fetch("/api/appointments/book", {
+          method: "POST",
+          body: formData,
+        });
+
+        const resData = await response.json();
+        if (response.ok && resData.status !== "error") {
+          const successModal = document.getElementById("successModal");
+          if (successModal) {
+            successModal.classList.add("active");
+          } else {
+            alert("Appointment booked successfully! Pending doctor approval.");
+            window.location.href = "/patient_portal";
+          }
+        } else {
+          alert("Booking Error: " + (resData.message || resData.detail || "Failed to submit request"));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Server connection failed. Ensure Uvicorn server is running.");
+      }
+    });
+  }
 </script>
    <!-- Google Translate API Script -->
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

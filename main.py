@@ -1456,6 +1456,8 @@ async def get_patient_appointments(request: Request):
                 a.appointment_id,
                 a.patient_id,
                 a.status,
+                a.appt_date,
+                a.appt_time,
                 a.confirmed_date,
                 a.confirmed_time,
                 d.full_name AS doctor_name,
@@ -1471,14 +1473,23 @@ async def get_patient_appointments(request: Request):
         formatted_appointments = []
         for row in rows:
             formatted_appointments.append({
-                "appointment_id": row.get("appointment_id"),
-                "patient_id": row.get("patient_id"),
-                "status": row.get("status") or "Pending",
-                "appointment_date": str(row.get("appt_date")) if row.get("appt_date") else "",
-                "confirmed_time": str(row.get("appt_time")) if row.get("appt_time") else "",
-                "doctor_name": row.get("doctor_name") or "Doctor",
-                "specialty": row.get("specialty") or "General"
-            })
+            "appointment_id": row.get("appointment_id"),
+            "patient_id": row.get("patient_id"),
+            "status": row.get("status") or "Pending",
+            "appointment_date": str(row.get("confirmed_date") or row.get("appt_date") or ""),
+            "confirmed_time": str(row.get("confirmed_time") or row.get("appt_time") or ""),
+            "doctor_name": row.get("doctor_name") or "Doctor",
+            "specialty": row.get("specialty") or "General"
+        })
+            # formatted_appointments.append({
+            #     "appointment_id": row.get("appointment_id"),
+            #     "patient_id": row.get("patient_id"),
+            #     "status": row.get("status") or "Pending",
+            #     "appointment_date": str(row.get("appt_date")) if row.get("appt_date") else "",
+            #     "confirmed_time": str(row.get("appt_time")) if row.get("appt_time") else "",
+            #     "doctor_name": row.get("doctor_name") or "Doctor",
+            #     "specialty": row.get("specialty") or "General"
+            # })
         
         return {"status": "success", "appointments": formatted_appointments}
         
