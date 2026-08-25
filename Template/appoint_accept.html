@@ -740,7 +740,7 @@
 
     <!-- Toast Notification Container -->
     <div id="toast-container"></div>
-  <script>
+ <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
   // =================================================================
@@ -766,6 +766,16 @@
     }, 3500);
   }
 
+  // Helper to parse FastAPI backend errors cleanly
+  function getErrorMessage(detail, fallbackMsg) {
+    if (!detail) return fallbackMsg;
+    if (typeof detail === "string") return detail;
+    if (Array.isArray(detail)) {
+      return detail.map((err) => `${err.loc?.join(".") || "field"}: ${err.msg}`).join(", ");
+    }
+    return JSON.stringify(detail);
+  }
+
   // Load pending requests on startup
   document.addEventListener("DOMContentLoaded", loadPendingAppointments);
 
@@ -784,8 +794,8 @@
       const response = await fetch(apiUrl);
       const result = await response.json();
 
-      if (response.ok && result.status === "success") {
-        const appointments = result.appointments || [];
+      if (response.ok && (result.status === "success" || Array.isArray(result.appointments) || Array.isArray(result.data))) {
+        const appointments = result.appointments || result.data || [];
 
         if (pendingEl) pendingEl.textContent = appointments.length;
 
@@ -801,6 +811,10 @@
           card.className = "request-card";
           card.dataset.requestId = appt.appointment_id;
 
+          // Key fallbacks for Backend field name variations
+          const patientName = appt.full_name || appt.patient_name || "Unknown Patient";
+          const apptDate = appt.appointment_date || appt.appt_date || "Today";
+
           const isPaid = (appt.payment_status || "Paid").toLowerCase() === "paid";
           const paymentBadge = isPaid
             ? `<span class="badge badge-paid">Paid</span>`
@@ -810,9 +824,7 @@
             ? `<a href="${appt.payment_proof}" target="_blank">View Proof</a>`
             : `<a href="#" onclick="showToast('No proof image uploaded.', 'error'); return false;">View Proof</a>`;
 
-          // ==========================================
-          // CLEAN PATIENT ID FORMATTING LOGIC
-          // ==========================================
+          // Clean Patient ID formatting logic
           let rawPatientId = String(
             appt.patient_id ||
               appt.patient_code ||
@@ -821,50 +833,45 @@
               ""
           ).trim();
 
-          let displayPatientId = "";
+          let displayPatientId = "PT-N/A";
           if (rawPatientId) {
-            if (rawPatientId.toUpperCase().startsWith("PT-")) {
-              displayPatientId = rawPatientId.toUpperCase();
-            } else {
-              displayPatientId = `PT-${rawPatientId.toUpperCase()}`;
-            }
-          } else {
-            displayPatientId = "PT-N/A";
+            displayPatientId = rawPatientId.toUpperCase().startsWith("PT-")
+              ? rawPatientId.toUpperCase()
+              : `PT-${rawPatientId.toUpperCase()}`;
           }
-          // ==========================================
 
           card.innerHTML = `
-        <div class="request-top">
-          <div>
-            <div class="req-patient">${appt.full_name}</div>
-            <div class="req-id mono">${displayPatientId}</div>
-            <div class="req-meta">Requested Date: ${appt.appointment_date || "Today"}</div>
-          </div>
-        </div>
-        <div class="req-payment-row">
-          <span>Amount: <span class="amount">Rs. ${appt.amount || "2,000"}</span></span>
-          ${paymentBadge}
-          ${proofLink}
-        </div>
-        <div class="req-actions">
-          <button type="button" class="btn btn-primary btn-sm approve-toggle-btn">Approve</button>
-          <button type="button" class="btn btn-reject btn-sm reject-btn">Reject</button>
-        </div>
-        <div class="approve-form" id="approveForm-${appt.appointment_id}">
-          <div class="approve-fields">
-            <div class="field">
-              <label>Confirmed date</label>
-              <input type="date" class="confirm-date" value="${appt.appointment_date || ""}" />
+            <div class="request-top">
+              <div>
+                <div class="req-patient">${patientName}</div>
+                <div class="req-id mono">${displayPatientId}</div>
+                <div class="req-meta">Requested Date: ${apptDate}</div>
+              </div>
             </div>
-            <div class="field">
-              <label>Confirmed time</label>
-              <input type="time" class="confirm-time" />
+            <div class="req-payment-row">
+              <span>Amount: <span class="amount">Rs. ${appt.amount || "2,000"}</span></span>
+              ${paymentBadge}
+              ${proofLink}
             </div>
-          </div>
-          <button type="button" class="btn btn-primary btn-sm confirm-send-btn">Confirm &amp; Send</button>
-          <button type="button" class="btn btn-line btn-sm cancel-approve-btn">Cancel</button>
-        </div>
-      `;
+            <div class="req-actions">
+              <button type="button" class="btn btn-primary btn-sm approve-toggle-btn">Approve</button>
+              <button type="button" class="btn btn-reject btn-sm reject-btn">Reject</button>
+            </div>
+            <div class="approve-form" id="approveForm-${appt.appointment_id}">
+              <div class="approve-fields">
+                <div class="field">
+                  <label>Confirmed date</label>
+                  <input type="date" class="confirm-date" value="${apptDate !== 'Today' ? apptDate : ''}" />
+                </div>
+                <div class="field">
+                  <label>Confirmed time</label>
+                  <input type="time" class="confirm-time" />
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm confirm-send-btn">Confirm &amp; Send</button>
+              <button type="button" class="btn btn-line btn-sm cancel-approve-btn">Cancel</button>
+            </div>
+          `;
           listContainer.appendChild(card);
         });
 
@@ -924,7 +931,7 @@
     if (e.target.classList.contains("confirm-send-btn")) {
       const btn = e.target;
       const card = btn.closest(".request-card");
-      const id = card.dataset.requestId;
+      const id = parseInt(card.dataset.requestId, 10); // Converted to Integer
       const date = card.querySelector(".confirm-date").value;
       const time = card.querySelector(".confirm-time").value;
       const patientName = card.querySelector(".req-patient").textContent;
@@ -951,17 +958,17 @@
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.detail || "Approval failed");
+          throw new Error(getErrorMessage(result.detail, "Approval failed"));
         }
 
         const decisionsBody = document.getElementById("decisionsBody");
         if (decisionsBody) {
           const row = document.createElement("tr");
           row.innerHTML = `
-        <td>${patientName}</td>
-        <td>${date} ${time}</td>
-        <td><span class="badge badge-confirmed">Confirmed</span></td>
-      `;
+            <td>${patientName}</td>
+            <td>${date} ${time}</td>
+            <td><span class="badge badge-confirmed">Confirmed</span></td>
+          `;
           decisionsBody.prepend(row);
         }
 
@@ -971,7 +978,7 @@
 
         showToast(
           `Successfully confirmed ${patientName}'s appointment for ${date} at ${time}.`,
-          "success",
+          "success"
         );
       } catch (err) {
         showToast("Error updating appointment: " + err.message, "error");
@@ -988,12 +995,12 @@
     if (e.target.classList.contains("reject-btn")) {
       const btn = e.target;
       const card = btn.closest(".request-card");
-      const id = card.dataset.requestId;
+      const id = parseInt(card.dataset.requestId, 10); // Converted to Integer
       const patientName = card.querySelector(".req-patient").textContent;
 
       if (
         !confirm(
-          `Are you sure you want to reject the appointment request from ${patientName}?`,
+          `Are you sure you want to reject the appointment request from ${patientName}?`
         )
       ) {
         return;
@@ -1011,17 +1018,17 @@
         const result = await response.json();
 
         if (!response.ok) {
-          throw new Error(result.detail || "Rejection failed");
+          throw new Error(getErrorMessage(result.detail, "Rejection failed"));
         }
 
         const decisionsBody = document.getElementById("decisionsBody");
         if (decisionsBody) {
           const row = document.createElement("tr");
           row.innerHTML = `
-        <td>${patientName}</td>
-        <td>—</td>
-        <td><span class="badge badge-rejected">Rejected</span></td>
-      `;
+            <td>${patientName}</td>
+            <td>—</td>
+            <td><span class="badge badge-rejected">Rejected</span></td>
+          `;
           decisionsBody.prepend(row);
         }
 
@@ -1031,7 +1038,7 @@
 
         showToast(
           `Appointment for ${patientName} has been rejected.`,
-          "success",
+          "success"
         );
       } catch (err) {
         showToast("Error rejecting appointment: " + err.message, "error");

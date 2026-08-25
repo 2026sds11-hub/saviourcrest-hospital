@@ -1002,29 +1002,29 @@ def get_pending_appointments(request: Request, doctor_id: int = None):
         conn.close()
 
 
-@app.post("/api/appointments/approve")
-async def approve_appointment(payload: ApproveAppointmentSchema):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
-        query = """
-            UPDATE appointments 
-            SET status = 'Confirmed',
-                confirmed_date = %s,
-                confirmed_time = %s 
-            WHERE appointment_id = %s
-        """
-        cursor.execute(query, (payload.confirmed_date, payload.confirmed_time, payload.appointment_id))
-        conn.commit()
+# @app.post("/api/appointments/approve")
+# async def approve_appointment(payload: ApproveAppointmentSchema):
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+#     try:
+#         query = """
+#             UPDATE appointments 
+#             SET status = 'Confirmed',
+#                 confirmed_date = %s,
+#                 confirmed_time = %s 
+#             WHERE appointment_id = %s
+#         """
+#         cursor.execute(query, (payload.confirmed_date, payload.confirmed_time, payload.appointment_id))
+#         conn.commit()
 
-        return {"status": "success", "message": "Appointment confirmed successfully!"}
-    except Exception as e:
-        print("Approve error:", e)
-        raise HTTPException(status_code=500, detail="Database update failed.")
-    finally:
-        # FIX: Connection leakage 
-        cursor.close()
-        conn.close()
+#         return {"status": "success", "message": "Appointment confirmed successfully!"}
+#     except Exception as e:
+#         print("Approve error:", e)
+#         raise HTTPException(status_code=500, detail="Database update failed.")
+#     finally:
+#         # FIX: Connection leakage 
+#         cursor.close()
+#         conn.close()
 
 
 @app.post("/api/appointments/reject")
@@ -1640,43 +1640,71 @@ class ApproveAppointmentRequest(BaseModel):
     appointment_id: int
     confirmed_date: Optional[str] = None
     confirmed_time: Optional[str] = None
-
+    
 @app.post("/api/appointments/approve")
 def approve_appointment_direct(payload: ApproveAppointmentRequest):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-
     try:
         cursor.execute("SELECT appt_date, appt_time FROM appointments WHERE appointment_id = %s", (payload.appointment_id,))
         appt = cursor.fetchone()
-
+        
         if not appt:
-            return {"status": "error", "message": "Appointment not found"}
+            raise HTTPException(status_code=404, detail="Appointment not found")
 
         final_date = payload.confirmed_date or appt.get("appt_date")
         final_time = payload.confirmed_time or appt.get("appt_time")
 
-        # 3. Update columns in Database
         query = """
-            UPDATE appointments
-            SET status = 'Confirmed',
-                confirmed_date = %s,
-                confirmed_time = %s
+            UPDATE appointments 
+            SET status = 'Confirmed', confirmed_date = %s, confirmed_time = %s 
             WHERE appointment_id = %s
         """
         cursor.execute(query, (final_date, final_time, payload.appointment_id))
         conn.commit()
-
-        print("✅ DATABASE SUCCESSFULLY UPDATED!")
         return {"status": "success", "message": "Appointment approved successfully!"}
-
     except Exception as e:
-        print(f"❌ DATABASE ERROR: {e}")
-        return {"status": "error", "message": str(e)}
-
+        raise HTTPException(status_code=500, detail=str(e))
     finally:
         cursor.close()
-        conn.close()
+        conn.close()   
+
+# @app.post("/api/appointments/approve")
+# def approve_appointment_direct(payload: ApproveAppointmentRequest):
+#     conn = get_db_connection()
+#     cursor = conn.cursor(dictionary=True)
+
+#     try:
+#         cursor.execute("SELECT appt_date, appt_time FROM appointments WHERE appointment_id = %s", (payload.appointment_id,))
+#         appt = cursor.fetchone()
+
+#         if not appt:
+#             return {"status": "error", "message": "Appointment not found"}
+
+#         final_date = payload.confirmed_date or appt.get("appt_date")
+#         final_time = payload.confirmed_time or appt.get("appt_time")
+
+#         # 3. Update columns in Database
+#         query = """
+#             UPDATE appointments
+#             SET status = 'Confirmed',
+#                 confirmed_date = %s,
+#                 confirmed_time = %s
+#             WHERE appointment_id = %s
+#         """
+#         cursor.execute(query, (final_date, final_time, payload.appointment_id))
+#         conn.commit()
+
+#         print("✅ DATABASE SUCCESSFULLY UPDATED!")
+#         return {"status": "success", "message": "Appointment approved successfully!"}
+
+#     except Exception as e:
+#         print(f"❌ DATABASE ERROR: {e}")
+#         return {"status": "error", "message": str(e)}
+
+#     finally:
+#         cursor.close()
+#         conn.close()
 
 
 # ---------------------------------------------------------
