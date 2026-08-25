@@ -781,9 +781,13 @@
         const pendingEl = document.getElementById("statPendingCount");
 
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/api/doctor/appointments`,
-          );
+          // URL se doctor_id read karke dynamic request bhejein
+        const urlParams = new URLSearchParams(window.location.search);
+        const doctorId = urlParams.get('doctor_id');
+        const apiUrl = doctorId ? `/api/doctor/appointments?doctor_id=${doctorId}` : '/api/doctor/appointments';
+        
+        const response = await fetch(apiUrl);
+        
           const result = await response.json();
 
           if (response.ok && result.status === "success") {
