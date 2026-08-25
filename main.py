@@ -47,6 +47,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+os.makedirs("static/uploads", exist_ok=True)
 app.add_middleware(
     SessionMiddleware, 
     secret_key=os.getenv("SECRET_KEY")
@@ -1265,10 +1266,17 @@ def book_appointment(
     #     shutil.copyfileobj(payment_proof.file, buffer)
     file_extension = payment_proof.filename.split(".")[-1]
     unique_filename = f"{uuid.uuid4()}.{file_extension}"
-    file_path = f"{upload_folder}/{unique_filename}"
+    
+    disk_path = os.path.join(upload_folder, unique_filename)
+    
+    web_path = f"/static/uploads/{unique_filename}"
 
-    with open(file_path, "wb") as buffer:
+    with open(disk_path, "wb") as buffer:
         shutil.copyfileobj(payment_proof.file, buffer)
+    # file_path = f"{upload_folder}/{unique_filename}"
+
+    # with open(file_path, "wb") as buffer:
+    #     shutil.copyfileobj(payment_proof.file, buffer)
 
     # Unique Appointment UUID
     appointment_uuid = str(uuid.uuid4())
@@ -1302,7 +1310,7 @@ def book_appointment(
         VALUES (%s, %s, %s, %s, %s, %s, %s, 'Pending')
     """
 
-    cursor.execute(query, (appointment_uuid, real_patient_id, doctor_id, appt_date, appt_time, amount_paid, file_path))
+    cursor.execute(query, (appointment_uuid, real_patient_id, doctor_id, appt_date, appt_time, amount_paid, web_path))
     conn.commit()
     
     cursor.close()
@@ -1386,9 +1394,6 @@ async def approve_appointment(payload: ApproveAppointmentSchema):
                 confirmed_time = %s 
             WHERE uuid = %s
         """
-
-              
-     
                
         cursor.execute(query, (payload.confirmed_date, payload.confirmed_time, payload.appointment_id))
         conn.commit()
@@ -1421,10 +1426,16 @@ async def reject_appointment(payload: RejectAppointmentSchema):
 
 @app.get("/api/patient/my-appointments")
 async def get_patient_appointments(request: Request):
-    patient_id = request.session.get("user_id") or request.session.get("patient_id")
-    
-    if not patient_id:
+    raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
+    if not raw_p_id:
         return {"status": "error", "message": "Patient not logged in"}
+    
+    # 'PT-' prefix remove karein taake DB integer se match ho jaye
+    patient_id = str(raw_p_id).replace("PT-", "").strip()
+    # patient_id = request.session.get("user_id") or request.session.get("patient_id")
+    
+    # if not patient_id:
+    #     return {"status": "error", "message": "Patient not logged in"}
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
