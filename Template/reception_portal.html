@@ -999,12 +999,12 @@
                   <td>Patient ID</td>
                   <td class="mono" id="ipPatientId">—</td>
                 </tr>
-                <tr>
+                <!-- <tr>
                   <td>Patient UUID</td>
                   <td class="mono" id="ipPatientUuid" style="font-size: 11px">
                     —
                   </td>
-                </tr>
+                </tr> -->
                 <tr>
                   <td>Patient Name</td>
                   <td id="ipPatientName" style="font-weight: 600">—</td>
@@ -1304,7 +1304,7 @@
             showNotification("Invoice Generated Successfully!", "success");
 
             document.getElementById("ipPatientId").textContent = ptId;
-            document.getElementById("ipPatientUuid").textContent = ptUuid;
+            // document.getElementById("ipPatientUuid").textContent = ptUuid;
             document.getElementById("ipPatientName").textContent = ptName;
             document.getElementById("ipService").textContent = service;
             document.getElementById("ipMethod").textContent = method;
