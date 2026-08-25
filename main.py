@@ -1265,7 +1265,7 @@ def doctor_portal_page(request: Request):
 
 @app.post("/api/appointments/book")
 def book_appointment(
-    patient_id: str = Form(...), 
+    patient_id: str = Form(...),
     doctor_id: str = Form(...),
     appt_date: str = Form(...),
     appt_time: str = Form(...),
@@ -1274,62 +1274,118 @@ def book_appointment(
 ):
     upload_folder = "static/uploads"
     os.makedirs(upload_folder, exist_ok=True)
-    # file_path = f"/{upload_folder}/{payment_proof.filename}"
     
-    # with open(f"static/uploads/{payment_proof.filename}", "wb") as buffer:
-    #     shutil.copyfileobj(payment_proof.file, buffer)
     file_extension = payment_proof.filename.split(".")[-1]
     unique_filename = f"{uuid.uuid4()}.{file_extension}"
-    
     disk_path = os.path.join(upload_folder, unique_filename)
-    
     web_path = f"/static/uploads/{unique_filename}"
 
     with open(disk_path, "wb") as buffer:
         shutil.copyfileobj(payment_proof.file, buffer)
-    # file_path = f"{upload_folder}/{unique_filename}"
 
-    # with open(file_path, "wb") as buffer:
-    #     shutil.copyfileobj(payment_proof.file, buffer)
-
-    # Unique Appointment UUID
     appointment_uuid = str(uuid.uuid4())
+    p_clean_id = patient_id.replace("PT-", "").strip()
 
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # query = """
-    #     INSERT INTO appointments 
-    #     (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
-    #     VALUES (%s, %s, %s, %s, %s, %s, 'Pending')
-    # """
-    conn = get_db_connection()
-    cursor = conn.cursor()
 
-    # 1. 'PT-60378' ke zariye real integer ID (e.g. 26) fetch karein
-    cursor.execute("SELECT id FROM patients WHERE patient_id = %s", (patient_id,))
-    patient_row = cursor.fetchone()
+    try:
+        # Check if patient exists using id or patient_id format safely
+        cursor.execute("SELECT id FROM patients WHERE id = %s OR id = %s", (p_clean_id, patient_id))
+        patient_row = cursor.fetchone()
 
-    if not patient_row:
+        real_patient_id = patient_row[0] if patient_row else p_clean_id
+
+        query = """
+            INSERT INTO appointments 
+            (uuid, patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'Pending')
+        """
+        cursor.execute(query, (
+            appointment_uuid, real_patient_id, doctor_id, 
+            appt_date, appt_time, amount_paid, web_path
+        ))
+        conn.commit()
+
+        return {
+            "status": "success", 
+            "message": "Appointment booked and is pending doctor approval!",
+            "appointment_uuid": appointment_uuid
+        }
+    except Exception as e:
+        print(f"❌ BOOKING ERROR: {e}")
+        return {"status": "error", "message": str(e)}
+    finally:
         cursor.close()
         conn.close()
-        return {"status": "error", "message": "Patient record not found"}
 
-    real_patient_id = patient_row[0]
-
-    # 2. Appointments table mein record insert karein
-    query = """
-        INSERT INTO appointments 
-        (uuid, patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, 'Pending')
-    """
-
-    cursor.execute(query, (appointment_uuid, real_patient_id, doctor_id, appt_date, appt_time, amount_paid, web_path))
-    conn.commit()
+# @app.post("/api/appointments/book")
+# def book_appointment(
+#     patient_id: str = Form(...), 
+#     doctor_id: str = Form(...),
+#     appt_date: str = Form(...),
+#     appt_time: str = Form(...),
+#     amount_paid: str = Form(...),
+#     payment_proof: UploadFile = File(...)
+# ):
+#     upload_folder = "static/uploads"
+#     os.makedirs(upload_folder, exist_ok=True)
+#     # file_path = f"/{upload_folder}/{payment_proof.filename}"
     
-    cursor.close()
-    conn.close()
-    return {"status": "success", "message": "Appointment booked and is pending doctor approval!","appointment_uuid": appointment_uuid}
+#     # with open(f"static/uploads/{payment_proof.filename}", "wb") as buffer:
+#     #     shutil.copyfileobj(payment_proof.file, buffer)
+#     file_extension = payment_proof.filename.split(".")[-1]
+#     unique_filename = f"{uuid.uuid4()}.{file_extension}"
+    
+#     disk_path = os.path.join(upload_folder, unique_filename)
+    
+#     web_path = f"/static/uploads/{unique_filename}"
+
+#     with open(disk_path, "wb") as buffer:
+#         shutil.copyfileobj(payment_proof.file, buffer)
+#     # file_path = f"{upload_folder}/{unique_filename}"
+
+#     # with open(file_path, "wb") as buffer:
+#     #     shutil.copyfileobj(payment_proof.file, buffer)
+
+#     # Unique Appointment UUID
+#     appointment_uuid = str(uuid.uuid4())
+
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+    
+#     # query = """
+#     #     INSERT INTO appointments 
+#     #     (patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
+#     #     VALUES (%s, %s, %s, %s, %s, %s, 'Pending')
+#     # """
+#     conn = get_db_connection()
+#     cursor = conn.cursor()
+
+#     # 1. 'PT-60378' ke zariye real integer ID (e.g. 26) fetch karein
+#     cursor.execute("SELECT id FROM patients WHERE patient_id = %s", (patient_id,))
+#     patient_row = cursor.fetchone()
+
+#     if not patient_row:
+#         cursor.close()
+#         conn.close()
+#         return {"status": "error", "message": "Patient record not found"}
+
+#     real_patient_id = patient_row[0]
+
+#     # 2. Appointments table mein record insert karein
+#     query = """
+#         INSERT INTO appointments 
+#         (uuid, patient_id, doctor_id, appt_date, appt_time, amount_paid, payment_proof_path, status)
+#         VALUES (%s, %s, %s, %s, %s, %s, %s, 'Pending')
+#     """
+
+#     cursor.execute(query, (appointment_uuid, real_patient_id, doctor_id, appt_date, appt_time, amount_paid, web_path))
+#     conn.commit()
+    
+#     cursor.close()
+#     conn.close()
+#     return {"status": "success", "message": "Appointment booked and is pending doctor approval!","appointment_uuid": appointment_uuid}
 
 
 # ---------------------------------------------------------
