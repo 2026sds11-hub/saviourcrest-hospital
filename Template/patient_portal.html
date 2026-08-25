@@ -1046,16 +1046,107 @@
     </footer>
 
     <script>
-      document.getElementById("year").textContent = new Date().getFullYear();
+      document.addEventListener("DOMContentLoaded", () => {
+        // 1. Year Update
+        const yearEl = document.getElementById("year");
+        if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+        // 2. Fetch Appointments
+        fetchAppointments();
+
+        // 3. Modal Listeners (Safe Checks)
+        const modalCancelBtn = document.getElementById("modalCancelBtn");
+        if (modalCancelBtn) {
+          modalCancelBtn.addEventListener("click", () => {
+            const confirmModal = document.getElementById("confirmModal");
+            if (confirmModal) confirmModal.classList.remove("active");
+            cardTargetToHide = null;
+          });
+        }
+
+        const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+        if (modalConfirmBtn) {
+          modalConfirmBtn.addEventListener("click", () => {
+            if (cardTargetToHide) {
+              cardTargetToHide.remove();
+              showToast("Appointment hidden from list", "success");
+
+              const apptList = document.getElementById("appointmentList");
+              const noMsg = document.getElementById("noApptMsg");
+              if (
+                apptList &&
+                apptList.querySelectorAll(".appt-card").length === 0
+              ) {
+                if (noMsg) {
+                  noMsg.textContent =
+                    "You don't have any appointment requests at the moment.";
+                  noMsg.style.display = "block";
+                }
+              }
+            }
+            const confirmModal = document.getElementById("confirmModal");
+            if (confirmModal) confirmModal.classList.remove("active");
+            cardTargetToHide = null;
+          });
+        }
+
+        // 4. Logout Listener (Safe Check)
+        const logoutBtn = document.getElementById("logoutBtn");
+        if (logoutBtn) {
+          logoutBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            try {
+              await fetch("/logout");
+            } catch (err) {
+              console.log(err);
+            }
+            showToast("Logged out successfully!", "success");
+            setTimeout(() => {
+              window.location.href = "/patient_login.html";
+            }, 2000);
+          });
+        }
+
+        // 5. Symptom Search Listener
+        const symptomSearchBtn = document.getElementById("symptomSearchBtn");
+        if (symptomSearchBtn) {
+          symptomSearchBtn.addEventListener("click", handleSymptomSearch);
+        }
+
+        // 6. Specialty Tiles Listeners
+        document.querySelectorAll(".spec-tile").forEach((tile) => {
+          tile.addEventListener("click", () =>
+            showSuggestion(tile.dataset.spec),
+          );
+        });
+
+        // 7. Toggle Box Listener
+        const toggleBoxBtn = document.getElementById("toggleBoxBtn");
+        if (toggleBoxBtn) {
+          toggleBoxBtn.addEventListener("click", () => {
+            const suggBody = document.getElementById("suggBody");
+            if (!suggBody) return;
+            if (suggBody.style.display === "none") {
+              suggBody.style.display = "block";
+              toggleBoxBtn.textContent = "▲";
+              toggleBoxBtn.title = "Hide List";
+            } else {
+              suggBody.style.display = "none";
+              toggleBoxBtn.textContent = "▼";
+              toggleBoxBtn.title = "Show List";
+            }
+          });
+        }
+      });
 
       // =========================================================
       // DYNAMIC APPOINTMENT FETCHING LOGIC
       // =========================================================
-      document.addEventListener("DOMContentLoaded", fetchAppointments);
-
       async function fetchAppointments() {
         const apptList = document.getElementById("appointmentList");
         const noMsg = document.getElementById("noApptMsg");
+
+        if (!apptList) return;
 
         try {
           const response = await fetch("/api/patient/my-appointments");
@@ -1065,10 +1156,17 @@
             const appointments = result.appointments || [];
 
             if (appointments.length === 0) {
-              noMsg.textContent =
-                "You don't have any appointment requests at the moment.";
+              if (noMsg) {
+                noMsg.textContent =
+                  "You don't have any appointment requests at the moment.";
+                noMsg.style.display = "block";
+              }
+              apptList.innerHTML = "";
               return;
             }
+
+            // Hide "No appointments" message when cards are present
+            if (noMsg) noMsg.style.display = "none";
 
             apptList.innerHTML = "";
 
@@ -1090,34 +1188,40 @@
               } else if (currentStatus === "rejected") {
                 badgeClass = "badge-rejected";
                 statusText = "Rejected";
-                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--red);">This appointment could not be confirmed.</div>`;
+                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--red, #ef4444);">This appointment could not be confirmed.</div>`;
               } else {
-                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--text-muted);">Requested Date: ${appt.appointment_date || "N/A"}</div>`;
+                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--text-muted, #64748b);">Requested Date: ${appt.appointment_date || "N/A"}</div>`;
               }
 
               const card = document.createElement("div");
               card.className = "appt-card";
               card.innerHTML = `
-                      <div class="appt-info">
-                        <div class="appt-header">
-                          <h4>Consultation with ${appt.doctor_name || "Assigned Doctor"}</h4>
-                          ${deleteBtnHtml}
-                        </div>
-                        <p>Department: ${appt.specialty || "General"}</p>
-                        ${dateTimeHtml}
-                      </div>
-                      <div class="appt-status">
-                        <span class="badge ${badgeClass}">${statusText}</span>
-                      </div>
-                    `;
+            <div class="appt-info">
+              <div class="appt-header">
+                <h4>Consultation with ${appt.doctor_name || "Assigned Doctor"}</h4>
+                ${deleteBtnHtml}
+              </div>
+              <p>Department: ${appt.specialty || "General"}</p>
+              ${dateTimeHtml}
+            </div>
+            <div class="appt-status">
+              <span class="badge ${badgeClass}">${statusText}</span>
+            </div>
+          `;
               apptList.appendChild(card);
             });
           } else {
-            noMsg.textContent = result.message || "No appointments found.";
+            if (noMsg) {
+              noMsg.textContent = result.message || "No appointments found.";
+              noMsg.style.display = "block";
+            }
           }
         } catch (error) {
-          console.error("Error:", error);
-          noMsg.textContent = "You have no active appointments right now.";
+          console.error("Error fetching appointments:", error);
+          if (noMsg) {
+            noMsg.textContent = "You have no active appointments right now.";
+            noMsg.style.display = "block";
+          }
         }
       }
 
@@ -1128,34 +1232,9 @@
 
       function askHideAppointment(btnElement) {
         cardTargetToHide = btnElement.closest(".appt-card");
-        document.getElementById("confirmModal").classList.add("active");
+        const modal = document.getElementById("confirmModal");
+        if (modal) modal.classList.add("active");
       }
-
-      document
-        .getElementById("modalCancelBtn")
-        .addEventListener("click", () => {
-          document.getElementById("confirmModal").classList.remove("active");
-          cardTargetToHide = null;
-        });
-
-      document
-        .getElementById("modalConfirmBtn")
-        .addEventListener("click", () => {
-          if (cardTargetToHide) {
-            cardTargetToHide.remove();
-            showToast("Appointment hidden from list", "success");
-
-            const apptList = document.getElementById("appointmentList");
-            if (apptList.querySelectorAll(".appt-card").length === 0) {
-              apptList.innerHTML = `
-                  <p class="no-requests" style="color: var(--text-muted); font-size: 13px">
-                    You don't have any appointment requests at the moment.
-                  </p>`;
-            }
-          }
-          document.getElementById("confirmModal").classList.remove("active");
-          cardTargetToHide = null;
-        });
 
       // =========================================================
       // SYMPTOM SEARCH & DOCTORS DATA
@@ -1207,6 +1286,7 @@
         Urology: "Urologist",
         Oncology: "Oncologist",
       };
+
       const doctorsBySpecialty = {
         Cardiology: [
           {
@@ -1299,7 +1379,7 @@
         Urology: [
           {
             id: 27,
-            name: "Dr. Umar ",
+            name: "Dr. Umar",
             photo: "/static/imageM.png",
             online: true,
           },
@@ -1314,54 +1394,45 @@
         ],
       };
 
-      const suggestionBox = document.getElementById("suggestionBox");
-      const suggSpecName = document.getElementById("suggSpecName");
-      const suggDocList = document.getElementById("suggDoctorList");
-      const noMatchMsg = document.getElementById("noMatchMsg");
-      const suggBody = document.getElementById("suggBody");
-      const toggleBoxBtn = document.getElementById("toggleBoxBtn");
-
-      // Hide/Show Toggle logic for Doctor Box
-      toggleBoxBtn.addEventListener("click", () => {
-        if (suggBody.style.display === "none") {
-          suggBody.style.display = "block";
-          toggleBoxBtn.textContent = "▲";
-          toggleBoxBtn.title = "Hide List";
-        } else {
-          suggBody.style.display = "none";
-          toggleBoxBtn.textContent = "▼";
-          toggleBoxBtn.title = "Show List";
-        }
-      });
-
       function showSuggestion(specKey) {
+        const suggestionBox = document.getElementById("suggestionBox");
+        const suggSpecName = document.getElementById("suggSpecName");
+        const suggDocList = document.getElementById("suggDoctorList");
+        const noMatchMsg = document.getElementById("noMatchMsg");
+        const suggBody = document.getElementById("suggBody");
+        const toggleBoxBtn = document.getElementById("toggleBoxBtn");
+
+        if (!suggestionBox || !suggDocList) return;
+
         const doctors = doctorsBySpecialty[specKey] || [];
-        suggSpecName.textContent = specialtyLabels[specKey] || specKey;
+        if (suggSpecName)
+          suggSpecName.textContent = specialtyLabels[specKey] || specKey;
         suggDocList.innerHTML = "";
 
-        // Reset visibility state when selecting a specialty
-        suggBody.style.display = "block";
-        toggleBoxBtn.textContent = "▲";
+        if (suggBody) suggBody.style.display = "block";
+        if (toggleBoxBtn) toggleBoxBtn.textContent = "▲";
 
         if (doctors.length === 0) {
-          noMatchMsg.textContent =
-            "No doctors listed under this specialty yet.";
-          noMatchMsg.style.display = "block";
+          if (noMatchMsg) {
+            noMatchMsg.textContent =
+              "No doctors listed under this specialty yet.";
+            noMatchMsg.style.display = "block";
+          }
         } else {
-          noMatchMsg.style.display = "none";
+          if (noMatchMsg) noMatchMsg.style.display = "none";
           doctors.forEach((doc) => {
             const row = document.createElement("div");
             row.className = "doc-row";
             row.innerHTML = `
-                    <div class="doc-row-left">
-                      <img class="doc-avatar" src="${doc.photo}" alt="${doc.name}">
-                      <div>
-                        <div class="doc-name">${doc.name}</div>
-                        <div class="doc-status ${doc.online ? "online" : "offline"}">${doc.online ? "Available now" : "Offline"}</div>
-                      </div>
-                    </div>
-                    <a class="btn btn-teal btn-sm" href="/Book_appointment_p.html?doctor_id=${doc.id}&doctor_name=${encodeURIComponent(doc.name)}&uuid={{ patient_uuid }}">Book Appointment</a>
-                  `;
+          <div class="doc-row-left">
+            <img class="doc-avatar" src="${doc.photo}" alt="${doc.name}">
+            <div>
+              <div class="doc-name">${doc.name}</div>
+              <div class="doc-status ${doc.online ? "online" : "offline"}">${doc.online ? "Available now" : "Offline"}</div>
+            </div>
+          </div>
+          <a class="btn btn-teal btn-sm" href="/Book_appointment_p.html?doctor_id=${doc.id}&doctor_name=${encodeURIComponent(doc.name)}">Book Appointment</a>
+        `;
             suggDocList.appendChild(row);
           });
         }
@@ -1372,67 +1443,52 @@
         });
       }
 
-      document
-        .getElementById("symptomSearchBtn")
-        .addEventListener("click", () => {
-          const query = document
-            .getElementById("symptomInput")
-            .value.toLowerCase()
-            .trim();
-          let matchedSpec = null;
-          for (const key in symptomMap) {
-            if (query.includes(key)) {
-              matchedSpec = symptomMap[key];
-              break;
-            }
+      function handleSymptomSearch() {
+        const input = document.getElementById("symptomInput");
+        if (!input) return;
+        const query = input.value.toLowerCase().trim();
+
+        let matchedSpec = null;
+        for (const key in symptomMap) {
+          if (query.includes(key)) {
+            matchedSpec = symptomMap[key];
+            break;
           }
-          if (matchedSpec) {
-            showSuggestion(matchedSpec);
-          } else {
-            suggBody.style.display = "block";
-            toggleBoxBtn.textContent = "▲";
-            suggestionBox.classList.add("show");
-            suggSpecName.textContent = "—";
-            suggDocList.innerHTML = "";
+        }
+
+        if (matchedSpec) {
+          showSuggestion(matchedSpec);
+        } else {
+          const suggestionBox = document.getElementById("suggestionBox");
+          const suggBody = document.getElementById("suggBody");
+          const toggleBoxBtn = document.getElementById("toggleBoxBtn");
+          const suggSpecName = document.getElementById("suggSpecName");
+          const suggDocList = document.getElementById("suggDoctorList");
+          const noMatchMsg = document.getElementById("noMatchMsg");
+
+          if (suggBody) suggBody.style.display = "block";
+          if (toggleBoxBtn) toggleBoxBtn.textContent = "▲";
+          if (suggestionBox) suggestionBox.classList.add("show");
+          if (suggSpecName) suggSpecName.textContent = "—";
+          if (suggDocList) suggDocList.innerHTML = "";
+          if (noMatchMsg) {
             noMatchMsg.textContent =
               "No matching specialist found — try browsing by specialty below.";
             noMatchMsg.style.display = "block";
           }
-        });
-
-      document.querySelectorAll(".spec-tile").forEach((tile) => {
-        tile.addEventListener("click", () => showSuggestion(tile.dataset.spec));
-      });
+        }
+      }
 
       // Toast Notification
       function showToast(message, type) {
         const toast = document.getElementById("toast");
+        if (!toast) return;
         toast.textContent = message;
         toast.className = "toast show " + type;
         setTimeout(() => {
           toast.classList.remove("show");
         }, 2200);
       }
-
-      // Logout handler
-      document
-        .getElementById("logoutBtn")
-        .addEventListener("click", async (e) => {
-          e.preventDefault();
-          try {
-            await fetch("/logout");
-          } catch (err) {
-            console.log(err);
-          }
-
-          // Added: Fire the toast message
-          showToast("Logged out successfully!", "success");
-
-          // Added: Delay redirecting by 2 seconds so the pop-up has time to animate
-          setTimeout(() => {
-            window.location.href = "/patient_login.html";
-          }, 2000);
-        });
     </script>
     <!-- Google Translate API Script -->
     <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

@@ -1424,35 +1424,34 @@ async def reject_appointment(payload: RejectAppointmentSchema):
         print("Reject error:", e)
         raise HTTPException(status_code=500, detail="Database update failed.")
 
+
 @app.get("/api/patient/my-appointments")
 async def get_patient_appointments(request: Request):
     raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
     if not raw_p_id:
         return {"status": "error", "message": "Patient not logged in"}
     
-    # 'PT-' prefix remove karein taake DB integer se match ho jaye
-    patient_id = str(raw_p_id).replace("PT-", "").strip()
-    # patient_id = request.session.get("user_id") or request.session.get("patient_id")
-    
-    # if not patient_id:
-    #     return {"status": "error", "message": "Patient not logged in"}
+    p_id_str = str(raw_p_id).strip()
+    p_id_clean = p_id_str.replace("PT-", "").strip()
+    p_id_with_prefix = f"PT-{p_id_clean}"
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
+
     try:
-        # 1. AUTO-UPDATE (Automation): Guzri hui 'Confirmed/Approved' dates ko 'Completed' mark kar do
+        # 1. AUTO-UPDATE: Guzri dates ko completed mark karein
         update_query = """
-            UPDATE appointments 
-            SET status = 'Completed' 
-            WHERE appt_date < CURDATE() AND status IN ('Confirmed', 'Approved')
+            UPDATE appointments
+            SET status = 'Completed'
+            WHERE COALESCE(confirmed_date, appt_date) < CURDATE() 
+              AND status IN ('Confirmed', 'Approved')
         """
         cursor.execute(update_query)
         conn.commit()
 
-        # 2. FETCH APPOINTMENTS: Ab sirf wo lao jo Completed nahi hain (taaki portal par sirf kaam ki cheez aaye)
+        # 2. FETCH APPOINTMENTS: PT- prefix, Plain ID, aur NULL status handling
         select_query = """
-            SELECT 
+            SELECT
                 a.appointment_id,
                 a.patient_id,
                 a.status,
@@ -1464,42 +1463,111 @@ async def get_patient_appointments(request: Request):
                 d.specialization AS specialty
             FROM appointments a
             LEFT JOIN doctors d ON a.doctor_id = d.id
-            WHERE a.patient_id = %s AND a.status != 'Completed'
+            WHERE (a.patient_id = %s OR a.patient_id = %s OR a.patient_id = %s)
+              AND (a.status IS NULL OR a.status != 'Completed')
             ORDER BY a.appointment_id DESC
         """
-        cursor.execute(select_query, (patient_id,))
+        cursor.execute(select_query, (p_id_str, p_id_clean, p_id_with_prefix))
         rows = cursor.fetchall()
 
         formatted_appointments = []
         for row in rows:
             formatted_appointments.append({
-            "appointment_id": row.get("appointment_id"),
-            "patient_id": row.get("patient_id"),
-            "status": row.get("status") or "Pending",
-            "appointment_date": str(row.get("confirmed_date") or row.get("appt_date") or ""),
-            "confirmed_time": str(row.get("confirmed_time") or row.get("appt_time") or ""),
-            "doctor_name": row.get("doctor_name") or "Doctor",
-            "specialty": row.get("specialty") or "General"
-        })
-            # formatted_appointments.append({
-            #     "appointment_id": row.get("appointment_id"),
-            #     "patient_id": row.get("patient_id"),
-            #     "status": row.get("status") or "Pending",
-            #     "appointment_date": str(row.get("appt_date")) if row.get("appt_date") else "",
-            #     "confirmed_time": str(row.get("appt_time")) if row.get("appt_time") else "",
-            #     "doctor_name": row.get("doctor_name") or "Doctor",
-            #     "specialty": row.get("specialty") or "General"
-            # })
-        
+                "appointment_id": row.get("appointment_id"),
+                "patient_id": row.get("patient_id"),
+                "status": row.get("status") or "Pending",
+                "appointment_date": str(row.get("confirmed_date") or row.get("appt_date") or ""),
+                "confirmed_time": str(row.get("confirmed_time") or row.get("appt_time") or ""),
+                "doctor_name": row.get("doctor_name") or "Doctor",
+                "specialty": row.get("specialty") or "General"
+            })
+
         return {"status": "success", "appointments": formatted_appointments}
-        
+
     except Exception as e:
         print(f"❌ DATABASE ERROR: {e}")
         return {"status": "error", "message": str(e)}
-        
+
     finally:
         cursor.close()
-        conn.close()
+        conn.close()    
+
+# @app.get("/api/patient/my-appointments")
+# async def get_patient_appointments(request: Request):
+#     raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
+#     if not raw_p_id:
+#         return {"status": "error", "message": "Patient not logged in"}
+    
+#     # 'PT-' prefix remove karein taake DB integer se match ho jaye
+#     patient_id = str(raw_p_id).replace("PT-", "").strip()
+#     # patient_id = request.session.get("user_id") or request.session.get("patient_id")
+    
+#     # if not patient_id:
+#     #     return {"status": "error", "message": "Patient not logged in"}
+
+#     conn = get_db_connection()
+#     cursor = conn.cursor(dictionary=True)
+    
+#     try:
+#         # 1. AUTO-UPDATE (Automation): Guzri hui 'Confirmed/Approved' dates ko 'Completed' mark kar do
+#         update_query = """
+#             UPDATE appointments 
+#             SET status = 'Completed' 
+#             WHERE appt_date < CURDATE() AND status IN ('Confirmed', 'Approved')
+#         """
+#         cursor.execute(update_query)
+#         conn.commit()
+
+#         # 2. FETCH APPOINTMENTS: Ab sirf wo lao jo Completed nahi hain (taaki portal par sirf kaam ki cheez aaye)
+#         select_query = """
+#             SELECT 
+#                 a.appointment_id,
+#                 a.patient_id,
+#                 a.status,
+#                 a.appt_date,
+#                 a.appt_time,
+#                 a.confirmed_date,
+#                 a.confirmed_time,
+#                 d.full_name AS doctor_name,
+#                 d.specialization AS specialty
+#             FROM appointments a
+#             LEFT JOIN doctors d ON a.doctor_id = d.id
+#             WHERE a.patient_id = %s AND a.status != 'Completed'
+#             ORDER BY a.appointment_id DESC
+#         """
+#         cursor.execute(select_query, (patient_id,))
+#         rows = cursor.fetchall()
+
+#         formatted_appointments = []
+#         for row in rows:
+#             formatted_appointments.append({
+#             "appointment_id": row.get("appointment_id"),
+#             "patient_id": row.get("patient_id"),
+#             "status": row.get("status") or "Pending",
+#             "appointment_date": str(row.get("confirmed_date") or row.get("appt_date") or ""),
+#             "confirmed_time": str(row.get("confirmed_time") or row.get("appt_time") or ""),
+#             "doctor_name": row.get("doctor_name") or "Doctor",
+#             "specialty": row.get("specialty") or "General"
+#         })
+#             # formatted_appointments.append({
+#             #     "appointment_id": row.get("appointment_id"),
+#             #     "patient_id": row.get("patient_id"),
+#             #     "status": row.get("status") or "Pending",
+#             #     "appointment_date": str(row.get("appt_date")) if row.get("appt_date") else "",
+#             #     "confirmed_time": str(row.get("appt_time")) if row.get("appt_time") else "",
+#             #     "doctor_name": row.get("doctor_name") or "Doctor",
+#             #     "specialty": row.get("specialty") or "General"
+#             # })
+        
+#         return {"status": "success", "appointments": formatted_appointments}
+        
+#     except Exception as e:
+#         print(f"❌ DATABASE ERROR: {e}")
+#         return {"status": "error", "message": str(e)}
+        
+#     finally:
+#         cursor.close()
+#         conn.close()
 
 # 2. ADD THIS NEW ROUTE (To delete rejected appointments)
 @app.delete("/api/patient/appointments/{appointment_id}")
