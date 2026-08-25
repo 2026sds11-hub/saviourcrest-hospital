@@ -1380,12 +1380,13 @@ def get_pending_appointments(request: Request, doctor_id: int = None):
         cursor.close()
         conn.close()
 
+
 @app.post("/api/appointments/approve")
 async def approve_appointment(payload: ApproveAppointmentSchema):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        # FIX: Changed 'uuid = %s' to 'appointment_id = %s'
+        # FIX: 'WHERE uuid = %s' ko 'WHERE appointment_id = %s' se replace kiya
         query = """
             UPDATE appointments 
             SET status = 'Confirmed',
@@ -1401,6 +1402,7 @@ async def approve_appointment(payload: ApproveAppointmentSchema):
         print("Approve error:", e)
         raise HTTPException(status_code=500, detail="Database update failed.")
     finally:
+        # FIX: Connection leakage roki
         cursor.close()
         conn.close()
 
@@ -1410,6 +1412,7 @@ async def reject_appointment(payload: RejectAppointmentSchema):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
+        # FIX: 'appointment_id' properly match karna
         query = "UPDATE appointments SET status = 'Rejected' WHERE appointment_id = %s"
         cursor.execute(query, (payload.appointment_id,))
         conn.commit()
@@ -1419,8 +1422,9 @@ async def reject_appointment(payload: RejectAppointmentSchema):
         print("Reject error:", e)
         raise HTTPException(status_code=500, detail="Database update failed.")
     finally:
+        # FIX: Connection leakage roki
         cursor.close()
-        conn.close()        
+        conn.close()     
 
 # @app.post("/api/appointments/approve")
 # async def approve_appointment(payload: ApproveAppointmentSchema):
@@ -1470,6 +1474,10 @@ async def reject_appointment(payload: RejectAppointmentSchema):
 @app.get("/api/patient/my-appointments")
 async def get_patient_appointments(request: Request):
     raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
+    
+    # 🔴 DEBUG: Terminal par dekhein ke aakhir ID aa kya rahi hai
+    print(f"🚨 DEBUG - PATIENT SESSION ID: {raw_p_id}")
+
     if not raw_p_id:
         return {"status": "error", "message": "Patient not logged in"}
 
@@ -1481,7 +1489,6 @@ async def get_patient_appointments(request: Request):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # 1. AUTO-UPDATE: Guzri dates ko completed mark karein
         update_query = """
             UPDATE appointments
             SET status = 'Completed'
@@ -1491,7 +1498,7 @@ async def get_patient_appointments(request: Request):
         cursor.execute(update_query)
         conn.commit()
 
-        # 2. FETCH APPOINTMENTS
+        # 🔥 FIX: WHERE mein 'a.uuid = %s' bhi add kar diya hai
         select_query = """
             SELECT 
                 a.appointment_id,
@@ -1505,16 +1512,17 @@ async def get_patient_appointments(request: Request):
                 d.specialization AS specialty
             FROM appointments a
             LEFT JOIN doctors d ON a.doctor_id = d.id
-            WHERE (a.patient_id = %s OR a.patient_id = %s OR a.patient_id = %s)
-              AND (a.status IS NULL OR a.status != 'Completed')
+            WHERE (a.patient_id = %s OR a.patient_id = %s OR a.patient_id = %s OR a.uuid = %s)
             ORDER BY a.appointment_id DESC
         """
-        cursor.execute(select_query, (p_id_str, p_id_clean, p_id_with_prefix))
+        # Note: 4 dafa variables pass kiye hain kyunke query mein 4 '%s' hain
+        cursor.execute(select_query, (p_id_str, p_id_clean, p_id_with_prefix, p_id_str))
         rows = cursor.fetchall()
+        
+        print(f"🚨 DEBUG - ROWS FOUND IN DB: {len(rows)}") # Ye terminal me batayega kitni aayi
 
         formatted_appointments = []
         for row in rows:
-            # FIX: Safe extraction to prevent str(None) -> "None" issue
             raw_date = row.get("confirmed_date") or row.get("appt_date")
             raw_time = row.get("confirmed_time") or row.get("appt_time")
 
@@ -1536,8 +1544,7 @@ async def get_patient_appointments(request: Request):
 
     finally:
         cursor.close()
-        conn.close()   
-
+        conn.close()
 # @app.get("/api/patient/my-appointments")
 # async def get_patient_appointments(request: Request):
 #     raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
