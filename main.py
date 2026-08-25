@@ -847,16 +847,30 @@ def login_patient(request: Request, email: str = Form(...), password: str = Form
             return JSONResponse(status_code=401, content={"success": False, "message": "Invalid email or password."})
 
         # Session Save (Fixed: str format instead of int)
-        real_id = patient.get("patient_id") or patient.get("id")
-        request.session["patient_id"] = str(real_id)
+        # real_id = patient.get("patient_id") or patient.get("id")
+        # request.session["patient_id"] = str(real_id)
 
-        # Deterministic Hashed UUID
-        patient_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(real_id)))
+        # # Deterministic Hashed UUID
+        # patient_uuid = str(uuid.uuid5(uuid.NAMESPACE_DNS, str(real_id)))
+
+        # return JSONResponse(content={
+        #     "success": True,
+        #     "message": "Login successful!",
+        #     "redirect": f"/patient_portal?uuid={patient_uuid}"
+        # })
+
+        # Session Save (Dono keys set karein taaki kahin bhi mis match na ho)
+        real_id = patient.get("id") or patient.get("patient_id")
+        request.session["patient_id"] = str(real_id)
+        request.session["user_id"] = str(real_id)
+
+    # Database wala exact UUID use karein (agar DB mein column hai) aksar real_id hi kafi hota hai
+        db_uuid = patient.get("uuid") or str(real_id)
 
         return JSONResponse(content={
-            "success": True,
-            "message": "Login successful!",
-            "redirect": f"/patient_portal?uuid={patient_uuid}"
+        "success": True,
+        "message": "Login successful!",
+        "redirect": f"/patient_portal?uuid={db_uuid}&patient_id={real_id}"
         })
 
     except Exception as e:
@@ -1470,13 +1484,17 @@ async def reject_appointment(payload: RejectAppointmentSchema):
 #         print("Reject error:", e)
 #         raise HTTPException(status_code=500, detail="Database update failed.")
 
-
 @app.get("/api/patient/my-appointments")
-async def get_patient_appointments(request: Request):
-    raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
+async def get_patient_appointments(request: Request, patient_id: str = None, uuid: str = None):
+    # Session, Query Parameter, ya fallback se ID nikalein
+    raw_p_id = (
+        request.session.get("user_id") 
+        or request.session.get("patient_id") 
+        or patient_id 
+        or uuid
+    )
     
-    # 🔴 DEBUG: Terminal par dekhein ke aakhir ID aa kya rahi hai
-    print(f"🚨 DEBUG - PATIENT SESSION ID: {raw_p_id}")
+    print(f"🚨 DEBUG - PATIENT SESSION/QUERY ID: {raw_p_id}")
 
     if not raw_p_id:
         return {"status": "error", "message": "Patient not logged in"}
@@ -1489,6 +1507,7 @@ async def get_patient_appointments(request: Request):
     cursor = conn.cursor(dictionary=True)
 
     try:
+        # AUTO-UPDATE (Optional status update)
         update_query = """
             UPDATE appointments
             SET status = 'Completed'
@@ -1498,7 +1517,7 @@ async def get_patient_appointments(request: Request):
         cursor.execute(update_query)
         conn.commit()
 
-        # 🔥 FIX: WHERE mein 'a.uuid = %s' bhi add kar diya hai
+        # FETCH: Direct matching across patient_id and uuid columns
         select_query = """
             SELECT 
                 a.appointment_id,
@@ -1515,11 +1534,8 @@ async def get_patient_appointments(request: Request):
             WHERE (a.patient_id = %s OR a.patient_id = %s OR a.patient_id = %s OR a.uuid = %s)
             ORDER BY a.appointment_id DESC
         """
-        # Note: 4 dafa variables pass kiye hain kyunke query mein 4 '%s' hain
         cursor.execute(select_query, (p_id_str, p_id_clean, p_id_with_prefix, p_id_str))
         rows = cursor.fetchall()
-        
-        print(f"🚨 DEBUG - ROWS FOUND IN DB: {len(rows)}") # Ye terminal me batayega kitni aayi
 
         formatted_appointments = []
         for row in rows:
@@ -1545,6 +1561,7 @@ async def get_patient_appointments(request: Request):
     finally:
         cursor.close()
         conn.close()
+
 # @app.get("/api/patient/my-appointments")
 # async def get_patient_appointments(request: Request):
 #     raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
