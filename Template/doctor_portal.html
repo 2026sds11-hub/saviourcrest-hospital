@@ -858,7 +858,7 @@
           <input
             type="hidden"
             id="loggedDoctorPmdc"
-            value="{{ doctor.pmdc_id if doctor and 'pmdc_id' in doctor else (doctor.pmdc if doctor and 'pmdc' in doctor else '') }}"
+            value="{{ doctor.pmdc_id or doctor.pmdc or '' }}"
           />
           <h2>Fetch Patient Record</h2>
           <p class="sub">
@@ -879,15 +879,19 @@
           <form id="fetchPatientForm">
             <div id="searchBoxId">
               <div class="field">
-                <label>Patient ID</label>
-                <input type="text" id="fetchId" placeholder="e.g. 7" />
+                <label for="fetchId">Patient ID</label>
+                <input
+                  type="text"
+                  id="fetchId"
+                  placeholder="e.g. 7 or PT-10001"
+                />
               </div>
             </div>
 
             <div id="searchBoxNamePhone" style="display: none">
               <div class="field-row">
                 <div class="field">
-                  <label>Patient Name</label>
+                  <label for="fetchName">Patient Name</label>
                   <input
                     type="text"
                     id="fetchName"
@@ -895,7 +899,7 @@
                   />
                 </div>
                 <div class="field">
-                  <label>Phone Number</label>
+                  <label for="fetchPhone">Phone Number</label>
                   <input
                     type="tel"
                     id="fetchPhone"
@@ -906,7 +910,11 @@
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              style="margin-top: 15px"
+            >
               Fetch Patient Data
             </button>
           </form>
@@ -1255,9 +1263,15 @@
         container.innerHTML =
           "<p style='text-align:center; padding:10px;'>Loading history...</p>";
 
+        // Patient ID se dirty prefix (jaise PT- ya :1) saaf karein
+        const cleanId = String(patientId)
+          .split(":")[0]
+          .replace("PT-", "")
+          .trim();
+
         try {
           const response = await fetch(
-            `/api/doctor/patient-history/${patientId}`,
+            `/api/doctor/patient-history/${cleanId}`,
           );
           const result = await response.json();
 
@@ -1265,17 +1279,35 @@
 
           if (response.ok && result.history && result.history.length > 0) {
             result.history.forEach((item) => {
+              // Medicines formatting
+              let medsFormatted = "None";
+              if (Array.isArray(item.medicines) && item.medicines.length > 0) {
+                medsFormatted = item.medicines
+                  .map((m) =>
+                    typeof m === "object"
+                      ? `${m.medicine_name || m.name || ""} (${m.dosage || ""})`
+                      : m,
+                  )
+                  .join(", ");
+              } else if (item.meds) {
+                medsFormatted = item.meds;
+              }
+
+              const visitDate =
+                item.visit_date || item.created_at || item.date || "N/A";
+              const doctorName = item.doctor_name || item.dr || "Doctor";
+              const diagnosis = item.diagnosis_notes || item.diagnosis || "N/A";
+
               const card = document.createElement("div");
               card.className = "history-card";
               card.innerHTML = `
                 <div class="history-header">
-                    <span style="font-weight:600;">Visit on ${item.date}</span>
-                    <span class="history-meta">Prescribed by ${item.dr}</span>
+                    <span style="font-weight:600;">Visit on ${visitDate}</span>
+                    <span class="history-meta">Prescribed by ${doctorName}</span>
                 </div>
                 <div class="history-details">
-                    <div><strong>Diagnosis:</strong> ${item.diagnosis}</div>
-                    <div><strong>Medicines:</strong> ${item.meds}</div>
-                    <div><strong>Tests Recommended:</strong> ${item.tests}</div>
+                    <div><strong>Diagnosis:</strong> ${diagnosis}</div>
+                    <div><strong>Medicines:</strong> ${medsFormatted}</div>
                 </div>
               `;
               container.appendChild(card);
