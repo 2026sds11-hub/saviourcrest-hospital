@@ -902,7 +902,26 @@
           </div>
 
           <!-- MY APPOINTMENTS PANEL -->
+          <!-- MY APPOINTMENTS PANEL -->
           <div class="panel" id="my-appointments">
+            <h2>My Appointments Status</h2>
+            <p class="sub">
+              Track your latest requests and check the confirmed timings
+              provided by your doctor.
+            </p>
+
+            <!-- noApptMsg KO appointmentList KE BAAHAR RAKHEIN -->
+            <p
+              class="no-requests"
+              id="noApptMsg"
+              style="color: var(--text-muted); font-size: 13px"
+            >
+              Loading your appointments...
+            </p>
+
+            <div class="request-list" id="appointmentList"></div>
+          </div>
+          <!-- <div class="panel" id="my-appointments">
             <h2>My Appointments Status</h2>
             <p class="sub">
               Track your latest requests and check the confirmed timings
@@ -918,7 +937,7 @@
                 Loading your appointments...
               </p>
             </div>
-          </div>
+          </div> -->
 
           <!-- FIND & BOOK A DOCTOR PANEL -->
           <div class="panel" id="find-doctor">
@@ -1072,16 +1091,14 @@
               showToast("Appointment hidden from list", "success");
 
               const apptList = document.getElementById("appointmentList");
-              const noMsg = document.getElementById("noApptMsg");
               if (
                 apptList &&
                 apptList.querySelectorAll(".appt-card").length === 0
               ) {
-                if (noMsg) {
-                  noMsg.textContent =
-                    "You don't have any appointment requests at the moment.";
-                  noMsg.style.display = "block";
-                }
+                apptList.innerHTML = `
+              <p class="no-requests" id="noApptMsg" style="color: var(--text-muted, #64748b); font-size: 13px;">
+                You don't have any appointment requests at the moment.
+              </p>`;
               }
             }
             const confirmModal = document.getElementById("confirmModal");
@@ -1140,88 +1157,79 @@
       });
 
       // =========================================================
-      // DYNAMIC APPOINTMENT FETCHING LOGIC
+      // DYNAMIC APPOINTMENT FETCHING LOGIC (FIXED)
       // =========================================================
       async function fetchAppointments() {
         const apptList = document.getElementById("appointmentList");
-        const noMsg = document.getElementById("noApptMsg");
-
         if (!apptList) return;
 
         try {
           const response = await fetch("/api/patient/my-appointments");
-          const result = await response.json();
-
-          if (response.ok && (result.status === "success" || result.success)) {
-            const appointments = result.appointments || [];
-
-            if (appointments.length === 0) {
-              if (noMsg) {
-                noMsg.textContent =
-                  "You don't have any appointment requests at the moment.";
-                noMsg.style.display = "block";
-              }
-              apptList.innerHTML = "";
-              return;
-            }
-
-            // Hide "No appointments" message when cards are present
-            if (noMsg) noMsg.style.display = "none";
-
-            apptList.innerHTML = "";
-
-            appointments.forEach((appt) => {
-              let badgeClass = "badge-pending";
-              let statusText = "Pending";
-              let dateTimeHtml = "";
-
-              const deleteBtnHtml = `<button onclick="askHideAppointment(this)" class="btn-delete-appt" title="Hide appointment">&times;</button>`;
-              const currentStatus = (appt.status || "").toLowerCase();
-
-              if (
-                currentStatus === "approved" ||
-                currentStatus === "confirmed"
-              ) {
-                badgeClass = "badge-confirmed";
-                statusText = "Confirmed";
-                dateTimeHtml = `<div class="appt-datetime">📅 ${appt.appointment_date || ""} &nbsp;|&nbsp; ⏰ ${appt.confirmed_time || ""}</div>`;
-              } else if (currentStatus === "rejected") {
-                badgeClass = "badge-rejected";
-                statusText = "Rejected";
-                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--red, #ef4444);">This appointment could not be confirmed.</div>`;
-              } else {
-                dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--text-muted, #64748b);">Requested Date: ${appt.appointment_date || "N/A"}</div>`;
-              }
-
-              const card = document.createElement("div");
-              card.className = "appt-card";
-              card.innerHTML = `
-            <div class="appt-info">
-              <div class="appt-header">
-                <h4>Consultation with ${appt.doctor_name || "Assigned Doctor"}</h4>
-                ${deleteBtnHtml}
-              </div>
-              <p>Department: ${appt.specialty || "General"}</p>
-              ${dateTimeHtml}
-            </div>
-            <div class="appt-status">
-              <span class="badge ${badgeClass}">${statusText}</span>
-            </div>
-          `;
-              apptList.appendChild(card);
-            });
-          } else {
-            if (noMsg) {
-              noMsg.textContent = result.message || "No appointments found.";
-              noMsg.style.display = "block";
-            }
+          if (!response.ok) {
+            throw new Error(`Server returned ${response.status}`);
           }
+
+          const result = await response.json();
+          // Handle array or object responses flexibly
+          const appointments =
+            result.appointments ||
+            result.data ||
+            (Array.isArray(result) ? result : []);
+
+          if (appointments.length === 0) {
+            apptList.innerHTML = `
+          <p class="no-requests" id="noApptMsg" style="color: var(--text-muted, #64748b); font-size: 13px;">
+            You don't have any appointment requests at the moment.
+          </p>`;
+            return;
+          }
+
+          // Clear container before rendering cards
+          apptList.innerHTML = "";
+
+          appointments.forEach((appt) => {
+            let badgeClass = "badge-pending";
+            let statusText = "Pending";
+            let dateTimeHtml = "";
+
+            const deleteBtnHtml = `<button onclick="askHideAppointment(this)" class="btn-delete-appt" title="Hide appointment">&times;</button>`;
+            const currentStatus = (appt.status || "").toLowerCase();
+
+            if (currentStatus === "approved" || currentStatus === "confirmed") {
+              badgeClass = "badge-confirmed";
+              statusText = "Confirmed";
+              dateTimeHtml = `<div class="appt-datetime">📅 ${appt.appointment_date || ""} &nbsp;|&nbsp; ⏰ ${appt.confirmed_time || "N/A"}</div>`;
+            } else if (currentStatus === "rejected") {
+              badgeClass = "badge-rejected";
+              statusText = "Rejected";
+              dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--red, #ef4444);">This appointment could not be confirmed.</div>`;
+            } else {
+              dateTimeHtml = `<div style="font-size: 11.5px; margin-top: 4px; color: var(--text-muted, #64748b);">Requested Date: ${appt.appointment_date || "N/A"}</div>`;
+            }
+
+            const card = document.createElement("div");
+            card.className = "appt-card";
+            card.innerHTML = `
+          <div class="appt-info">
+            <div class="appt-header">
+              <h4>Consultation with ${appt.doctor_name || appt.doctor || "Assigned Doctor"}</h4>
+              ${deleteBtnHtml}
+            </div>
+            <p>Department: ${appt.specialty || appt.department || "General"}</p>
+            ${dateTimeHtml}
+          </div>
+          <div class="appt-status">
+            <span class="badge ${badgeClass}">${statusText}</span>
+          </div>
+        `;
+            apptList.appendChild(card);
+          });
         } catch (error) {
           console.error("Error fetching appointments:", error);
-          if (noMsg) {
-            noMsg.textContent = "You have no active appointments right now.";
-            noMsg.style.display = "block";
-          }
+          apptList.innerHTML = `
+        <p class="no-requests" id="noApptMsg" style="color: var(--text-muted, #64748b); font-size: 13px;">
+          You have no active appointments right now.
+        </p>`;
         }
       }
 

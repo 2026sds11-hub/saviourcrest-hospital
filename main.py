@@ -1382,47 +1382,89 @@ def get_pending_appointments(request: Request, doctor_id: int = None):
 
 @app.post("/api/appointments/approve")
 async def approve_appointment(payload: ApproveAppointmentSchema):
+    conn = get_db_connection()
+    cursor = conn.cursor()
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # 🔥 YAHAN CHANGE KIYA HAI: appt_date ki jagah confirmed_date likha hai
+        # FIX: Changed 'uuid = %s' to 'appointment_id = %s'
         query = """
             UPDATE appointments 
-            SET status = 'Confirmed', 
-                confirmed_date = %s, 
+            SET status = 'Confirmed',
+                confirmed_date = %s,
                 confirmed_time = %s 
-            WHERE uuid = %s
+            WHERE appointment_id = %s
         """
-               
         cursor.execute(query, (payload.confirmed_date, payload.confirmed_time, payload.appointment_id))
         conn.commit()
-        
-        cursor.close()
-        conn.close()
-        
+
         return {"status": "success", "message": "Appointment confirmed successfully!"}
     except Exception as e:
         print("Approve error:", e)
         raise HTTPException(status_code=500, detail="Database update failed.")
+    finally:
+        cursor.close()
+        conn.close()
+
 
 @app.post("/api/appointments/reject")
 async def reject_appointment(payload: RejectAppointmentSchema):
+    conn = get_db_connection()
+    cursor = conn.cursor()
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
         query = "UPDATE appointments SET status = 'Rejected' WHERE appointment_id = %s"
         cursor.execute(query, (payload.appointment_id,))
         conn.commit()
-        
-        cursor.close()
-        conn.close()
-        
+
         return {"status": "success", "message": "Appointment rejected successfully!"}
     except Exception as e:
         print("Reject error:", e)
         raise HTTPException(status_code=500, detail="Database update failed.")
+    finally:
+        cursor.close()
+        conn.close()        
+
+# @app.post("/api/appointments/approve")
+# async def approve_appointment(payload: ApproveAppointmentSchema):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+        
+#         # 🔥 YAHAN CHANGE KIYA HAI: appt_date ki jagah confirmed_date likha hai
+#         query = """
+#             UPDATE appointments 
+#             SET status = 'Confirmed', 
+#                 confirmed_date = %s, 
+#                 confirmed_time = %s 
+#             WHERE uuid = %s
+#         """
+               
+#         cursor.execute(query, (payload.confirmed_date, payload.confirmed_time, payload.appointment_id))
+#         conn.commit()
+        
+#         cursor.close()
+#         conn.close()
+        
+#         return {"status": "success", "message": "Appointment confirmed successfully!"}
+#     except Exception as e:
+#         print("Approve error:", e)
+#         raise HTTPException(status_code=500, detail="Database update failed.")
+
+# @app.post("/api/appointments/reject")
+# async def reject_appointment(payload: RejectAppointmentSchema):
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+        
+#         query = "UPDATE appointments SET status = 'Rejected' WHERE appointment_id = %s"
+#         cursor.execute(query, (payload.appointment_id,))
+#         conn.commit()
+        
+#         cursor.close()
+#         conn.close()
+        
+#         return {"status": "success", "message": "Appointment rejected successfully!"}
+#     except Exception as e:
+#         print("Reject error:", e)
+#         raise HTTPException(status_code=500, detail="Database update failed.")
 
 
 @app.get("/api/patient/my-appointments")
@@ -1430,7 +1472,7 @@ async def get_patient_appointments(request: Request):
     raw_p_id = request.session.get("user_id") or request.session.get("patient_id")
     if not raw_p_id:
         return {"status": "error", "message": "Patient not logged in"}
-    
+
     p_id_str = str(raw_p_id).strip()
     p_id_clean = p_id_str.replace("PT-", "").strip()
     p_id_with_prefix = f"PT-{p_id_clean}"
@@ -1443,15 +1485,15 @@ async def get_patient_appointments(request: Request):
         update_query = """
             UPDATE appointments
             SET status = 'Completed'
-            WHERE COALESCE(confirmed_date, appt_date) < CURDATE() 
+            WHERE COALESCE(confirmed_date, appt_date) < CURDATE()
               AND status IN ('Confirmed', 'Approved')
         """
         cursor.execute(update_query)
         conn.commit()
 
-        # 2. FETCH APPOINTMENTS: PT- prefix, Plain ID, aur NULL status handling
+        # 2. FETCH APPOINTMENTS
         select_query = """
-            SELECT
+            SELECT 
                 a.appointment_id,
                 a.patient_id,
                 a.status,
@@ -1472,12 +1514,16 @@ async def get_patient_appointments(request: Request):
 
         formatted_appointments = []
         for row in rows:
+            # FIX: Safe extraction to prevent str(None) -> "None" issue
+            raw_date = row.get("confirmed_date") or row.get("appt_date")
+            raw_time = row.get("confirmed_time") or row.get("appt_time")
+
             formatted_appointments.append({
                 "appointment_id": row.get("appointment_id"),
                 "patient_id": row.get("patient_id"),
                 "status": row.get("status") or "Pending",
-                "appointment_date": str(row.get("confirmed_date") or row.get("appt_date") or ""),
-                "confirmed_time": str(row.get("confirmed_time") or row.get("appt_time") or ""),
+                "appointment_date": str(raw_date) if raw_date is not None else "",
+                "confirmed_time": str(raw_time) if raw_time is not None else "",
                 "doctor_name": row.get("doctor_name") or "Doctor",
                 "specialty": row.get("specialty") or "General"
             })
@@ -1490,7 +1536,7 @@ async def get_patient_appointments(request: Request):
 
     finally:
         cursor.close()
-        conn.close()    
+        conn.close()   
 
 # @app.get("/api/patient/my-appointments")
 # async def get_patient_appointments(request: Request):
