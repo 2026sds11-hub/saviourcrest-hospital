@@ -965,7 +965,7 @@ def get_pending_appointments(request: Request, doctor_id: int = None):
         query = """
             SELECT 
                 a.appointment_id,
-                a.patient_id,
+                p.patient_id,               -- <--- FIX: a.patient_id ko p.patient_id kar diya
                 p.full_name,
                 a.appt_date AS appointment_date,
                 a.appt_time AS appointment_time,
@@ -1640,7 +1640,7 @@ class ApproveAppointmentRequest(BaseModel):
     appointment_id: int
     confirmed_date: Optional[str] = None
     confirmed_time: Optional[str] = None
-    
+
 @app.post("/api/appointments/approve")
 def approve_appointment_direct(payload: ApproveAppointmentRequest):
     conn = get_db_connection()
