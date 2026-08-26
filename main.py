@@ -57,6 +57,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 create_tables()
 
+#===========================================
+# sitemap
+#===========================================
+@app.get("/sitemap.xml")
+async def get_sitemap():
+    sitemap_path = os.path.join(os.path.dirname(__file__), "sitemap.xml")
+    return FileResponse(sitemap_path, media_type="application/xml")
+
+
 # ----------------------------------------------------------------
 # HOMEPAGE
 # ----------------------------------------------------------------
