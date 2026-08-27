@@ -75,11 +75,11 @@ async def get_sitemap():
 # HOMEPAGE
 # ----------------------------------------------------------------
 
-@app.get("/", methods=["GET", "HEAD"])
+@app.get("/")
 def home_redirect():
     return RedirectResponse(url="/main_page", status_code=302)
 
-@app.get("/main_page", response_class=HTMLResponse, methods=["GET","HEAD"])
+@app.get("/main_page", response_class=HTMLResponse)
 def read_main(request: Request):
     db = get_db_connection()
     db.close()
@@ -2740,3 +2740,7 @@ def serve_page(page_name: str, request: Request):
         return templates.TemplateResponse(page_name, {"request": request})
     except Exception:
         return JSONResponse(status_code=404, content={"detail": "Page not found"})
+#==========
+@app.api_route("/uptime", methods=["GET", "HEAD"])
+def uptime_check():
+    return {"status": "ok"}
