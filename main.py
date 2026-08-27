@@ -75,11 +75,11 @@ async def get_sitemap():
 # HOMEPAGE
 # ----------------------------------------------------------------
 
-@app.get("/")
+@app.get("/", methods=["GET", "HEAD"])
 def home_redirect():
     return RedirectResponse(url="/main_page", status_code=302)
 
-@app.get("/main_page", response_class=HTMLResponse)
+@app.get("/main_page", response_class=HTMLResponse, methods=["GET","HEAD"])
 def read_main(request: Request):
     db = get_db_connection()
     db.close()
