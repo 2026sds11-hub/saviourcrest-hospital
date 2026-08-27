@@ -59,10 +59,15 @@ create_tables()
 
 #===========================================
 # sitemap
-#===========================================
+#===========================================.
 @app.get("/sitemap.xml")
 async def get_sitemap():
-    sitemap_path = os.path.join(os.path.dirname(__file__), "sitemap.xml")
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sitemap_path = os.path.join(base_dir, "sitemap.xml")
+    
+    if not os.path.exists(sitemap_path):
+        raise HTTPException(status_code=404, detail="Sitemap file not found on server")
+        
     return FileResponse(sitemap_path, media_type="application/xml")
 
 
