@@ -2741,6 +2741,3 @@ def serve_page(page_name: str, request: Request):
     except Exception:
         return JSONResponse(status_code=404, content={"detail": "Page not found"})
 #==========
-@app.api_route("/uptime", methods=["GET", "HEAD"])
-def uptime_check():
-    return {"status": "ok"}
