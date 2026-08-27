@@ -42,6 +42,10 @@ templates = Jinja2Templates(directory="Template")
 
 app = FastAPI(title="Saviours Hospital")
 
+@app.route("/health", methods=["GET", "HEAD"])
+def health_check():
+    return {"status": "ok"}
+
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
