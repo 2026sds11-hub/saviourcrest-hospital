@@ -73,7 +73,11 @@ async def get_sitemap():
 # ----------------------------------------------------------------
 # HOMEPAGE
 # ----------------------------------------------------------------
-
+@app.get("/")
+async def uptime_check(response:Response):
+    response.status_code = 200
+    return response
+#===========================================
 @app.get("/")
 def home_redirect():
     return RedirectResponse(url="/main_page", status_code=302)
@@ -2739,4 +2743,4 @@ def serve_page(page_name: str, request: Request):
         return templates.TemplateResponse(page_name, {"request": request})
     except Exception:
         return JSONResponse(status_code=404, content={"detail": "Page not found"})
-#==========
+
