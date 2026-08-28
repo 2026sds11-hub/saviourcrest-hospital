@@ -73,7 +73,7 @@ async def get_sitemap():
 # ----------------------------------------------------------------
 # HOMEPAGE
 # ----------------------------------------------------------------
-@app.get("/")
+@app.head("/")
 async def uptime_check(response:Response):
     response.status_code = 200
     return response
