@@ -360,6 +360,10 @@
                 window.location.href = destination;
               }, 1200);
 
+            } else if (res.status === 429) {
+              // Rate limit error handle (5 requests per hour limit reached)
+              errorBox.textContent = "Access blocked! Too many attempts, please try again after 1 hour.";
+              errorBox.style.display = "block";
             } else {
               errorBox.textContent =
                 data.detail || "Invalid username or password.";
