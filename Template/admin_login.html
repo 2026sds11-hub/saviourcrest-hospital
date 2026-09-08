@@ -362,7 +362,7 @@
 
             } else if (res.status === 429) {
               // Rate limit error handle (5 requests per hour limit reached)
-              errorBox.textContent = "Access blocked! Too many attempts, please try again after 1 hour.";
+              errorBox.textContent = "⛔ ACCESS BLOCKED: Security protocol triggered due to 5 consecutive failed login attempts. System locked for 1 hour.";
               errorBox.style.display = "block";
             } else {
               errorBox.textContent =
