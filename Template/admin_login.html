@@ -150,6 +150,25 @@
         margin-bottom: 16px;
       }
 
+      /* High Security Critical Alert Styling */
+      .error-msg.security-blocked {
+        background: rgba(192, 57, 43, 0.15);
+        border: 1px solid #e74c3c;
+        color: #ffb3b3;
+        animation: threatPulse 1.6s infinite alternate;
+      }
+
+      @keyframes threatPulse {
+        0% {
+          box-shadow: 0 0 6px rgba(231, 76, 60, 0.3);
+          border-color: #c0392b;
+        }
+        100% {
+          box-shadow: 0 0 16px rgba(231, 76, 60, 0.75);
+          border-color: #ff4d4d;
+        }
+      }
+
       .success-msg {
         background: #122824;
         color: #9ce4dc;
@@ -327,6 +346,7 @@
           const successBox = document.getElementById("successMsg");
           
           errorBox.style.display = "none";
+          errorBox.classList.remove("security-blocked");
           successBox.style.display = "none";
 
           try {
@@ -362,7 +382,19 @@
 
             } else if (res.status === 429) {
               // Rate limit error handle (5 requests per hour limit reached)
-              errorBox.textContent = "⛔ ACCESS BLOCKED: Security protocol triggered due to 5 consecutive failed login attempts. System locked for 1 hour.";
+              errorBox.classList.add("security-blocked");
+              errorBox.innerHTML = `
+                <div style="font-weight: 700; color: #ff4d4d; letter-spacing: 0.5px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                  ⚠️ CRITICAL SECURITY ALERT
+                </div>
+                <div style="font-size: 12px; line-height: 1.4;">
+                  Access temporarily blocked due to <strong>5 consecutive unauthorized attempts</strong>.
+                </div>
+                <div style="font-size: 11px; color: #e4a79c; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(231, 76, 60, 0.3);">
+                  🔒 <strong>Lockout Window:</strong> 1 Hour<br>
+                  🛡️ <strong>Status:</strong> Security trace logged & System Admin notified.
+                </div>
+              `;
               errorBox.style.display = "block";
             } else {
               errorBox.textContent =
